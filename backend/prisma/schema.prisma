@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Puedes ajustar esto a mysql, sqlite, etc.
+  url      = env("DATABASE_URL")
+}
+
+model Persona {
+  rut                  String               @id @db.VarChar(9)
+  nombre               String               @db.VarChar(63)
+  contrasena           String               @db.VarChar(255)
+  rol                  String               @db.VarChar(15)
+
+  objetosEncargados    ObjetoPerdido[]
+  alertasAutor         AlertaBusqueda[]
+  ubicacionesEncargado UbicacionEncargado[]
+  marcadores           MarcadorEncargado[]
+  solicitudes          SolicitudDetalles[]
+  reuniones            Reunion[]
+  alertasLeidas        AlertaLeida[]
+}
+
+model EstadoObjeto {
+  id              Int             @id @default(autoincrement())
+  nombre          String          @db.VarChar(15)
+
+  objetosPerdidos ObjetoPerdido[]
+}
+
+model ObjetoPerdido {
+  id            Int          @id @default(autoincrement())
+  fecha_ingreso DateTime     @default(now())
+  nombre        String       @db.VarChar(31)
+  descripcion   String       @db.VarChar(255)
+
+  id_estado     Int
+  estado        EstadoObjeto @relation(fields: [id_estado], references: [id])
+
+  rut_encargado String
+  encargado     Persona      @relation(fields: [rut_encargado], references: [rut])
+
+  fotos         FotoObjeto[]
+  entregas      Entrega[]
+}
+
+model Foto {
+  id             Int             @id @default(autoincrement())
+  url            String          @db.VarChar(255)
+  fotosObjeto    FotoObjeto[]
+  fotosUbicacion FotoUbicacion[]
+  fotosAlerta    FotoAlerta[]
+}
+
+model FotoObjeto {
+  id_foto   Int
+  id_objeto Int
+  foto      Foto          @relation(fields: [id_foto], references: [id])
+  objeto    ObjetoPerdido @relation(fields: [id_objeto], references: [id])
+
+  @@id([id_foto, id_objeto])
+}
+
+model Ubicacion {
+  id          Int                  @id @default(autoincrement())
+  nombre      String               @db.VarChar(31)
+  descripcion String               @db.VarChar(255)
+  encargados  UbicacionEncargado[]
+  fotos       FotoUbicacion[]
+}
+
+model UbicacionEncargado {
+  id_encargado String
+  id_ubicacion Int
+  encargado    Persona   @relation(fields: [id_encargado], references: [rut])
+  ubicacion    Ubicacion @relation(fields: [id_ubicacion], references: [id])
+
+  @@id([id_encargado, id_ubicacion])
+}
+
+model FotoUbicacion {
+  id_foto      Int
+  id_ubicacion Int
+  foto         Foto      @relation(fields: [id_foto], references: [id])
+  ubicacion    Ubicacion @relation(fields: [id_ubicacion], references: [id])
+
+  @@id([id_foto, id_ubicacion])
+}
+
+model EstadoAlerta {
+  id      Int              @id @default(autoincrement())
+  nombre  String           @db.VarChar(15)
+  alertas AlertaBusqueda[]
+}
+
+model AlertaBusqueda {
+  id             Int                 @id @default(autoincrement())
+  fecha_creacion DateTime            @default(now())
+  fecha_edicion  DateTime            @updatedAt
+  descripcion    String              @db.VarChar(255)
+
+  id_estado      Int
+  estado         EstadoAlerta        @relation(fields: [id_estado], references: [id])
+  
+  rut_autor      String
+  autor          Persona             @relation(fields: [rut_autor], references: [rut])
+
+  marcadores     MarcadorEncargado[]
+  fotos          FotoAlerta[]
+  cierres        CierreAlerta[]
+  solicitudes    SolicitudDetalles[]
+  reuniones      Reunion[]
+  lecturas       AlertaLeida[]
+}
+
+model MarcadorEncargado {
+  id_alerta     Int
+  rut_encargado String
+  alerta        AlertaBusqueda @relation(fields: [id_alerta], references: [id])
+  encargado     Persona        @relation(fields: [rut_encargado], references: [rut])
+
+  @@id([id_alerta, rut_encargado])
+}
+
+model Entrega {
+  id                 Int            @id @default(autoincrement())
+  fecha_entrega      DateTime       @default(now())
+  rut_reclamante     String         @db.VarChar(9)
+  nombre_reclamante  String         @db.VarChar(63)
+
+  id_objeto          Int
+  objeto             ObjetoPerdido  @relation(fields: [id_objeto], references: [id])
+
+  cierresAlerta      CierreAlerta[]
+}
+
+model FotoAlerta {
+  id_foto   Int
+  id_alerta Int
+  foto      Foto           @relation(fields: [id_foto], references: [id])
+  alerta    AlertaBusqueda @relation(fields: [id_alerta], references: [id])
+
+  @@id([id_foto, id_alerta])
+}
+
+model CierreAlerta {
+  id_alerta  Int
+  id_entrega Int
+  alerta     AlertaBusqueda @relation(fields: [id_alerta], references: [id])
+  entrega    Entrega        @relation(fields: [id_entrega], references: [id])
+
+  @@id([id_alerta, id_entrega])
+}
+
+model SolicitudDetalles {
+  id             Int            @id @default(autoincrement())
+  fecha_creacion DateTime       @default(now())
+  indicaciones   String         @db.VarChar(255)
+  id_alerta      Int
+  alerta         AlertaBusqueda @relation(fields: [id_alerta], references: [id])
+  rut_encargado  String
+  encargado      Persona        @relation(fields: [rut_encargado], references: [rut])
+}
+
+model Reunion {
+  id             Int            @id @default(autoincrement())
+  fecha_creacion DateTime       @default(now())
+  indicaciones   String         @db.VarChar(255)
+
+  id_alerta      Int
+  alerta         AlertaBusqueda @relation(fields: [id_alerta], references: [id])
+
+  rut_encargado  String
+  encargado      Persona        @relation(fields: [rut_encargado], references: [rut])
+}
+
+model AlertaLeida {
+  id_alerta     Int
+  rut_encargado String
+  alerta        AlertaBusqueda @relation(fields: [id_alerta], references: [id])
+  encargado     Persona        @relation(fields: [rut_encargado], references: [rut])
+
+  @@id([id_alerta, rut_encargado])
+}
