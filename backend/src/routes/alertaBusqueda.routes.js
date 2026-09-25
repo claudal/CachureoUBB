@@ -5,6 +5,6 @@ import { filtroAlertaBusquedaSchema } from "../schemas/alertaBusqueda.schema.js"
 
 const router = Router();
 
-router.get('/',validate(filtroAlertaBusquedaSchema, 'query'), getAlertasBusqueda);
+router.get('/',validate(filtroAlertaBusquedaSchema, 'query', 'vQuery'), getAlertasBusqueda);
 
 export default router;
