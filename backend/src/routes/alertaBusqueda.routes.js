@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { getAlertasBusqueda } from "../controllers/alertaBusqueda.controller.js";
-import { validate } from "../middlewares/validador.middleware.js";
+import { validate } from "../middlewares/validate.middleware.js";
 import { filtroAlertaBusquedaSchema } from "../schemas/alertaBusqueda.schema.js";
 
 const router = Router();
