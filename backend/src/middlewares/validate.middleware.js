@@ -1,3 +1,10 @@
+/**
+ * 
+ * @param {import("zod").ZodObject} schema 
+ * @param {'body'|'query'|'params'} [target='body'] 
+ * @param {string} [targetResult=target] 
+ * @returns 
+ */
 export const validate = (schema, target = 'body', targetResult = target) => {
   return (req, res, next) => {
     const result = schema.safeParse(req[target]);
