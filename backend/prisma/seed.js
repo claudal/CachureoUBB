@@ -12,28 +12,42 @@ async function main() {
   await prisma.rolPersona.deleteMany();
 
   console.log('=> Creando estados de alerta');
-  const nombresEstadoAlerta = ['Abierto', 'Cerrado', 'Rectificado'];
-  const estadosAlerta = await Promise.all(
-    nombresEstadoAlerta.map((nombre) =>
-      prisma.estadoAlerta.create({
+  const estadosAlerta = {
+    abierto: await prisma.estadoAlerta.create({
         data: {
-          nombre
+          id: 1,
+          nombre: "Abierto"
+        },
+      }),
+    cerrado: await prisma.estadoAlerta.create({
+        data: {
+          id: 2,
+          nombre: "Cerrado"
+        },
+      }),
+    rectificado: await prisma.estadoAlerta.create({
+        data: {
+          id: 3,
+          nombre: "Rectificado"
         },
       })
-    )
-  );
+  }
 
   console.log('=> Creando roles de personas');
-  const nombresRolesPersonas = ['Encargado de Objetos', 'Usuario'];
-  const rolesPersonas = await Promise.all(
-    nombresRolesPersonas.map((nombre) =>
-      prisma.rolPersona.create({
+  const rolesPersonas = {
+    usuario: await prisma.rolPersona.create({
         data: {
-          nombre
+          id: 1,
+          nombre: "Usuario"
+        },
+      }),
+    encargado: await prisma.rolPersona.create({
+        data: {
+          id: 2,
+          nombre: "Encargado de objetos"
         },
       })
-    )
-  );
+  }
 
   console.log('--- Seed base completado :V ---');
 
@@ -49,7 +63,7 @@ async function main() {
           rut,
           nombre: faker.person.fullName(),
           contrasena: "admin",
-          id_rol: rolesPersonas[0].id
+          id_rol: rolesPersonas.encargado.id
         },
       })
     )
@@ -64,7 +78,7 @@ async function main() {
           rut,
           nombre: faker.person.fullName(),
           contrasena: "admin",
-          id_rol: rolesPersonas[1].id
+          id_rol: rolesPersonas.usuario.id
         },
       })
     )
@@ -79,7 +93,7 @@ async function main() {
           rut_autor: usuario.rut,
           fecha_creacion: faker.date.recent({days:{min:0,max:255}}),
           descripcion: faker.lorem.sentences(2),
-          id_estado: estadosAlerta[0].id
+          id_estado: estadosAlerta.abierto.id
         },
       });
     }
