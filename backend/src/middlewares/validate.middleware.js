@@ -14,7 +14,12 @@ export const validate = (schema, target = 'body') => {
       });
     }
 
-    req[target] = result.data;
+    if (target === 'query') {
+      Object.keys(req.query).forEach((key) => delete req.query[key]);
+      Object.assign(req.query, result.data);
+    } else {
+      req[target] = result.data;
+    }
     next();
   };
 };
