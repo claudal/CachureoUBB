@@ -20,7 +20,7 @@ model Persona {
   contrasena           String               @db.VarChar(255)
 
   id_rol               Int
-  rol                  RolPersona @relation(fields: [id_rol], references: [id])
+  rol                  RolPersona @relation(onDelete: Restrict, fields: [id_rol], references: [id])
 
   objetosEncargados    ObjetoPerdido[]
   alertasAutor         AlertaBusqueda[]
@@ -45,10 +45,10 @@ model ObjetoPerdido {
   descripcion   String       @db.VarChar(255)
 
   id_estado     Int
-  estado        EstadoObjeto @relation(fields: [id_estado], references: [id])
+  estado        EstadoObjeto @relation(onDelete: Restrict, fields: [id_estado], references: [id])
 
   rut_encargado String
-  encargado     Persona      @relation(fields: [rut_encargado], references: [rut])
+  encargado     Persona      @relation(onDelete: Restrict, fields: [rut_encargado], references: [rut])
 
   fotos         FotoObjeto[]
   entregas      Entrega[]
@@ -65,8 +65,8 @@ model Foto {
 model FotoObjeto {
   id_foto   Int
   id_objeto Int
-  foto      Foto          @relation(fields: [id_foto], references: [id])
-  objeto    ObjetoPerdido @relation(fields: [id_objeto], references: [id])
+  foto      Foto          @relation(onDelete: Restrict, fields: [id_foto], references: [id])
+  objeto    ObjetoPerdido @relation(onDelete: Restrict, fields: [id_objeto], references: [id])
 
   @@id([id_foto, id_objeto])
 }
@@ -82,8 +82,8 @@ model Ubicacion {
 model UbicacionEncargado {
   id_encargado String
   id_ubicacion Int
-  encargado    Persona   @relation(fields: [id_encargado], references: [rut])
-  ubicacion    Ubicacion @relation(fields: [id_ubicacion], references: [id])
+  encargado    Persona   @relation(onDelete: Restrict, fields: [id_encargado], references: [rut])
+  ubicacion    Ubicacion @relation(onDelete: Restrict, fields: [id_ubicacion], references: [id])
 
   @@id([id_encargado, id_ubicacion])
 }
@@ -91,8 +91,8 @@ model UbicacionEncargado {
 model FotoUbicacion {
   id_foto      Int
   id_ubicacion Int
-  foto         Foto      @relation(fields: [id_foto], references: [id])
-  ubicacion    Ubicacion @relation(fields: [id_ubicacion], references: [id])
+  foto         Foto      @relation(onDelete: Restrict, fields: [id_foto], references: [id])
+  ubicacion    Ubicacion @relation(onDelete: Restrict, fields: [id_ubicacion], references: [id])
 
   @@id([id_foto, id_ubicacion])
 }
@@ -110,10 +110,10 @@ model AlertaBusqueda {
   descripcion    String              @db.VarChar(255)
 
   id_estado      Int
-  estado         EstadoAlerta        @relation(fields: [id_estado], references: [id])
+  estado         EstadoAlerta        @relation(onDelete: Restrict, fields: [id_estado], references: [id])
   
   rut_autor      String
-  autor          Persona             @relation(fields: [rut_autor], references: [rut])
+  autor          Persona             @relation(onDelete: Restrict, fields: [rut_autor], references: [rut])
 
   marcadores     MarcadorEncargado[]
   fotos          FotoAlerta[]
@@ -126,8 +126,8 @@ model AlertaBusqueda {
 model MarcadorEncargado {
   id_alerta     Int
   rut_encargado String
-  alerta        AlertaBusqueda @relation(fields: [id_alerta], references: [id])
-  encargado     Persona        @relation(fields: [rut_encargado], references: [rut])
+  alerta        AlertaBusqueda @relation(onDelete: Restrict, fields: [id_alerta], references: [id])
+  encargado     Persona        @relation(onDelete: Restrict, fields: [rut_encargado], references: [rut])
 
   @@id([id_alerta, rut_encargado])
 }
@@ -139,7 +139,7 @@ model Entrega {
   nombre_reclamante  String         @db.VarChar(63)
 
   id_objeto          Int
-  objeto             ObjetoPerdido  @relation(fields: [id_objeto], references: [id])
+  objeto             ObjetoPerdido  @relation(onDelete: Restrict, fields: [id_objeto], references: [id])
 
   cierresAlerta      CierreAlerta[]
 }
@@ -147,8 +147,8 @@ model Entrega {
 model FotoAlerta {
   id_foto   Int
   id_alerta Int
-  foto      Foto           @relation(fields: [id_foto], references: [id])
-  alerta    AlertaBusqueda @relation(fields: [id_alerta], references: [id])
+  foto      Foto           @relation(onDelete: Restrict, fields: [id_foto], references: [id])
+  alerta    AlertaBusqueda @relation(onDelete: Restrict, fields: [id_alerta], references: [id])
 
   @@id([id_foto, id_alerta])
 }
@@ -156,8 +156,8 @@ model FotoAlerta {
 model CierreAlerta {
   id_alerta  Int
   id_entrega Int
-  alerta     AlertaBusqueda @relation(fields: [id_alerta], references: [id])
-  entrega    Entrega        @relation(fields: [id_entrega], references: [id])
+  alerta     AlertaBusqueda @relation(onDelete: Restrict, fields: [id_alerta], references: [id])
+  entrega    Entrega        @relation(onDelete: Restrict, fields: [id_entrega], references: [id])
 
   @@id([id_alerta, id_entrega])
 }
@@ -167,9 +167,9 @@ model SolicitudDetalles {
   fecha_creacion DateTime       @default(now())
   indicaciones   String         @db.VarChar(255)
   id_alerta      Int
-  alerta         AlertaBusqueda @relation(fields: [id_alerta], references: [id])
+  alerta         AlertaBusqueda @relation(onDelete: Restrict, fields: [id_alerta], references: [id])
   rut_encargado  String
-  encargado      Persona        @relation(fields: [rut_encargado], references: [rut])
+  encargado      Persona        @relation(onDelete: Restrict, fields: [rut_encargado], references: [rut])
 }
 
 model Reunion {
@@ -178,17 +178,17 @@ model Reunion {
   indicaciones   String         @db.VarChar(255)
 
   id_alerta      Int
-  alerta         AlertaBusqueda @relation(fields: [id_alerta], references: [id])
+  alerta         AlertaBusqueda @relation(onDelete: Restrict, fields: [id_alerta], references: [id])
 
   rut_encargado  String
-  encargado      Persona        @relation(fields: [rut_encargado], references: [rut])
+  encargado      Persona        @relation(onDelete: Restrict, fields: [rut_encargado], references: [rut])
 }
 
 model AlertaLeida {
   id_alerta     Int
   rut_encargado String
-  alerta        AlertaBusqueda @relation(fields: [id_alerta], references: [id])
-  encargado     Persona        @relation(fields: [rut_encargado], references: [rut])
+  alerta        AlertaBusqueda @relation(onDelete: Restrict, fields: [id_alerta], references: [id])
+  encargado     Persona        @relation(onDelete: Restrict, fields: [rut_encargado], references: [rut])
 
   @@id([id_alerta, rut_encargado])
 }
