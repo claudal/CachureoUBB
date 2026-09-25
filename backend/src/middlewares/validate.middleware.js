@@ -1,4 +1,4 @@
-export const validate = (schema, target = 'body') => {
+export const validate = (schema, target = 'body', targetResult = target) => {
   return (req, res, next) => {
     const result = schema.safeParse(req[target]);
 
@@ -13,13 +13,8 @@ export const validate = (schema, target = 'body') => {
         detalles: errors,
       });
     }
-
-    if (target === 'query') {
-      Object.keys(req.query).forEach((key) => delete req.query[key]);
-      Object.assign(req.query, result.data);
-    } else {
-      req[target] = result.data;
-    }
+    
+    req[targetResult] = result.data;
     next();
   };
 };
