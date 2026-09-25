@@ -126,8 +126,8 @@ model AlertaBusqueda {
 model MarcadorEncargado {
   id_alerta     Int
   rut_encargado String
-  alerta        AlertaBusqueda @relation(onDelete: Restrict, fields: [id_alerta], references: [id])
-  encargado     Persona        @relation(onDelete: Restrict, fields: [rut_encargado], references: [rut])
+  alerta        AlertaBusqueda @relation(onDelete: Cascade, fields: [id_alerta], references: [id])
+  encargado     Persona        @relation(onDelete: Cascade, fields: [rut_encargado], references: [rut])
 
   @@id([id_alerta, rut_encargado])
 }
@@ -147,8 +147,8 @@ model Entrega {
 model FotoAlerta {
   id_foto   Int
   id_alerta Int
-  foto      Foto           @relation(onDelete: Restrict, fields: [id_foto], references: [id])
-  alerta    AlertaBusqueda @relation(onDelete: Restrict, fields: [id_alerta], references: [id])
+  foto      Foto           @relation(onDelete: Cascade, fields: [id_foto], references: [id])
+  alerta    AlertaBusqueda @relation(onDelete: Cascade, fields: [id_alerta], references: [id])
 
   @@id([id_foto, id_alerta])
 }
@@ -156,8 +156,8 @@ model FotoAlerta {
 model CierreAlerta {
   id_alerta  Int
   id_entrega Int
-  alerta     AlertaBusqueda @relation(onDelete: Restrict, fields: [id_alerta], references: [id])
-  entrega    Entrega        @relation(onDelete: Restrict, fields: [id_entrega], references: [id])
+  alerta     AlertaBusqueda @relation(onDelete: Cascade, fields: [id_alerta], references: [id])
+  entrega    Entrega        @relation(onDelete: Cascade, fields: [id_entrega], references: [id])
 
   @@id([id_alerta, id_entrega])
 }
@@ -167,9 +167,9 @@ model SolicitudDetalles {
   fecha_creacion DateTime       @default(now())
   indicaciones   String         @db.VarChar(255)
   id_alerta      Int
-  alerta         AlertaBusqueda @relation(onDelete: Restrict, fields: [id_alerta], references: [id])
+  alerta         AlertaBusqueda @relation(onDelete: Cascade, fields: [id_alerta], references: [id])
   rut_encargado  String
-  encargado      Persona        @relation(onDelete: Restrict, fields: [rut_encargado], references: [rut])
+  encargado      Persona        @relation(onDelete: Cascade, fields: [rut_encargado], references: [rut])
 }
 
 model Reunion {
@@ -178,17 +178,17 @@ model Reunion {
   indicaciones   String         @db.VarChar(255)
 
   id_alerta      Int
-  alerta         AlertaBusqueda @relation(onDelete: Restrict, fields: [id_alerta], references: [id])
+  alerta         AlertaBusqueda @relation(onDelete: Cascade, fields: [id_alerta], references: [id])
 
   rut_encargado  String
-  encargado      Persona        @relation(onDelete: Restrict, fields: [rut_encargado], references: [rut])
+  encargado      Persona        @relation(onDelete: Cascade, fields: [rut_encargado], references: [rut])
 }
 
 model AlertaLeida {
   id_alerta     Int
   rut_encargado String
-  alerta        AlertaBusqueda @relation(onDelete: Restrict, fields: [id_alerta], references: [id])
-  encargado     Persona        @relation(onDelete: Restrict, fields: [rut_encargado], references: [rut])
+  alerta        AlertaBusqueda @relation(onDelete: Cascade, fields: [id_alerta], references: [id])
+  encargado     Persona        @relation(onDelete: Cascade, fields: [rut_encargado], references: [rut])
 
   @@id([id_alerta, rut_encargado])
 }
