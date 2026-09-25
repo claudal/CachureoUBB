@@ -15,5 +15,6 @@ export const updateAnimalSchema = createAnimalSchema.partial();*/
 
 export const filtroAlertaBusquedaSchema = z.object({
   id_estado: z.string().regex(/^\d+$/).transform(Number).optional(),
-  rut_autor: z.string().refine((rut) => rutjs.validate(rut),{error: "El rut del autor debe ser válido"}).optional()
+  rut_autor: z.string().refine((rut) => rutjs.validate(rut),{error: "El rut del autor debe ser válido"}).optional(),
+  rut_marcador: z.string().refine((rut) => rutjs.validate(rut),{error: "El rut del encargado en el marcador debe ser válido"}).optional()
 });
