@@ -17,5 +17,5 @@ export const filtroAlertaBusquedaSchema = z.object({
   id_estado: z.string().regex(/^\d+$/).transform(Number).optional(),
   rut_autor: z.string().refine((rut) => rutjs.validate(rut),{error: "El rut del autor debe ser válido"}).optional(),
   rut_encargado: z.string().refine((rut) => rutjs.validate(rut),{error: "El rut del encargado a aplicar debe ser válido"}).optional(),
-  marcado: z.string().transform(Boolean).optional()
+  marcado: z.enum(['true','false'],{error: "El valor del parámetro debe ser booleano"}).transform((valor) => valor === 'true').optional()
 });
