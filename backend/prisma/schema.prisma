@@ -7,11 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model RolPersona {
+  id              Int             @id @default(autoincrement())
+  nombre          String          @db.VarChar(31)
+
+  personas    Persona[]
+}
+
 model Persona {
   rut                  String               @id @db.VarChar(9)
   nombre               String               @db.VarChar(63)
   contrasena           String               @db.VarChar(255)
-  rol                  String               @db.VarChar(15)
+
+  id_rol               Int
+  rol                  RolPersona @relation(fields: [id_rol], references: [id])
 
   objetosEncargados    ObjetoPerdido[]
   alertasAutor         AlertaBusqueda[]
