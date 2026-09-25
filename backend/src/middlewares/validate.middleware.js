@@ -3,7 +3,7 @@
  * @param {import("zod").ZodObject} schema 
  * @param {'body'|'query'|'params'} [target='body'] 
  * @param {string} [targetResult=target] 
- * @returns 
+ * @returns {import("express").RequestHandler}
  */
 export const validate = (schema, target = 'body', targetResult = target) => {
   return (req, res, next) => {
