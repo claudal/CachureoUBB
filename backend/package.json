@@ -2,6 +2,14 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
+  "homepage": "https://github.com/claudal/CachureoUBB#readme",
+  "bugs": {
+    "url": "https://github.com/claudal/CachureoUBB/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/claudal/CachureoUBB.git"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
