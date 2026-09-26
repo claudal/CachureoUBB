@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker'; // datos de prueba
-import * as rutjs from "rut.js"
+import * as rutjs from "rut.js";
+import { hashSync } from "bcrypt"; // crear contraseñas de prueba
+import { BCRYPT_SALT_ROUNDS } from '../src/config/auth.js';
 
 const prisma = new PrismaClient();
 
@@ -55,6 +57,8 @@ async function main() {
   if(process.env.NODE_ENV !== 'development')
     return;
 
+  const contrasena = "123456";
+
   console.log('=> Creando encargados');
   const rutEncargados = ['20000000', '20000001', '20000002']; // sin código verificador 
   const encargados = await Promise.all(
@@ -63,7 +67,7 @@ async function main() {
         data: {
           rut: rut.concat(rutjs.getCheckDigit(rut)),
           nombre: faker.person.fullName(),
-          contrasena: "admin",
+          contrasena: hashSync(contrasena,BCRYPT_SALT_ROUNDS),
           id_rol: rolesPersonas.encargado.id
         },
       })
@@ -78,7 +82,7 @@ async function main() {
         data: {
           rut: rut.concat(rutjs.getCheckDigit(rut)),
           nombre: faker.person.fullName(),
-          contrasena: "admin",
+          contrasena: hashSync(contrasena,BCRYPT_SALT_ROUNDS),
           id_rol: rolesPersonas.usuario.id
         },
       })
