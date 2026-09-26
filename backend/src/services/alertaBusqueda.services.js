@@ -31,3 +31,12 @@ export async function listar(filtros = {},usuario = undefined){
         }
     });
 }
+
+/**
+ * 
+ * @param {import("@prisma/client").AlertaBusqueda.id_alerta} id_alerta
+ * @returns 
+ */
+export function buscarPorId(id_alerta){
+    return prisma.alertaBusqueda.findUnique({where:{id: id_alerta}});
+}

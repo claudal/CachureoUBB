@@ -18,3 +18,7 @@ export const filtroAlertaBusquedaSchema = z.object({
   rut_autor: z.string().refine((rut) => rutjs.validate(rut),{error: "El rut del autor debe ser válido"}).optional(),
   marcado: z.enum(['true','false'],{error: "El valor del parámetro debe ser booleano"}).transform((valor) => valor === 'true').optional()
 });
+
+export const parametroAlertaBusquedaSchema = z.object({
+  id: z.string().regex(/^\d+$/).transform(Number)
+})
