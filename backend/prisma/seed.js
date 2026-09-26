@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker'; // datos de prueba
+import * as rutjs from "rut.js"
 
 const prisma = new PrismaClient();
 
@@ -55,12 +56,12 @@ async function main() {
     return;
 
   console.log('=> Creando encargados');
-  const rutEncargados = ["123456789", '999999999', '000000000']; //TODO: poner rut válidos de prueba
+  const rutEncargados = ['20000000', '20000001', '20000002']; // sin código verificador 
   const encargados = await Promise.all(
     rutEncargados.map((rut) =>
       prisma.persona.create({
         data: {
-          rut,
+          rut: rut.concat(rutjs.getCheckDigit(rut)),
           nombre: faker.person.fullName(),
           contrasena: "admin",
           id_rol: rolesPersonas.encargado.id
@@ -70,12 +71,12 @@ async function main() {
   );
 
   console.log('=> Creando usuarios');
-  const rutUsuarios = ["123456788", '999999998', '000000008']; //TODO: poner rut válidos de prueba
+  const rutUsuarios = ['21000000', '21000001', '21000002', '21000003', '21000004', '21000005', '21000006', '21000007', '21000008']; //TODO: poner rut válidos de prueba
   const usuarios = await Promise.all(
     rutUsuarios.map((rut) =>
       prisma.persona.create({
         data: {
-          rut,
+          rut: rut.concat(rutjs.getCheckDigit(rut)),
           nombre: faker.person.fullName(),
           contrasena: "admin",
           id_rol: rolesPersonas.usuario.id
