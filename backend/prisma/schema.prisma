@@ -17,7 +17,7 @@ model RolPersona {
 model Persona {
   rut                  String               @id @db.VarChar(9)
   nombre               String               @db.VarChar(63)
-  contrasena           String               @db.VarChar(255)
+  contrasena           String               @db.VarChar(60)
 
   id_rol               Int
   rol                  RolPersona @relation(onDelete: Restrict, fields: [id_rol], references: [id])
