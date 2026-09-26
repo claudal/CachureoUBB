@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken'
  */
 export function autenticacion(req, res, next){
   // obtiene el token de autenticación del encabezado de la petición
-  const authHeader = req.headers.autenticacion;
+  const authHeader = req.headers.authorization;
 
   // verifica que el token exista y venga en el formato correcto
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
