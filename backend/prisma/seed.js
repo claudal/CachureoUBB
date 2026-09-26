@@ -75,7 +75,7 @@ async function main() {
   );
 
   console.log('=> Creando usuarios');
-  const rutUsuarios = ['21000000', '21000001', '21000002', '21000003', '21000004', '21000005', '21000006', '21000007', '21000008']; //TODO: poner rut válidos de prueba
+  const rutUsuarios = ['21000000', '21000001', '21000002', '21000003', '21000004', '21000005', '21000006', '21000007', '21000008']; // sin código verificador 
   const usuarios = await Promise.all(
     rutUsuarios.map((rut) =>
       prisma.persona.create({
