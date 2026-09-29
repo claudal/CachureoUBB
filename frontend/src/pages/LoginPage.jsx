@@ -37,17 +37,14 @@ export default function LoginPage() {
 
       if (respuesta.token) {
         localStorage.setItem('token', respuesta.token);
-        if (respuesta.usuario) {
-          localStorage.setItem('usuario', JSON.stringify(respuesta.usuario));
-        }
 
-        if(respuesta.usuario.rol === 2){
+        if(respuesta.persona.rol === 2){
           useNavigate('/encargado/principal');
         } else 
           useNavigate('/');
       }
     } catch (err) {
-      setError(err.detalles[0].mensaje || 'Credenciales inválidas. Por favor intente de nuevo.');
+      setError(err.message || 'Credenciales inválidas. Por favor intente de nuevo.');
     } finally {
       setCargando(false);
     }
