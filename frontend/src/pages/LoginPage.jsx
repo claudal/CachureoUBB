@@ -4,6 +4,7 @@ import { login } from '../services/autenticacion';
 
 
 export default function LoginPage() {
+  const navigate = useNavigate();
 
   // Estados del formulario
   const [formData, setFormData] = useState({
@@ -39,9 +40,9 @@ export default function LoginPage() {
         localStorage.setItem('token', respuesta.token);
 
         if(respuesta.persona.rol === 2){
-          useNavigate('/encargado/principal');
+          navigate('/encargado/principal');
         } else 
-          useNavigate('/');
+          navigate('/');
       }
     } catch (err) {
       setError(err.message || 'Credenciales inválidas. Por favor intente de nuevo.');
