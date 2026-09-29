@@ -10,7 +10,6 @@ async function pedir(ruta, opciones = {}) {
     headers,
     ...opciones
   });
-  console.log(res)
   const datos = await res.json();
   if (!res.ok) {
     const error = new Error(datos.error || 'Algo salio mal');
