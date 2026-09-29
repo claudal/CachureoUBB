@@ -19,15 +19,21 @@ export async function listar(filtros = {},usuario = undefined){
                 rut_encargado: usuario.rut
             }
         }
+        include.marcadores = {
+            where: {
+                rut_encargado: usuario.rut
+            }
+        }
     }
     const alertas = await prisma.alertaBusqueda.findMany({where,include,orderBy:{fecha_creacion:'desc'}});
     if(!usuario?.rol == 2)
         return alertas;
     return alertas.map((alerta)=>{
-        const { lecturas, ...restoAlerta} = alerta;
+        const { lecturas,marcadores, ...restoAlerta} = alerta;
         return {
             ...restoAlerta,
-            leida: lecturas.length > 0
+            leida: lecturas.length > 0,
+            marcada: marcadores.length > 0
         }
     });
 }
