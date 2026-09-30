@@ -66,7 +66,7 @@ export default function LoginPage() {
             </label>
             <input
               id="rut"
-              type="number"
+              type="text"
               name="rut"
               value={formData.rut}
               onChange={handleChange}
