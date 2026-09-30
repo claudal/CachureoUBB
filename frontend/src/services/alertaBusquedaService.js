@@ -15,3 +15,7 @@ export function quitarMarcador(id_alerta){
 export function agregarMarcador(id_alerta){
     return api.post(`/alertasBusqueda/${id_alerta}/marcadores`);
 }
+
+export function registrarLectura(id_alerta){
+    return api.post(`/alertasBusqueda/${id_alerta}/lecturas`);
+}

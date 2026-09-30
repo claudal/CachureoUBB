@@ -62,6 +62,22 @@ export default function AlertasAbiertasPage() {
     }
   };
 
+    // Alternar el estado de marcador de una alerta (POST / DELETE subrecurso)
+  const registrarLectura = async (idAlerta) => {
+    try {
+        // Agregar marcador (POST /api/alertas/:id/marcador)
+        await alertaBusquedaService.registrarLectura(idAlerta);
+
+        setAlertas((prev) =>
+            prev.map((alerta) =>
+              alerta.id === idAlerta ? { ...alerta, leida: true } : alerta
+            )
+          );
+    } catch (err) {
+      alert(`No se pudo registrar la lectura: ${err.message}`);
+    }
+  };
+
   return (
     <div style={styles.container}>
       {/* Encabezado y Selector de Modo */}
@@ -126,7 +142,16 @@ export default function AlertasAbiertasPage() {
           ) : (
             <div style={styles.grid}>
               {alertas.map((alerta) => (
-                <article key={alerta.id} style={styles.card}>
+                <article
+                  key={alerta.id}
+                  onClick={() => !alerta.leida && registrarLectura(alerta.id)}
+                  style={{
+                    ...styles.card,
+                    backgroundColor: alerta.leida ? '#f0f2f5' : '#ffffff', // Tono más gris si está leída
+                    cursor: alerta.leida ? 'default' : 'pointer',
+                    opacity: alerta.leida ? 0.85 : 1, // Opcional: atenúa ligeramente la tarjeta
+                  }}
+                >
                   <div style={styles.cardHeader}>
                     <span
                       style={{
@@ -139,7 +164,10 @@ export default function AlertasAbiertasPage() {
 
                     {/* Botón de Estrella / Marcador */}
                     <button
-                      onClick={() => toggleMarcador(alerta.id, alerta.marcada)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Evita que el clic en la estrella active el click de la tarjeta (marcar como leída)
+                        toggleMarcador(alerta.id, alerta.marcada);
+                      }}
                       style={styles.starBtn}
                       title={alerta.marcada ? 'Quitar marcador' : 'Marcar alerta'}
                     >
@@ -147,7 +175,13 @@ export default function AlertasAbiertasPage() {
                     </button>
                   </div>
 
-                  <h3 style={styles.cardTitle}>{alerta.titulo}</h3>
+                  <h3 style={{
+                    ...styles.cardTitle,
+                    fontWeight: alerta.leida ? 'normal' : 'bold' // Opcional: texto normal si ya se leyó
+                  }}>
+                    {alerta.titulo}
+                  </h3>
+                  
                   <p style={styles.cardDescription}>{alerta.descripcion}</p>
 
                   <div style={styles.cardFooter}>
