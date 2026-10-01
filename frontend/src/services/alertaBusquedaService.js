@@ -3,8 +3,7 @@ import { api } from "./api.js";
 export function listar(filtros){
     const query = new URLSearchParams();
     if(filtros.id_estado) query.set('id_estado',filtros.id_estado);
-    if(filtros.marcado) query.set('marcado',filtros.marcado);
-    console.warn(`/alertasBusqueda/?${query.toString()}`)
+    if(filtros.marcado) query.set('marcado',filtros.marcado)
     return api.get(`/alertasBusqueda/?${query.toString()}`);
 }
 
