@@ -7,6 +7,10 @@ export function listar(filtros){
     return api.get(`/alertasBusqueda/?${query.toString()}`);
 }
 
+export function buscarPorId(id){
+    return api.get(`/alertasBusqueda/${id}/`);
+}
+
 export function quitarMarcador(id_alerta){
     return api.delete(`/alertasBusqueda/${id_alerta}/marcadores`);
 }
