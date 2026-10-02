@@ -48,6 +48,32 @@ export async function listarEncargado(rut_encargado,filtros = {},){
  * @param {import("@prisma/client").AlertaBusqueda.id_alerta} id_alerta
  * @returns 
  */
+export async function buscarPorIdEncargado(id_alerta,rut_encargado){
+    const alerta = await prisma.alertaBusqueda.findUnique({
+        where:{id: id_alerta},
+        include: {
+            fotos:{select: {id_foto: true}},
+            marcadores: {where:{rut_encargado}},
+            solicitudes: {where:{rut_encargado}},
+            reuniones: {where:{rut_encargado}}
+        }
+    });
+    const {marcadores, ...restoAlerta} = alerta;
+    return {
+        ...restoAlerta,
+        marcada: marcadores.length > 0
+    }
+}
+
+/**
+ * 
+ * @param {import("@prisma/client").AlertaBusqueda.id_alerta} id_alerta
+ * @returns 
+ */
 export function buscarPorId(id_alerta){
-    return prisma.alertaBusqueda.findUnique({where:{id: id_alerta}});
+    const alerta = prisma.alertaBusqueda.findUnique({
+        where:{id: id_alerta},
+        include: {fotos:{select: {id_foto: true}}}
+    });
+    return alerta;
 }
