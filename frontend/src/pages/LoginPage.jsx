@@ -40,7 +40,7 @@ export default function LoginPage() {
         localStorage.setItem('token', respuesta.token);
 
         if(respuesta.persona.rol === 2){
-          navigate('/encargado/principal');
+          navigate('/atenderAlertas');
         } else 
           navigate('/');
       }

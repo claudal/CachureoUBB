@@ -2,7 +2,8 @@ import './App.css';
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import TestAuditPage from './pages/TestAuditPage';
 import LoginPage from './pages/LoginPage';
-import AlertasAbiertasPage from './pages/AlertasAbiertasPage';
+import AtenderAlertasPage from './pages/AtenderAlertasPage';
+import TratarAlertaPage from './pages/TratarAlerta';
 
 function App() {
 
@@ -11,7 +12,8 @@ function App() {
       <Routes>
         <Route path="/" element={<TestAuditPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/encargado/principal" element={<AlertasAbiertasPage />} />
+        <Route path="/atenderAlertas" element={<AtenderAlertasPage />} />
+        <Route path="/tratarAlerta/:id" element={<TratarAlertaPage />} />
       </Routes>
     </BrowserRouter>
   );

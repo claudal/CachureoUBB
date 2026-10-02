@@ -24,7 +24,7 @@ import { useState, useEffect, useCallback } from 'react';
 import * as alertaBusquedaService from '../services/alertaBusquedaService.js';
 import { useNavigate } from 'react-router-dom';
 
-export default function AlertasAbiertasPage() {
+export default function AtenderAlertasPage() {
   const navigate = useNavigate();
   const [alertas, setAlertas] = useState([]);
   const [cargando, setCargando] = useState(true);
