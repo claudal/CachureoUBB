@@ -1,7 +1,31 @@
+import {
+  Container,
+  Box,
+  Typography,
+  ToggleButtonGroup,
+  ToggleButton,
+  Alert,
+  AlertTitle,
+  List,
+  ListItem,
+  ListItemText,
+  CircularProgress,
+  Grid,
+  Card,
+  CardActionArea,
+  CardContent,
+  CardActions,
+  Chip,
+  Icon,
+} from '@mui/material';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { useState, useEffect, useCallback } from 'react';
 import * as alertaBusquedaService from '../services/alertaBusquedaService.js';
+import { useNavigate } from 'react-router-dom';
 
 export default function AlertasAbiertasPage() {
+  const navigate = useNavigate();
   const [alertas, setAlertas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
@@ -34,170 +58,209 @@ export default function AlertasAbiertasPage() {
     cargarAlertas();
   }, [cargarAlertas]);
 
-  // Alternar el estado de marcador de una alerta (POST / DELETE subrecurso)
-  const toggleMarcador = async (idAlerta, estaMarcada) => {
-    try {
-      if (estaMarcada) {
-        // Quitar marcador (DELETE /api/alertas/:id/marcador)
-        await alertaBusquedaService.quitarMarcador(idAlerta)
-      } else {
-        // Agregar marcador (POST /api/alertas/:id/marcador)
-        await alertaBusquedaService.agregarMarcador(idAlerta);
-      }
-
-      // Actualización optimista de la interfaz local
-      if (filtro === 'MARCADAS' && estaMarcada) {
-        // Si estamos en la vista de "Marcadas" y se desmarca, se remueve de la lista inmediatamente
-        setAlertas((prev) => prev.filter((alerta) => alerta.id !== idAlerta));
-      } else {
-        // Si estamos en "Todas", solo alternamos su flag 'marcada'
-        setAlertas((prev) =>
-          prev.map((alerta) =>
-            alerta.id === idAlerta ? { ...alerta, marcada: !estaMarcada } : alerta
-          )
-        );
-      }
-    } catch (err) {
-      alert(`No se pudo actualizar el marcador: ${err.message}`);
-    }
-  };
-
     // Alternar el estado de marcador de una alerta (POST / DELETE subrecurso)
   const registrarLectura = async (idAlerta) => {
     try {
         // Agregar marcador (POST /api/alertas/:id/marcador)
         await alertaBusquedaService.registrarLectura(idAlerta);
-
-        setAlertas((prev) =>
-            prev.map((alerta) =>
-              alerta.id === idAlerta ? { ...alerta, leida: true } : alerta
-            )
-          );
     } catch (err) {
       alert(`No se pudo registrar la lectura: ${err.message}`);
     }
   };
 
-  return (
-    <div style={styles.container}>
-      {/* Encabezado y Selector de Modo */}
-      <header style={styles.header}>
-        <div>
-          <h1 style={styles.title}>Alertas Abiertas</h1>
-          <p style={styles.subtitle}>Gestión y seguimiento de alertas del sistema</p>
-        </div>
+    // Alternar el estado de marcador de una alerta (POST / DELETE subrecurso)
+  const abrirAlerta = async (alerta) => {
+    try {
+        // Agregar marcador (POST /api/alertas/:id/marcador)
+        if(!alerta.leida)
+          await registrarLectura(alerta.id);
+        console.log("xd")
+        navigate(`/tratarAlerta/${alerta.id}`);
+    } catch (err) {
+    }
+  };
 
-        {/* Solo 2 Botones de Modo */}
-        <div style={styles.filterContainer}>
-          <button
-            onClick={() => setFiltro('TODAS')}
-            style={{
-              ...styles.filterBtn,
-              ...(filtro === 'TODAS' ? styles.filterBtnActive : {}),
+return (
+  <Container maxWidth="lg" sx={{ py: 4 }}>
+    {/* Encabezado y Selector de Modo */}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between',
+        alignItems: { xs: 'flex-start', sm: 'center' },
+        gap: 2,
+        mb: 4,
+        pb: 2,
+        borderBottom: 1,
+        borderColor: 'divider',
+      }} 
+    >
+      <Box>
+        <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+          Alertas Abiertas
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Gestión y seguimiento de alertas del sistema
+        </Typography>
+      </Box>
+
+      <ToggleButtonGroup
+        value={filtro}
+        exclusive
+        onChange={(e, nuevoFiltro) => nuevoFiltro && setFiltro(nuevoFiltro)}
+        color="primary"
+        size="small"
+      >
+        <ToggleButton value="TODAS">Todas</ToggleButton>
+        <ToggleButton value="MARCADAS">
+          <StarIcon sx={{ mr: 0.5, fontSize: 18, color: '#f59e0b' }} />
+          Marcadas
+        </ToggleButton>
+      </ToggleButtonGroup>
+    </Box>
+
+    {/* Banner de Errores */}
+    {error && (
+      <Alert severity="error" sx={{ mb: 4 }}>
+        <AlertTitle>Error</AlertTitle>
+        {error}
+        {detallesError.length > 0 && (
+          <List dense disablePadding sx={{ mt: 1 }}>
+            {detallesError.map((det, index) => (
+              <ListItem key={index} disableGutters dense>
+                <ListItemText
+                  primary={`${det.path ? det.path.join('.') + ': ' : ''}${det.message}`}
+                />
+              </ListItem>
+            ))}
+          </List>
+        )}
+      </Alert>
+    )}
+
+    {/* Estado de Carga */}
+    {cargando ? (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          py: 8,
+          gap: 2,
+        }}
+      >
+        <CircularProgress />
+        <Typography variant="body2" color="text.secondary">
+          Consultando servidor ({filtro.toLowerCase()})...
+        </Typography>
+      </Box>
+    ) : (
+      /* Grilla de Alertas */
+      <main>
+        {alertas.length === 0 ? (
+          <Box
+            sx={{
+              p: 6,
+              textAlign: 'center',
+              bgcolor: 'action.hover',
+              borderRadius: 2,
+              color: 'text.secondary',
             }}
           >
-            Todas
-          </button>
-          <button
-            onClick={() => setFiltro('MARCADAS')}
-            style={{
-              ...styles.filterBtn,
-              ...(filtro === 'MARCADAS' ? styles.filterBtnActive : {}),
-            }}
-          >
-            ★ Marcadas
-          </button>
-        </div>
-      </header>
-
-      {/* Control de Errores */}
-      {error && (
-        <div style={styles.errorBanner}>
-          <strong>{error}</strong>
-          {detallesError.length > 0 && (
-            <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
-              {detallesError.map((det, index) => (
-                <li key={index}>
-                  {det.path ? `${det.path.join('.')}: ` : ''}{det.message}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
-      {/* Estado de Carga */}
-      {cargando ? (
-        <div style={styles.loadingState}>
-          <div style={styles.spinner}></div>
-          <p>Consultando servidor ({filtro.toLowerCase()})...</p>
-        </div>
-      ) : (
-        /* Renderizado de Alertas */
-        <main>
-          {alertas.length === 0 ? (
-            <div style={styles.emptyState}>
-              <p>No hay alertas {filtro === 'MARCADAS' ? 'marcadas' : 'abiertas'} disponibles.</p>
-            </div>
-          ) : (
-            <div style={styles.grid}>
-              {alertas.map((alerta) => (
-                <article
-                  key={alerta.id}
-                  onClick={() => !alerta.leida && registrarLectura(alerta.id)}
-                  style={{
-                    ...styles.card,
-                    backgroundColor: alerta.leida ? '#f0f2f5' : '#ffffff', // Tono más gris si está leída
-                    cursor: alerta.leida ? 'default' : 'pointer',
-                    opacity: alerta.leida ? 0.85 : 1, // Opcional: atenúa ligeramente la tarjeta
+            <Typography variant="h6">
+              No hay alertas {filtro === 'MARCADAS' ? 'marcadas' : 'abiertas'} disponibles.
+            </Typography>
+          </Box>
+        ) : (
+          <Grid container spacing={3}>
+            {alertas.map((alerta) => (
+              <Grid xs={12} sm={6} md={4} key={alerta.id.toString()}>
+                <Card
+                  variant="outlined"
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    bgcolor: alerta.leida ? 'action.hover' : 'background.paper',
+                    opacity: alerta.leida ? 0.85 : 1,
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': { boxShadow: 3 },
                   }}
                 >
-                  <div style={styles.cardHeader}>
-                    <span
-                      style={{
-                        ...styles.badge,
-                        backgroundColor: getPrioridadColor(alerta.prioridad),
-                      }}
-                    >
-                      {alerta.prioridad || 'NORMAL'}
-                    </span>
+                  <CardActionArea
+                    onClick={() => abrirAlerta(alerta)}
+                    sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}
+                  >
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          mb: 2,
+                        }}
+                      >
+                        <Chip
+                          label={alerta.prioridad || 'NORMAL'}
+                          color={getPrioridadColor(alerta.prioridad)}
+                          size="small"
+                          sx={{ fontWeight: 'bold' }}
+                        />
 
-                    {/* Botón de Estrella / Marcador */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation(); // Evita que el clic en la estrella active el click de la tarjeta (marcar como leída)
-                        toggleMarcador(alerta.id, alerta.marcada);
-                      }}
-                      style={styles.starBtn}
-                      title={alerta.marcada ? 'Quitar marcador' : 'Marcar alerta'}
-                    >
-                      {alerta.marcada ? '★' : '☆'}
-                    </button>
-                  </div>
+                        {/* Botón de estrella con e.stopPropagation() */}
+                        <Icon
+                          color="warning"
+                          size="small"
+                          aria-label={alerta.marcada ? 'Quitar marcador' : 'Marcar alerta'}
+                        >
+                          {alerta.marcada ? <StarIcon /> : <StarBorderIcon />}
+                        </Icon>
+                      </Box>
 
-                  <h3 style={{
-                    ...styles.cardTitle,
-                    fontWeight: alerta.leida ? 'normal' : 'bold' // Opcional: texto normal si ya se leyó
-                  }}>
-                    {alerta.titulo}
-                  </h3>
-                  
-                  <p style={styles.cardDescription}>{alerta.descripcion}</p>
+                      <Typography
+                        variant="h6"
+                        component="h2"
+                        gutterBottom
+                        fontWeight={alerta.leida ? 'regular' : 'bold'}
+                        color={alerta.leida ? 'text.secondary' : 'text.primary'}
+                      >
+                        {alerta.titulo}
+                      </Typography>
 
-                  <div style={styles.cardFooter}>
-                    <span style={styles.dateText}>
-                      {new Date(alerta.fecha_creacion || alerta.createdAt).toLocaleDateString()}
-                    </span>
-                    <span style={styles.idText}>ID: #{alerta.id}</span>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </main>
-      )}
-    </div>
-  );
+                      <Typography variant="body2" color="text.secondary">
+                        {alerta.descripcion}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+
+                  <CardActions
+                    sx={{
+                      justifyContent: 'space-between',
+                      px: 2,
+                      py: 1.5,
+                      borderTop: 1,
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      {new Date(alerta.fecha_creacion).toLocaleDateString()}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                      ID: #{alerta.id}
+                    </Typography>
+                  </CardActions>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </main>
+    )}
+  </Container>
+);
 }
 
 // Auxiliar para prioridad
