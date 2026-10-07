@@ -41,8 +41,11 @@ export default function LoginPage() {
 
         if(respuesta.persona.rol === 2){
           navigate('/encargado/principal');
-        } else 
+        } else if (respuesta.persona.rol === 1) {
+          navigate('/inicio');
+        } else {
           navigate('/');
+        }
       }
     } catch (err) {
       setError(err.message || 'Credenciales inválidas. Por favor intente de nuevo.');

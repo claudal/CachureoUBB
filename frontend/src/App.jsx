@@ -3,6 +3,7 @@ import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import TestAuditPage from './pages/TestAuditPage';
 import LoginPage from './pages/LoginPage';
 import AlertasAbiertasPage from './pages/AlertasAbiertasPage';
+import InicioPage from './pages/InicioPage';
 
 function App() {
 
@@ -11,6 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<TestAuditPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/inicio" element={<InicioPage />} />
         <Route path="/encargado/principal" element={<AlertasAbiertasPage />} />
       </Routes>
     </BrowserRouter>
