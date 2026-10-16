@@ -9,8 +9,6 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Limpiando datos anteriores...');
 
-  await prisma.alertaBusqueda.deleteMany();
-  await prisma.oficina.deleteMany();
   await prisma.estadoAlerta.deleteMany();
 
   console.log('=> Creando estados de alerta');
@@ -40,7 +38,35 @@ async function main() {
   if(process.env.NODE_ENV !== 'development')
     return;
 
-  const sedes = ['C']
+  await prisma.encargadoOficina.deleteMany();
+  await prisma.oficina.deleteMany();
+  await prisma.campus.deleteMany();
+
+  console.log('=> Creando campus');
+  const nombreCampus = ['Concepción', 'La Castilla', 'Fernando May'];
+  const campus = await Promise.all(
+    nombreCampus.map((nombre) =>
+      prisma.campus.create({
+        data: {
+          nombre,
+          direccion: faker.location.direction()
+        },
+      })
+    )
+  );
+
+  const oficinas = [];
+  for(let campu of campus){
+    for(let i = 0;i<10;++i){
+      oficinas.push(await prisma.oficina.create({
+        data:{
+          nombre: faker.book.title(),
+          descripcion: faker.lorem.sentence(),
+          idCampus: campu.id
+        }
+      }))
+    }
+  }
 
   const clave = "123456";
 
@@ -53,8 +79,9 @@ async function main() {
           rut: rut.concat(rutjs.getCheckDigit(rut)),
           correoContacto: faker.internet.email(),
           nombre: faker.person.fullName(),
-          clave: hashSync(clave,BCRYPT_SALT_ROUNDS)
-        },
+          clave: hashSync(clave,BCRYPT_SALT_ROUNDS),
+          idOficina: faker.helpers.arrayElement(oficinas).id
+        }
       })
     )
   );
