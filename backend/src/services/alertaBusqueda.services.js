@@ -5,27 +5,26 @@ export async function listar(filtros = {},usuario = undefined){
     const where = {};
     /**@type {import("@prisma/client").Prisma.AlertaBusquedaInclude}*/
     const include = {};
-    if(filtros.id_estado) where.id_estado = filtros.id_estado;
-    if(filtros.rut_autor) where.rut_autor = filtros.rut_autor;
+    if(filtros.idEstado) where.idEstado = filtros.idEstado;
     if(usuario?.rol == 2) {
         if(filtros.marcado) 
             where.marcadores = {
                 some: {
-                    rut_encargado: usuario.rut
+                    rutEncargado: usuario.rut
                 }
             }
         include.lecturas = {
             where: {
-                rut_encargado: usuario.rut
+                rutEncargado: usuario.rut
             }
         }
         include.marcadores = {
             where: {
-                rut_encargado: usuario.rut
+                rutEncargado: usuario.rut
             }
         }
     }
-    const alertas = await prisma.alertaBusqueda.findMany({where,include,orderBy:{fecha_creacion:'desc'}});
+    const alertas = await prisma.alertaBusqueda.findMany({where,include,orderBy:{fechaEdicion:'desc'}});
     if(!usuario?.rol == 2)
         return alertas;
     return alertas.map((alerta)=>{
@@ -40,9 +39,9 @@ export async function listar(filtros = {},usuario = undefined){
 
 /**
  * 
- * @param {import("@prisma/client").AlertaBusqueda.id_alerta} id_alerta
+ * @param {import("@prisma/client").AlertaBusqueda.idAlerta} idAlerta
  * @returns 
  */
-export function buscarPorId(id_alerta){
-    return prisma.alertaBusqueda.findUnique({where:{id: id_alerta}});
+export function buscarPorId(idAlerta){
+    return prisma.alertaBusqueda.findUnique({where:{id: idAlerta}});
 }

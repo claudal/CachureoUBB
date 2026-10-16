@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { login } from '../services/autenticacion';
+import { loginEncargadoOficina } from '../services/autenticacion';
 
 
-export default function LoginPage() {
+export default function EncargadoLoginPage() {
   const navigate = useNavigate();
 
   // Estados del formulario
   const [formData, setFormData] = useState({
     rut: '',
-    contrasena: '',
+    clave: '',
   });
 
   // Estados de interfaz
@@ -34,7 +34,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const respuesta = await login(formData.rut,formData.contrasena);
+      const respuesta = await loginEncargadoOficina(formData.rut,formData.clave);
 
       if (respuesta.token) {
         localStorage.setItem('token', respuesta.token);
@@ -81,14 +81,14 @@ export default function LoginPage() {
           </div>
 
           <div style={styles.inputGroup}>
-            <label htmlFor="contrasena" style={styles.label}>
+            <label htmlFor="clave" style={styles.label}>
               Contraseña
             </label>
             <input
-              id="contrasena"
+              id="clave"
               type="password"
-              name="contrasena"
-              value={formData.contrasena}
+              name="clave"
+              value={formData.clave}
               onChange={handleChange}
               placeholder="••••••••"
               required

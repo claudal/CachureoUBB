@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 import { useFetch } from '../hooks/useFetch.js';
 import * as objetoPerdidoService from '../services/objetoPerdidoService.js';
-import * as personaService from '../services/personaService.js';
+import * as encargadoOficinaService from '../services/encargadoOficinaService.js';
 
 export default function TestAuditPage() {
   const {datos: objetos, cargando: loading} = useFetch(useCallback(objetoPerdidoService.listar,[]));
-  const {datos: personas} = useFetch(useCallback(personaService.listar,[]));
+  const {datos: encargadosOficina} = useFetch(useCallback(encargadoOficinaService.listar,[]));
 
   if (loading) {
     return <div>Cargando datos...</div>;
@@ -27,7 +27,7 @@ export default function TestAuditPage() {
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Estado</th>
-                <th>Encargado (RUT)</th>
+                <th>Oficina</th>
                 <th>Fecha Ingreso</th>
               </tr>
             </thead>
@@ -38,7 +38,7 @@ export default function TestAuditPage() {
                   <td>{obj.nombre}</td>
                   <td>{obj.descripcion}</td>
                   <td>{obj.estado?.nombre || 'Desconocido'}</td>
-                  <td>{obj.rut_encargado}</td>
+                  <td>{obj.oficinaId}</td>
                   <td>{new Date(obj.fecha_ingreso).toLocaleDateString()}</td>
                 </tr>
               ))}
@@ -49,8 +49,8 @@ export default function TestAuditPage() {
 
       <section>
         <h2>Personas Registradas</h2>
-        {personas.length === 0 ? (
-          <p>No hay personas registradas.</p>
+        {encargadosOficina.length === 0 ? (
+          <p>No hay encargadosOficina registradas.</p>
         ) : (
           <table border="1" cellPadding="10" style={{ borderCollapse: 'collapse', width: '100%' }}>
             <thead>
@@ -61,11 +61,11 @@ export default function TestAuditPage() {
               </tr>
             </thead>
             <tbody>
-              {personas.map(persona => (
-                <tr key={persona.rut}>
-                  <td>{persona.rut}</td>
-                  <td>{persona.nombre}</td>
-                  <td>{persona.rol?.nombre || 'Desconocido'}</td>
+              {encargadosOficina.map(encargadoOficina => (
+                <tr key={encargadoOficina.rut}>
+                  <td>{encargadoOficina.rut}</td>
+                  <td>{encargadoOficina.nombre}</td>
+                  <td>{encargadoOficina.rol?.nombre || 'Desconocido'}</td>
                 </tr>
               ))}
             </tbody>

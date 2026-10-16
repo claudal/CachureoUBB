@@ -5,8 +5,8 @@ import { prisma } from "../config/prisma.js";
  * @param {import("@prisma/client").Prisma.MarcadorEncargadoCreateInput} data 
  * @returns 
  */
-export function crear(id_alerta,rut_encargado){
-    return prisma.marcadorEncargado.create({data:{id_alerta,rut_encargado}});
+export function crear(idAlerta,rutEncargado){
+    return prisma.marcadorEncargado.create({data:{idAlerta,rutEncargado}});
 }
 
 /**
@@ -14,8 +14,8 @@ export function crear(id_alerta,rut_encargado){
  * @param {import("@prisma/client").Prisma.MarcadorEncargadoCreateInput} data 
  * @returns 
  */
-export function eliminar(id_alerta,rut_encargado){
-    return prisma.marcadorEncargado.delete({where: {id_alerta_rut_encargado: {id_alerta,rut_encargado}}});
+export function eliminar(idAlerta,rutEncargado){
+    return prisma.marcadorEncargado.delete({where: {idAlerta_rutEncargado: {idAlerta,rutEncargado}}});
 }
 
 /**
@@ -23,6 +23,6 @@ export function eliminar(id_alerta,rut_encargado){
  * @param {import("@prisma/client").Prisma.MarcadorEncargadoCreateInput} data 
  * @returns 
  */
-export function buscar(id_alerta,rut_encargado){
-    return prisma.marcadorEncargado.findUnique({where:{id_alerta_rut_encargado:{id_alerta,rut_encargado}}});
+export function buscar(idAlerta,rutEncargado){
+    return prisma.marcadorEncargado.findUnique({where:{idAlerta_rutEncargado:{idAlerta,rutEncargado}}});
 }
