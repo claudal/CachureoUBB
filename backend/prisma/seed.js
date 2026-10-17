@@ -9,10 +9,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Limpiando datos anteriores...');
 
-  await prisma.alertaBusqueda.deleteMany();
-  await prisma.persona.deleteMany();
   await prisma.estadoAlerta.deleteMany();
-  await prisma.rolPersona.deleteMany();
 
   console.log('=> Creando estados de alerta');
   const estadosAlerta = {
@@ -36,73 +33,58 @@ async function main() {
       })
   }
 
-  console.log('=> Creando roles de personas');
-  const rolesPersonas = {
-    usuario: await prisma.rolPersona.create({
-        data: {
-          id: 1,
-          nombre: "Usuario"
-        },
-      }),
-    encargado: await prisma.rolPersona.create({
-        data: {
-          id: 2,
-          nombre: "Encargado de objetos"
-        },
-      })
-  }
-
   console.log('--- Seed base completado :V ---');
 
   if(process.env.NODE_ENV !== 'development')
     return;
 
-  const contrasena = "123456";
+  await prisma.encargadoOficina.deleteMany();
+  await prisma.oficina.deleteMany();
+  await prisma.campus.deleteMany();
+
+  console.log('=> Creando campus');
+  const nombreCampus = ['Concepción', 'La Castilla', 'Fernando May'];
+  const campus = await Promise.all(
+    nombreCampus.map((nombre) =>
+      prisma.campus.create({
+        data: {
+          nombre,
+          direccion: faker.location.direction()
+        },
+      })
+    )
+  );
+
+  const oficinas = [];
+  for(let campu of campus){
+    for(let i = 0;i<10;++i){
+      oficinas.push(await prisma.oficina.create({
+        data:{
+          nombre: faker.book.title(),
+          descripcion: faker.lorem.sentence(),
+          idCampus: campu.id
+        }
+      }))
+    }
+  }
+
+  const clave = "123456";
 
   console.log('=> Creando encargados');
   const rutEncargados = ['20000000', '20000001', '20000002']; // sin código verificador 
   const encargados = await Promise.all(
     rutEncargados.map((rut) =>
-      prisma.persona.create({
+      prisma.encargadoOficina.create({
         data: {
           rut: rut.concat(rutjs.getCheckDigit(rut)),
+          correoContacto: faker.internet.email(),
           nombre: faker.person.fullName(),
-          contrasena: hashSync(contrasena,BCRYPT_SALT_ROUNDS),
-          id_rol: rolesPersonas.encargado.id
-        },
+          clave: hashSync(clave,BCRYPT_SALT_ROUNDS),
+          idOficina: faker.helpers.arrayElement(oficinas).id
+        }
       })
     )
   );
-
-  console.log('=> Creando usuarios');
-  const rutUsuarios = ['21000000', '21000001', '21000002', '21000003', '21000004', '21000005', '21000006', '21000007', '21000008']; // sin código verificador 
-  const usuarios = await Promise.all(
-    rutUsuarios.map((rut) =>
-      prisma.persona.create({
-        data: {
-          rut: rut.concat(rutjs.getCheckDigit(rut)),
-          nombre: faker.person.fullName(),
-          contrasena: hashSync(contrasena,BCRYPT_SALT_ROUNDS),
-          id_rol: rolesPersonas.usuario.id
-        },
-      })
-    )
-  );
-
-  console.log('=> Creando solicitudes abiertas...');
-  for (const usuario of usuarios) {
-    const cantidadAlertasAbiertas = faker.number.int({ min: 0, max: 3 });
-    for (let i = 0; i < cantidadAlertasAbiertas; i++) {
-      await prisma.alertaBusqueda.create({
-        data: {
-          rut_autor: usuario.rut,
-          fecha_creacion: faker.date.recent({days:{min:0,max:255}}),
-          descripcion: faker.lorem.sentences(2),
-          id_estado: estadosAlerta.abierto.id
-        },
-      });
-    }
-  }
 
   console.log('--- Seed de prueba completado :V ---');
 }

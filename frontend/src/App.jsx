@@ -1,9 +1,9 @@
 import './App.css';
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import TestAuditPage from './pages/TestAuditPage';
-import LoginPage from './pages/LoginPage';
-import AtenderAlertasPage from './pages/AtenderAlertasPage';
-import TratarAlertaPage from './pages/TratarAlerta';
+import EncargadoLoginPage from './pages/LoginPage';
+import AlertasAbiertasPage from './pages/AlertasAbiertasPage';
+import InicioPage from './pages/InicioPage';
 
 function App() {
 
@@ -11,9 +11,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<TestAuditPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/atenderAlertas" element={<AtenderAlertasPage />} />
-        <Route path="/tratarAlerta/:id" element={<TratarAlertaPage />} />
+        <Route path="/login" element={<EncargadoLoginPage />} />
+        <Route path="/inicio" element={<InicioPage />} />
+        <Route path="/encargado/principal" element={<AlertasAbiertasPage />} />
       </Routes>
     </BrowserRouter>
   );

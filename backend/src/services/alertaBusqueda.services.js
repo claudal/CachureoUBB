@@ -45,7 +45,7 @@ export async function listarEncargado(rut_encargado,filtros = {},){
 
 /**
  * 
- * @param {import("@prisma/client").AlertaBusqueda.id_alerta} id_alerta
+ * @param {import("@prisma/client").AlertaBusqueda.idAlerta} idAlerta
  * @returns 
  */
 export async function buscarPorIdEncargado(id_alerta,rut_encargado){

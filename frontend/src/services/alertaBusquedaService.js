@@ -2,7 +2,7 @@ import { api } from "./api.js";
 
 export function listar(filtros){
     const query = new URLSearchParams();
-    if(filtros.id_estado) query.set('id_estado',filtros.id_estado);
+    if(filtros.idEstado) query.set('idEstado',filtros.idEstado);
     if(filtros.marcado) query.set('marcado',filtros.marcado)
     return api.get(`/alertasBusqueda/?${query.toString()}`);
 }
@@ -15,10 +15,10 @@ export function quitarMarcador(id_alerta){
     return api.delete(`/alertasBusqueda/${id_alerta}/marcadores`);
 }
 
-export function agregarMarcador(id_alerta){
-    return api.post(`/alertasBusqueda/${id_alerta}/marcadores`);
+export function agregarMarcador(idAlerta){
+    return api.post(`/alertasBusqueda/${idAlerta}/marcadores`);
 }
 
-export function registrarLectura(id_alerta){
-    return api.post(`/alertasBusqueda/${id_alerta}/lecturas`);
+export function registrarLectura(idAlerta){
+    return api.post(`/alertasBusqueda/${idAlerta}/lecturas`);
 }

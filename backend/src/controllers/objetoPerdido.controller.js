@@ -5,7 +5,7 @@ export const getObjetosPerdidos = async (req, res) => {
     const objetos = await prisma.objetoPerdido.findMany({
       include: {
         estado: true,
-        encargado: true
+        oficina: true
       }
     });
     res.json(objetos);
