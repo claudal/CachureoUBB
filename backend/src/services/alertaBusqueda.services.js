@@ -5,7 +5,7 @@ export async function listarUsuario(rut_usuario,filtros = {},){
     const where = {
         rut_autor: rut_usuario
     };
-    if(filtros.id_estado) where.id_estado = filtros.id_estado;
+    if(filtros.idEstado) where.idEstado = filtros.idEstado;
     return await prisma.alertaBusqueda.findMany({where,orderBy:{fecha_creacion:'desc'}});
 }
 
