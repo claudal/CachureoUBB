@@ -38,11 +38,7 @@ export default function EncargadoLoginPage() {
 
       if (respuesta.token) {
         localStorage.setItem('token', respuesta.token);
-
-        if(respuesta.persona.rol === 2){
-          navigate('/atenderAlertas');
-        } else 
-          navigate('/');
+        navigate('/encargado/principal');
       }
     } catch (err) {
       setError(err.message || 'Credenciales inválidas. Por favor intente de nuevo.');
