@@ -139,7 +139,7 @@ model ObjetoPerdido {
 }
 
 model AlertaBusqueda {
-  id            Int      @id @default(autoincrement())
+  id            String   @id @default(uuid())
   fechaCreacion DateTime @default(now()) @map("fecha_creacion")
   fechaEdicion  DateTime @updatedAt @map("fecha_edicion")
   descripcion   String   @db.Text
@@ -222,7 +222,7 @@ model FotoOficina {
 
 model FotoAlerta {
   idFoto   Int @map("id_foto")
-  idAlerta Int @map("id_alerta")
+  idAlerta String @map("id_alerta")
 
   // Relaciones con @relation explícito
   foto   Foto           @relation(fields: [idFoto], references: [id], onDelete: Cascade)
@@ -245,7 +245,7 @@ model ObjetoTieneEtiqueta {
 }
 
 model MarcadorEncargado {
-  idAlerta     Int    @map("id_alerta")
+  idAlerta     String    @map("id_alerta")
   rutEncargado String @map("rut_encargado") @db.VarChar(12)
 
   // Relaciones con @relation explícito
@@ -257,7 +257,7 @@ model MarcadorEncargado {
 }
 
 model AlertaLeida {
-  idAlerta     Int    @map("id_alerta")
+  idAlerta     String    @map("id_alerta")
   rutEncargado String @map("rut_encargado") @db.VarChar(12)
 
   // Relaciones con @relation explícito
@@ -269,7 +269,7 @@ model AlertaLeida {
 }
 
 model CierreAlerta {
-  idAlerta  Int @map("id_alerta") @unique
+  idAlerta  String @map("id_alerta") @unique
   idEntrega Int @map("id_entrega") @unique
 
   // Relaciones con @relation explícito
@@ -281,7 +281,7 @@ model CierreAlerta {
 }
 
 model SolicitudDetalles {
-  idAlerta          Int      @map("id_alerta")
+  idAlerta          String      @map("id_alerta")
   rutEncargado      String   @map("rut_encargado") @db.VarChar(12)
   fechaModificacion DateTime @default(now()) @updatedAt @map("fecha_modificacion")
   indicaciones      String   @db.Text
@@ -295,7 +295,7 @@ model SolicitudDetalles {
 }
 
 model Reunion {
-  idAlerta          Int      @map("id_alerta")
+  idAlerta          String      @map("id_alerta")
   rutEncargado      String   @map("rut_encargado") @db.VarChar(12)
   fechaModificacion DateTime @default(now()) @updatedAt @map("fecha_modificacion")
   indicaciones      String   @db.Text
