@@ -1,43 +1,35 @@
 import { prisma } from "../config/prisma.js";
 
-export async function listarUsuario(rut_usuario,filtros = {},){
+export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
     /**@type {import("@prisma/client").Prisma.AlertaBusquedaWhereInput}*/
     const where = {
-        rut_autor: rut_usuario
+        idCampus
     };
-    if(filtros.idEstado) where.idEstado = filtros.idEstado;
-    return await prisma.alertaBusqueda.findMany({where,orderBy:{fecha_creacion:'desc'}});
-}
-
-export async function listarEncargado(rut_encargado,filtros = {},){
-    /**@type {import("@prisma/client").Prisma.AlertaBusquedaWhereInput}*/
-    const where = {};
     /**@type {import("@prisma/client").Prisma.AlertaBusquedaInclude}*/
     const include = {};
-    if(filtros.id_estado) where.id_estado = filtros.id_estado;
-    if(filtros.rut_autor) where.rut_autor = filtros.rut_autor;
+    if(filtros.idEstado) where.idEstado = filtros.id_estado;
     if(filtros.marcado) 
         where.marcadores = {
             some: {
-                rut_encargado
+                rutEncargado
             }
         }
-    include.lecturas = {
+    include.alertasLeidas = {
         where: {
-            rut_encargado
+            rutEncargado
         }
     }
     include.marcadores = {
         where: {
-            rut_encargado
+            rutEncargado
         }
     }
-    const alertas = await prisma.alertaBusqueda.findMany({where,include,orderBy:{fecha_creacion:'desc'}});
+    const alertas = await prisma.alertaBusqueda.findMany({where,include,orderBy:{fechaEdicion:'desc'}});
     return alertas.map((alerta)=>{
-        const { lecturas,marcadores, ...restoAlerta} = alerta;
+        const { alertasLeidas,marcadores, ...restoAlerta} = alerta;
         return {
             ...restoAlerta,
-            leida: lecturas.length > 0,
+            leida: alertasLeidas.length > 0,
             marcada: marcadores.length > 0
         }
     });

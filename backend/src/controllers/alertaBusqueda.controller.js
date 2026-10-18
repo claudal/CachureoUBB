@@ -8,7 +8,7 @@ import * as services from "../services/alertaBusqueda.services.js";
  */
 export async function getAlertasBusqueda(req, res, next) {
     try {
-        return res.json(await services.listarEncargado(req.user.rut, req.vQuery));
+        return res.json(await services.listarEncargado(req.user.rut,req.user.idCampus, req.vQuery));
     } catch (err) {
         next(err);
     }
