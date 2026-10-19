@@ -9,6 +9,8 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Limpiando datos anteriores...');
 
+  // las alertas referencian estados y campus (Restrict), asi que se borran primero
+  await prisma.alertaBusqueda.deleteMany();
   await prisma.estadoAlerta.deleteMany();
 
   console.log('=> Creando estados de alerta');
@@ -85,6 +87,20 @@ async function main() {
       })
     )
   );
+
+  console.log('=> Creando alertas de busqueda');
+  // 3 abiertas y 1 cerrada por sede, para probar el filtro por sede y por estado
+  for(const campu of campus) {
+    for(let i = 0; i < 4; ++i) {
+      await prisma.alertaBusqueda.create({
+        data: {
+          descripcion: `[${campu.nombre}] ${faker.lorem.sentence()}`,
+          idCampus: campu.id,
+          idEstado: i === 3 ? estadosAlerta.cerrado.id : estadosAlerta.abierto.id
+        }
+      });
+    }
+  }
 
   console.log('--- Seed de prueba completado :V ---');
 }
