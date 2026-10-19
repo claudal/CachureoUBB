@@ -15,7 +15,7 @@ export async function loginEncargadoOficina(rut,clave){
         throw err;
     }
 
-    const payload = {rut: usuario.rut};
+    const payload = {rut: usuario.rut, rol: 2 };
     return {
         usuario: payload,
         token: jwt.sign(payload,process.env.JWT_SECRET,{expiresIn: '8h'})

@@ -39,9 +39,9 @@ export default function EncargadoLoginPage() {
       if (respuesta.token) {
         localStorage.setItem('token', respuesta.token);
 
-        if(respuesta.persona.rol === 2){
+        if(respuesta.usuario.rol === 2){
           navigate('/encargado/principal');
-        } else if (respuesta.persona.rol === 1) {
+        } else if (respuesta.usuario.rol === 1) {
           navigate('/inicio');
         } else {
           navigate('/');
