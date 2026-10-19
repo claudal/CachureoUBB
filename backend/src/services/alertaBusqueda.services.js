@@ -7,7 +7,14 @@ export async function listar(filtros = {}, usuario = undefined){
     const include = {};
     if(filtros.idEstado) where.idEstado = filtros.idEstado;
     if(usuario?.rol == 2) {
-        if(filtros.marcado) 
+        // el encargado solo ve las alertas de la sede de su oficina
+        const encargado = await prisma.encargadoOficina.findUnique({
+            where: {rut: usuario.rut},
+            select: {oficina: {select: {idCampus: true}}}
+        });
+        if(!encargado) return [];
+        where.idCampus = encargado.oficina.idCampus;
+        if(filtros.marcado)
             where.marcadores = {
                 some: {
                     rutEncargado: usuario.rut
