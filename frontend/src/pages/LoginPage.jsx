@@ -34,7 +34,7 @@ export default function EncargadoLoginPage() {
     setError('');
 
     try {
-      const respuesta = await loginEncargadoOficina(formData.rut,formData.clave);
+      const respuesta = await loginEncargadoOficina(formData.rut, formData.clave);
 
       if (respuesta.token) {
         localStorage.setItem('token', respuesta.token);

@@ -1,6 +1,6 @@
 import { prisma } from "../config/prisma.js";
 
-export async function listar(filtros = {},usuario = undefined){
+export async function listar(filtros = {}, usuario = undefined){
     /**@type {import("@prisma/client").Prisma.AlertaBusquedaWhereInput}*/
     const where = {};
     /**@type {import("@prisma/client").Prisma.AlertaBusquedaInclude}*/
@@ -13,7 +13,7 @@ export async function listar(filtros = {},usuario = undefined){
                     rutEncargado: usuario.rut
                 }
             }
-        include.lecturas = {
+        include.alertasLeidas = {
             where: {
                 rutEncargado: usuario.rut
             }
@@ -24,14 +24,14 @@ export async function listar(filtros = {},usuario = undefined){
             }
         }
     }
-    const alertas = await prisma.alertaBusqueda.findMany({where,include,orderBy:{fechaEdicion:'desc'}});
-    if(!usuario?.rol == 2)
+    const alertas = await prisma.alertaBusqueda.findMany({where, include, orderBy: {fechaEdicion:'desc'}});
+    if(usuario?.rol != 2)
         return alertas;
     return alertas.map((alerta)=>{
-        const { lecturas,marcadores, ...restoAlerta} = alerta;
+        const { alertasLeidas, marcadores, ...restoAlerta } = alerta;
         return {
             ...restoAlerta,
-            leida: lecturas.length > 0,
+            leida: alertasLeidas.length > 0,
             marcada: marcadores.length > 0
         }
     });
