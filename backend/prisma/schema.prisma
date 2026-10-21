@@ -142,6 +142,7 @@ model AlertaBusqueda {
   id            String   @id @default(uuid())
   fechaCreacion DateTime @default(now()) @map("fecha_creacion")
   fechaEdicion  DateTime @updatedAt @map("fecha_edicion")
+  nombre        String   @db.VarChar(63)
   descripcion   String   @db.Text
   idCampus        Int      @map("id_campus")
   idEstado      Int      @map("id_estado")
