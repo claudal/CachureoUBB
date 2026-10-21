@@ -90,7 +90,7 @@ async function main() {
       data: {
         idEstado: estadosAlerta.abierto.id,
         idCampus: faker.helpers.arrayElement(campus).id,
-        nombre: faker.lorem.sentence(),
+        nombre: faker.lorem.sentence({min:1,max:4}),
         descripcion: faker.lorem.paragraph()
       }
     })
