@@ -18,5 +18,5 @@ export const filtroAlertaBusquedaSchema = z.object({
 });
 
 export const parametroAlertaBusquedaSchema = z.object({
-  id: z.string().regex(/^\d+$/).transform(Number)
+  id: z.uuid({error: "El identificador debe tener formato UUID"})
 })

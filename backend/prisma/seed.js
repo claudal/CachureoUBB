@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { faker } from '@faker-js/faker'; // datos de prueba
+import { fa, faker } from '@faker-js/faker'; // datos de prueba
 import * as rutjs from "rut.js";
 import { hashSync } from "bcrypt"; // crear contraseñas de prueba
 import { BCRYPT_SALT_ROUNDS } from '../src/config/auth.js';
@@ -7,39 +7,11 @@ import { BCRYPT_SALT_ROUNDS } from '../src/config/auth.js';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Limpiando datos anteriores...');
-
-  // las alertas referencian estados y campus (Restrict), asi que se borran primero
-  await prisma.alertaBusqueda.deleteMany();
-  await prisma.estadoAlerta.deleteMany();
-
-  console.log('=> Creando estados de alerta');
-  const estadosAlerta = {
-    abierto: await prisma.estadoAlerta.create({
-        data: {
-          id: 1,
-          nombre: "Abierto"
-        },
-      }),
-    cerrado: await prisma.estadoAlerta.create({
-        data: {
-          id: 2,
-          nombre: "Cerrado"
-        },
-      }),
-    rectificado: await prisma.estadoAlerta.create({
-        data: {
-          id: 3,
-          nombre: "Rectificado"
-        },
-      })
-  }
-
-  console.log('--- Seed base completado :V ---');
 
   if(process.env.NODE_ENV !== 'development')
     return;
 
+  await prisma.alertaBusqueda.deleteMany();
   await prisma.encargadoOficina.deleteMany();
   await prisma.oficina.deleteMany();
   await prisma.campus.deleteMany();
@@ -88,18 +60,40 @@ async function main() {
     )
   );
 
-  console.log('=> Creando alertas de busqueda');
-  // 3 abiertas y 1 cerrada por sede, para probar el filtro por sede y por estado
-  for(const campu of campus) {
-    for(let i = 0; i < 4; ++i) {
-      await prisma.alertaBusqueda.create({
+  await prisma.estadoAlerta.deleteMany();
+
+  console.log('=> Creando estados de alerta');
+  const estadosAlerta = {
+    abierto: await prisma.estadoAlerta.create({
         data: {
-          descripcion: `[${campu.nombre}] ${faker.lorem.sentence()}`,
-          idCampus: campu.id,
-          idEstado: i === 3 ? estadosAlerta.cerrado.id : estadosAlerta.abierto.id
-        }
-      });
-    }
+          id: 1,
+          nombre: "Abierto"
+        },
+      }),
+    cerrado: await prisma.estadoAlerta.create({
+        data: {
+          id: 2,
+          nombre: "Cerrado"
+        },
+      }),
+    rectificado: await prisma.estadoAlerta.create({
+        data: {
+          id: 3,
+          nombre: "Rectificado"
+        },
+      })
+  }
+
+  console.log('=> Creando alertas de búsqueda abiertas');
+  for(let i = 0;i<30;++i){
+    await prisma.alertaBusqueda.create({
+      data: {
+        idEstado: estadosAlerta.abierto.id,
+        idCampus: faker.helpers.arrayElement(campus).id,
+        nombre: faker.lorem.sentence(),
+        descripcion: faker.lorem.paragraph()
+      }
+    })
   }
 
   console.log('--- Seed de prueba completado :V ---');
