@@ -7,7 +7,7 @@ export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
     };
     /**@type {import("@prisma/client").Prisma.AlertaBusquedaInclude}*/
     const include = {};
-    if(filtros.idEstado) where.idEstado = filtros.id_estado;
+    if(filtros.idEstado) where.idEstado = filtros.idEstado;
     if(filtros.marcado) 
         where.marcadores = {
             some: {

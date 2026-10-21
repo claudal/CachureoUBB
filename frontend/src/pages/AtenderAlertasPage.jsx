@@ -41,7 +41,7 @@ export default function AtenderAlertasPage() {
     setDetallesError([]);
 
     try {
-      const datos = await alertaBusquedaService.listar({id_estado: 1,marcado:filtro === 'MARCADAS'});
+      const datos = await alertaBusquedaService.listar({idEstado: 1,marcado:filtro === 'MARCADAS'});
       
       setAlertas(datos);
     } catch (err) {
