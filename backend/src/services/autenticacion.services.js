@@ -26,3 +26,14 @@ export async function loginEncargadoOficina(rut,clave){
         token: jwt.sign({rut: payload.rut},process.env.JWT_SECRET,{expiresIn: '8h'})
     }
 }
+
+export async function getPerfilEncargadoOficina(rut) {
+    const encargado = await buscarPorRut(rut,{oficina: true});
+    return {
+        rut: encargado.rut,
+        nombre: encargado.nombre,
+        correoContacto: encargado.correoContacto,
+        idOficina: encargado.idOficina,
+        idCampus: encargado.oficina.idCampus
+    }
+}
