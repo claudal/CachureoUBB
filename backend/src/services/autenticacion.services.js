@@ -16,11 +16,13 @@ export async function loginEncargadoOficina(rut,clave){
     }
     const payload = {
         rut: usuario.rut,
+        nombre: usuario.nombre,
+        correoContacto: usuario.correoContacto,
         idOficina: usuario.oficina.id,
         idCampus: usuario.oficina.idCampus
     }
     return {
         usuario: payload,
-        token: jwt.sign(payload,process.env.JWT_SECRET,{expiresIn: '8h'})
+        token: jwt.sign({rut: payload.rut},process.env.JWT_SECRET,{expiresIn: '8h'})
     }
 }
