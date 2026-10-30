@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
-import { buscarPorId } from "./encargadoOficina.services.js";
+import { buscarPorRut } from "./encargadoOficina.services.js";
 import jwt from "jsonwebtoken";
 
 export async function loginEncargadoOficina(rut,clave){
-    const usuario = await buscarPorId(rut,{oficina:true});
+    const usuario = await buscarPorRut(rut,{oficina:true});
     if(!usuario) {
         const err = new Error('Persona no encontrada');
         err.statusCode = 404;

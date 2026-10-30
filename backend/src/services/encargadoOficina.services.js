@@ -6,6 +6,6 @@ import { prisma } from "../config/prisma.js";
  * @param {import("@prisma/client").Prisma.EncargadoOficinaInclude} include
  * @returns 
  */
-export function buscarPorId(rut,include=undefined){
+export function buscarPorRut(rut,include=undefined){
     return prisma.encargadoOficina.findUnique({where:{rut: rut},include});
 }
