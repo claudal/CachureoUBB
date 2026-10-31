@@ -74,6 +74,7 @@ CREATE TABLE "encargado_oficina" (
     "clave" VARCHAR(255) NOT NULL,
     "habilitado" BOOLEAN NOT NULL DEFAULT true,
     "reinicio_clave" BOOLEAN NOT NULL DEFAULT false,
+    "fechaClave" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "id_oficina" INTEGER NOT NULL,
 
     CONSTRAINT "encargado_oficina_pkey" PRIMARY KEY ("rut")
@@ -93,9 +94,10 @@ CREATE TABLE "objeto_perdido" (
 
 -- CreateTable
 CREATE TABLE "alerta_busqueda" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "fecha_creacion" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "fecha_edicion" TIMESTAMP(3) NOT NULL,
+    "nombre" VARCHAR(63) NOT NULL,
     "descripcion" TEXT NOT NULL,
     "id_campus" INTEGER NOT NULL,
     "id_estado" INTEGER NOT NULL,
@@ -143,7 +145,7 @@ CREATE TABLE "foto_oficina" (
 -- CreateTable
 CREATE TABLE "foto_alerta" (
     "id_foto" INTEGER NOT NULL,
-    "id_alerta" INTEGER NOT NULL,
+    "id_alerta" TEXT NOT NULL,
 
     CONSTRAINT "foto_alerta_pkey" PRIMARY KEY ("id_foto","id_alerta")
 );
@@ -158,7 +160,7 @@ CREATE TABLE "objeto_tiene_etiqueta" (
 
 -- CreateTable
 CREATE TABLE "marcador_encargado" (
-    "id_alerta" INTEGER NOT NULL,
+    "id_alerta" TEXT NOT NULL,
     "rut_encargado" VARCHAR(12) NOT NULL,
 
     CONSTRAINT "marcador_encargado_pkey" PRIMARY KEY ("id_alerta","rut_encargado")
@@ -166,7 +168,7 @@ CREATE TABLE "marcador_encargado" (
 
 -- CreateTable
 CREATE TABLE "alerta_leida" (
-    "id_alerta" INTEGER NOT NULL,
+    "id_alerta" TEXT NOT NULL,
     "rut_encargado" VARCHAR(12) NOT NULL,
 
     CONSTRAINT "alerta_leida_pkey" PRIMARY KEY ("id_alerta","rut_encargado")
@@ -174,7 +176,7 @@ CREATE TABLE "alerta_leida" (
 
 -- CreateTable
 CREATE TABLE "cierre_alerta" (
-    "id_alerta" INTEGER NOT NULL,
+    "id_alerta" TEXT NOT NULL,
     "id_entrega" INTEGER NOT NULL,
 
     CONSTRAINT "cierre_alerta_pkey" PRIMARY KEY ("id_alerta","id_entrega")
@@ -182,7 +184,7 @@ CREATE TABLE "cierre_alerta" (
 
 -- CreateTable
 CREATE TABLE "solicitud_detalles" (
-    "id_alerta" INTEGER NOT NULL,
+    "id_alerta" TEXT NOT NULL,
     "rut_encargado" VARCHAR(12) NOT NULL,
     "fecha_modificacion" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "indicaciones" TEXT NOT NULL,
@@ -192,7 +194,7 @@ CREATE TABLE "solicitud_detalles" (
 
 -- CreateTable
 CREATE TABLE "reunion" (
-    "id_alerta" INTEGER NOT NULL,
+    "id_alerta" TEXT NOT NULL,
     "rut_encargado" VARCHAR(12) NOT NULL,
     "fecha_modificacion" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "indicaciones" TEXT NOT NULL,
@@ -211,6 +213,9 @@ CREATE TABLE "tratamiento_caducidad" (
 
     CONSTRAINT "tratamiento_caducidad_pkey" PRIMARY KEY ("id_objeto","rut_encargado")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "foto_url_key" ON "foto"("url");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "entrega_id_foto_key" ON "entrega"("id_foto");
