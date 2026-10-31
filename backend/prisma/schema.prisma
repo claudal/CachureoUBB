@@ -103,7 +103,6 @@ model EncargadoOficina {
   clave          String   @db.VarChar(255)
   habilitado     Boolean  @default(true)
   reinicioClave  Boolean  @default(false) @map("reinicio_clave")
-  fechaClave     DateTime @default(now())
   idOficina      Int      @map("id_oficina")
 
   // Relaciones con @relation explícito
