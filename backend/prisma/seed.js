@@ -11,10 +11,12 @@ async function main() {
   if(process.env.NODE_ENV !== 'development')
     return;
 
-  await prisma.alertaBusqueda.deleteMany();
-  await prisma.encargadoOficina.deleteMany();
-  await prisma.oficina.deleteMany();
-  await prisma.campus.deleteMany();
+  try {
+    await prisma.alertaBusqueda.deleteMany();
+    await prisma.encargadoOficina.deleteMany();
+    await prisma.oficina.deleteMany();
+    await prisma.campus.deleteMany();
+  } catch (err){}
 
   console.log('=> Creando campus');
   const nombreCampus = ['Concepción', 'La Castilla', 'Fernando May'];
