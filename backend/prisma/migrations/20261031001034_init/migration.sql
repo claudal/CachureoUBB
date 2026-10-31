@@ -74,7 +74,6 @@ CREATE TABLE "encargado_oficina" (
     "clave" VARCHAR(255) NOT NULL,
     "habilitado" BOOLEAN NOT NULL DEFAULT true,
     "reinicio_clave" BOOLEAN NOT NULL DEFAULT false,
-    "fechaClave" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "id_oficina" INTEGER NOT NULL,
 
     CONSTRAINT "encargado_oficina_pkey" PRIMARY KEY ("rut")
