@@ -2,6 +2,8 @@ import bcrypt from "bcrypt";
 import { buscarPorRut } from "./encargadoOficina.services.js";
 import jwt from "jsonwebtoken";
 
+const SESSION_EXPIRATION_TIME = '1h';
+
 export async function loginEncargadoOficina(rut,clave){
     const usuario = await buscarPorRut(rut,{oficina:true});
     if(!usuario) {
@@ -23,7 +25,7 @@ export async function loginEncargadoOficina(rut,clave){
     }
     return {
         usuario: payload,
-        token: jwt.sign({rut: payload.rut},process.env.JWT_SECRET,{expiresIn: '8h'})
+        token: jwt.sign({rut: payload.rut},process.env.JWT_SECRET,{expiresIn: SESSION_EXPIRATION_TIME})
     }
 }
 
