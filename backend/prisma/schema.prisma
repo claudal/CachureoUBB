@@ -97,13 +97,14 @@ model Oficina {
 }
 
 model EncargadoOficina {
-  rut            String  @id @db.VarChar(9)
-  nombre         String  @db.VarChar(150)
-  correoContacto String  @map("correo_contacto") @db.VarChar(255)
-  clave          String  @db.VarChar(255)
-  habilitado     Boolean @default(true)
-  reinicioClave  Boolean @default(false) @map("reinicio_clave")
-  idOficina      Int     @map("id_oficina")
+  rut            String   @id @db.VarChar(9)
+  nombre         String   @db.VarChar(150)
+  correoContacto String   @map("correo_contacto") @db.VarChar(255)
+  clave          String   @db.VarChar(255)
+  habilitado     Boolean  @default(true)
+  reinicioClave  Boolean  @default(false) @map("reinicio_clave")
+  fechaClave     DateTime @default(now())
+  idOficina      Int      @map("id_oficina")
 
   // Relaciones con @relation explícito
   oficina Oficina @relation(fields: [idOficina], references: [id], onDelete: Restrict)
