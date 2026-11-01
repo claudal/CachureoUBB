@@ -1,77 +1,115 @@
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginEncargadoSchema } from '../schemas/auth.schema';
 import { useState } from 'react';
 import { useAuth } from '../context/AutenticacionContext';
 import { useNavigate } from 'react-router-dom';
 
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert"
 
 export default function EncargadoLoginPage() {
     const [apiError, setApiError] = useState(null);
     const { loginEncargadoOficina } = useAuth();
     const navigate = useNavigate();
-    const {
-        register,
-        handleSubmit,
-        formState: {errors, isSubmitting}
-    } = useForm({resolver: zodResolver(LoginEncargadoSchema)});
+    const formulario = useForm({resolver: zodResolver(LoginEncargadoSchema)});
     const onSubmit = async (data) => {
         setApiError(null);
         try{
             await loginEncargadoOficina(data)
-            navigate('encargadoOficina/inicio');
+            navigate('/encargado/principal',{relative:false});
         } catch(err) {
             setApiError(err.message);
         }
     }
     return (
-        <div>
-            <header>
-                <h1>
-                    Iniciar sesión
-                </h1>
-            </header>
-            {
-                apiError && (
-                    <div>
-                        <p>{apiError}</p>
-                    </div>
-                )
-            }
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <div>
-                    <label>
-                        Ingrese su rut
-                    </label>
-                    <input type="text" placeholder="12345678-9" {...register("rut")} />
-                    {
-                        errors.rut && (
-                            <p>
-                                {errors.rut.message}
-                            </p>
-                        )
-                    }
-                </div>
-                <div>
-                    <label>
-                        Ingrese su contraseña
-                    </label>
-                    <input type="password" placeholder="••••••••" {...register("clave")}/>
-                    {
-                        errors.clave && (
-                            <p>
-                                {errors.clave.message}
-                            </p>
-                        )
-                    }
-                </div>
-                <button type="submit">
-                    Ingresar
-                </button>
-            </form>
-            <footer>
-                ¿Olvidaste tu contraseña? <span>Solicita la recuperación</span>
-            </footer>
+        <div className="flex min-h-screen items-center justify-center p-4">
+            <Card className="w-full sm:max-w-md">
+            <CardHeader>
+                <CardTitle>Iniciar sesión</CardTitle>
+                <CardDescription>
+                Ingrese sus credenciales.
+                </CardDescription>
+                {apiError && (
+                    <Alert variant="destructive">
+                        <AlertTitle>Error al ingresar</AlertTitle>
+                        <AlertDescription>{apiError}</AlertDescription>
+                    </Alert>
+                )}
+            </CardHeader>
+            <CardContent>
+                <form id="form-rhf-demo" onSubmit={formulario.handleSubmit(onSubmit)}>
+                <FieldGroup>
+                    <Controller
+                    name="rut"
+                    control={formulario.control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="form-rut">
+                            Rut
+                        </FieldLabel>
+                        <Input
+                            {...field}
+                            id="form-rut"
+                            aria-invalid={fieldState.invalid}
+                            placeholder="11.111.111-1"
+                            autoComplete="on"
+                        />
+                        {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                        )}
+                        </Field>
+                    )}
+                    />
+                    <Controller
+                    name="clave"
+                    control={formulario.control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="form-clave">
+                            Contraseña
+                        </FieldLabel>
+                        <Input
+                            {...field}
+                            type="password"
+                            id="form-clave"
+                            aria-invalid={fieldState.invalid}
+                            placeholder="•••••••"
+                            autoComplete="off"
+                        />
+                        {fieldState.invalid && (
+                            <FieldError errors={[fieldState.error]} />
+                        )}
+                        </Field>
+                    )}
+                    />
+                </FieldGroup>
+                </form>
+            </CardContent>
+            <CardFooter>
+                <Field orientation="horizontal">
+                <Button type="submit" form="form-rhf-demo" disabled={formulario.formState.isSubmitting}>
+                    {formulario.formState.isSubmitting ? "Ingresando..." : "Ingresar"}
+                </Button>
+                </Field>
+            </CardFooter>
+            </Card>
         </div>
-    );
+  );
 }
