@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
       } catch (error) {
         console.error('Error al restaurar sesión:', error);
         localStorage.removeItem('token');
-        setUser(null);
+        setUsuario(null);
       } finally {
         setCargando(false);
       }
@@ -42,13 +42,13 @@ export function AuthProvider({ children }) {
   const loginEncargadoOficina = async (credenciales) => {
     const data = await services.loginEncargadoOficina(credenciales);
     localStorage.setItem('token', data.token);
-    setUser(data.usuario);
+    setUsuario(data.usuario);
     return data.usuario;
   };
 
   const logout = () => {
     localStorage.removeItem('token');
-    setUser(null);
+    setUsuario(null);
   };
 
   const value = {

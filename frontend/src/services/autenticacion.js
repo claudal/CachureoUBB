@@ -5,5 +5,5 @@ export function loginEncargadoOficina(credenciales){
 }
 
 export function getPerfil(){
-    return api.get('/perfil/');
+    return api.get('/autenticacion/perfil/');
 }

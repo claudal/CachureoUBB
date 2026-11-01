@@ -1,4 +1,6 @@
-const BASE = import.meta.env.VITE_API_URL;
+import { API_URL } from '../api/config.js';
+
+const BASE = API_URL;
 
 async function pedir(ruta, opciones = {}) {
   const headers = { 'Content-Type': 'application/json' }

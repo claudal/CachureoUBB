@@ -19,7 +19,7 @@ export default function EncargadoLoginPage() {
         setApiError(null);
         try{
             await loginEncargadoOficina(data)
-            navigate('encargadoOficina/inicio');
+            navigate('/encargado/principal');
         } catch(err) {
             setApiError(err.message);
         }
@@ -65,8 +65,8 @@ export default function EncargadoLoginPage() {
                         )
                     }
                 </div>
-                <button type="submit">
-                    Ingresar
+                <button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Ingresando...' : 'Ingresar'}
                 </button>
             </form>
             <footer>
