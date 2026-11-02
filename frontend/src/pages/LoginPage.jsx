@@ -33,7 +33,7 @@ export default function EncargadoLoginPage() {
         setApiError(null);
         try{
             await loginEncargadoOficina(data)
-            navigate('/encargado/principal',{relative:false});
+            navigate('/menuOficina',{relative:false});
         } catch(err) {
             setApiError(err.message);
         }
@@ -41,74 +41,74 @@ export default function EncargadoLoginPage() {
     return (
         <div className="flex min-h-screen items-center justify-center p-4">
             <Card className="w-full sm:max-w-md">
-            <CardHeader>
-                <CardTitle>Iniciar sesión</CardTitle>
-                <CardDescription>
-                Ingrese sus credenciales.
-                </CardDescription>
-                {apiError && (
-                    <Alert variant="destructive">
-                        <AlertTitle>Error al ingresar</AlertTitle>
-                        <AlertDescription>{apiError}</AlertDescription>
-                    </Alert>
-                )}
-            </CardHeader>
-            <CardContent>
-                <form id="form-rhf-demo" onSubmit={formulario.handleSubmit(onSubmit)}>
-                <FieldGroup>
-                    <Controller
-                    name="rut"
-                    control={formulario.control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="form-rut">
-                            Rut
-                        </FieldLabel>
-                        <Input
-                            {...field}
-                            id="form-rut"
-                            aria-invalid={fieldState.invalid}
-                            placeholder="11.111.111-1"
-                            autoComplete="on"
-                        />
-                        {fieldState.invalid && (
-                            <FieldError errors={[fieldState.error]} />
-                        )}
-                        </Field>
+                <CardHeader>
+                    <CardTitle>Iniciar sesión</CardTitle>
+                    <CardDescription>
+                    Ingrese sus credenciales.
+                    </CardDescription>
+                    {apiError && (
+                        <Alert variant="destructive">
+                            <AlertTitle>Error al ingresar</AlertTitle>
+                            <AlertDescription>{apiError}</AlertDescription>
+                        </Alert>
                     )}
-                    />
-                    <Controller
-                    name="clave"
-                    control={formulario.control}
-                    render={({ field, fieldState }) => (
-                        <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor="form-clave">
-                            Contraseña
-                        </FieldLabel>
-                        <Input
-                            {...field}
-                            type="password"
-                            id="form-clave"
-                            aria-invalid={fieldState.invalid}
-                            placeholder="•••••••"
-                            autoComplete="off"
-                        />
-                        {fieldState.invalid && (
-                            <FieldError errors={[fieldState.error]} />
+                </CardHeader>
+                <CardContent>
+                    <form id="form-rhf-demo" onSubmit={formulario.handleSubmit(onSubmit)}>
+                    <FieldGroup>
+                        <Controller
+                        name="rut"
+                        control={formulario.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor="form-rut">
+                                Rut
+                            </FieldLabel>
+                            <Input
+                                {...field}
+                                id="form-rut"
+                                aria-invalid={fieldState.invalid}
+                                placeholder="11.111.111-1"
+                                autoComplete="on"
+                            />
+                            {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                            )}
+                            </Field>
                         )}
-                        </Field>
-                    )}
-                    />
-                </FieldGroup>
-                </form>
-            </CardContent>
-            <CardFooter>
-                <Field orientation="horizontal">
-                <Button type="submit" form="form-rhf-demo" disabled={formulario.formState.isSubmitting}>
-                    {formulario.formState.isSubmitting ? "Ingresando..." : "Ingresar"}
-                </Button>
-                </Field>
-            </CardFooter>
+                        />
+                        <Controller
+                        name="clave"
+                        control={formulario.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor="form-clave">
+                                Contraseña
+                            </FieldLabel>
+                            <Input
+                                {...field}
+                                type="password"
+                                id="form-clave"
+                                aria-invalid={fieldState.invalid}
+                                placeholder="•••••••"
+                                autoComplete="off"
+                            />
+                            {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                            )}
+                            </Field>
+                        )}
+                        />
+                    </FieldGroup>
+                    </form>
+                </CardContent>
+                <CardFooter>
+                    <Field orientation="horizontal">
+                    <Button type="submit" form="form-rhf-demo" disabled={formulario.formState.isSubmitting}>
+                        {formulario.formState.isSubmitting ? "Ingresando..." : "Ingresar"}
+                    </Button>
+                    </Field>
+                </CardFooter>
             </Card>
         </div>
   );
