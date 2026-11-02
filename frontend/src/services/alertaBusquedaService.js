@@ -1,6 +1,6 @@
 import { api } from "./api.js";
 
-export function listar(filtros){
+export function listar(filtros={}){
     const query = new URLSearchParams();
     if(filtros.idEstado) query.set('idEstado',filtros.idEstado);
     if(filtros.marcado) query.set('marcado',filtros.marcado)
