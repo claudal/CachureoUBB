@@ -1,4 +1,5 @@
 import * as services from "../services/alertaBusqueda.services.js";
+import { buscarPorRut } from "../services/encargadoOficina.services.js";
 
 /**
  * 
@@ -8,7 +9,12 @@ import * as services from "../services/alertaBusqueda.services.js";
  */
 export async function getAlertasBusqueda(req, res, next) {
     try {
-        return res.json(await services.listarEncargado(req.user.rut,req.user.idCampus, req.vQuery));
+        // la sede se obtiene de la oficina actual del encargado y no del token,
+        // asi un cambio de oficina de encargado se refleja de inmediato
+        const encargado = await buscarPorRut(req.user.rut, {oficina: true});
+        if(!encargado)
+            return res.status(401).json({"error": "El usuario de la sesión ya no existe"});
+        return res.json(await services.listarEncargado(encargado.rut, encargado.oficina.idCampus, req.vQuery));
     } catch (err) {
         next(err);
     }

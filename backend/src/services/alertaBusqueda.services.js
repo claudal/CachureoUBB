@@ -1,6 +1,9 @@
 import { prisma } from "../config/prisma.js";
 
 export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
+    // sin sede, Prisma ignoraría el filtro y devolvería alertas de todas las sedes
+    if(idCampus == null)
+        throw new Error("Se requiere la sede para listar alertas");
     /**@type {import("@prisma/client").Prisma.AlertaBusquedaWhereInput}*/
     const where = {
         idCampus
