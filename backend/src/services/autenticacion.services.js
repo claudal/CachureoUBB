@@ -6,14 +6,15 @@ const SESSION_EXPIRATION_TIME = '1h';
 
 export async function loginEncargadoOficina(rut,clave){
     const usuario = await buscarPorRut(rut,{oficina:true});
-    if(!usuario) {
-        const err = new Error('Persona no encontrada');
-        err.statusCode = 404;
+    // mismo mensaje para rut inexistente y clave incorrecta, así no se puede averiguar qué ruts existen
+    if(!usuario || !(await bcrypt.compare(clave,usuario.clave))) {
+        const err = new Error('RUT o contraseña incorrectos');
+        err.statusCode = 401;
         throw err;
     }
-    if(!(await bcrypt.compare(clave,usuario.clave))) {
-        const err = new Error('Contraseña incorrecta');
-        err.statusCode = 401;
+    if(!usuario.habilitado) {
+        const err = new Error('El usuario se encuentra deshabilitado');
+        err.statusCode = 403;
         throw err;
     }
     const payload = {
@@ -25,12 +26,22 @@ export async function loginEncargadoOficina(rut,clave){
     }
     return {
         usuario: payload,
-        token: jwt.sign({rut: payload.rut},process.env.JWT_SECRET,{expiresIn: SESSION_EXPIRATION_TIME})
+        // idOficina e idCampus van en el token porque los controladores los leen desde req.user
+        token: jwt.sign(
+            {rut: payload.rut, idOficina: payload.idOficina, idCampus: payload.idCampus},
+            process.env.JWT_SECRET,
+            {expiresIn: SESSION_EXPIRATION_TIME}
+        )
     }
 }
 
 export async function getPerfilEncargadoOficina(rut) {
     const encargado = await buscarPorRut(rut,{oficina: true});
+    if(!encargado) {
+        const err = new Error('El usuario de la sesión ya no existe');
+        err.statusCode = 404;
+        throw err;
+    }
     return {
         rut: encargado.rut,
         nombre: encargado.nombre,
