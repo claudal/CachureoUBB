@@ -3,6 +3,8 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
 
+/* tema shadcn: b2Dd5uyCu */
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
