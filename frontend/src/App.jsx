@@ -5,6 +5,7 @@ import InicioPage from './pages/InicioPage';
 import { AuthProvider } from './context/AutenticacionContext';
 import MenuOficinaPage from './pages/MenuOficina';
 import ProtectedRoute from './pages/ProtectedRoute';
+import AtenderAlertasPage from './pages/AtenderAlertas';
 
 function App() {
 
@@ -25,7 +26,7 @@ function App() {
             />
             <Route
               path="atenderAlertas"
-              element={<InicioPage />}
+              element={<AtenderAlertasPage />}
             />
             <Route
               path="perfil"
