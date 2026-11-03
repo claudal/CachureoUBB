@@ -124,7 +124,8 @@ model ObjetoPerdido {
   id           Int      @id @default(autoincrement())
   fechaIngreso DateTime @default(now()) @map("fecha_ingreso")
   nombre       String   @db.VarChar(150)
-  descripcion  String?  @db.Text
+  descripcion  String   @db.Text
+  esValioso    Boolean
   idEstado     Int      @map("id_estado")
   idOficina    Int      @map("id_oficina")
 
