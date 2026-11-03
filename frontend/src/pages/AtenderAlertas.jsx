@@ -9,40 +9,38 @@ import { AlertCircle, ArrowRightCircleIcon, BookmarkIcon, EyeIcon, SearchIcon, X
 import { useState } from 'react';
 import { FieldError, FieldGroup, Field, FieldLabel, FieldDescription } from "../components/ui/field.js"
 import { ScrollArea } from "../components/ui/scroll-area.js"
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerDescription, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
 import { CarruselImagenes } from '../components/CarruselImagenes.jsx';
+import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
 
 const filtroEtiqueta = {valioso:true}
-const filtro = {}
+const filtroAlerta = {
+  idEstado: 1
+}
+const VALOR_DEFECTO_FILTRO = {
+  "nombre": "",
+  "palabrasClave": "",
+  "etiquetasObjeto": []
+}
 
 const LARGO_MAXIMO_DESCRIPCION_ALERTA = 100;
 
 const listarAlertas = alertaBusquedaService.listar
 
 export default function AtenderAlertasPage() {
-  const [filtros, setFiltros] = useState(filtro);
+  const [filtros, setFiltros] = useState(filtroAlerta);
   const alertas = useFetch(listarAlertas,filtros);
 
-  const [menuFiltro, setMenuFiltro] = useState(false);
-  const formularioFiltro = useForm({
-    defaultValues: {
-      nombre: "",
-      palabrasClave: "",
-      etiquetasObjeto: []
-    }
-  });
-
-  function onSubmit(data){
+  const onSubmitFiltros = (data) => {
     data.marcado = filtros.marcado;
+    data.idEstado = 1;
     setFiltros(data);
-    setMenuFiltro(false);
   }
 
-  function abrirMenuFiltro(){
-    setMenuFiltro(true)
-  }
+  const controladorPanelFiltro = usePanelFiltro(VALOR_DEFECTO_FILTRO,onSubmitFiltros);
+
   function toggleMarcados(data){
     setFiltros({
       ...filtros,
@@ -79,77 +77,69 @@ export default function AtenderAlertasPage() {
 
   return (
     <div>
-      <Drawer open={menuFiltro} onOpenChange={setMenuFiltro} swipeDirection='right'>
-        <DrawerContent>
-          <DrawerHeader className="p-4 border-b">
-            <DrawerTitle className="font-semibold text-lg">Filtros</DrawerTitle>
-          </DrawerHeader>
-            <form id="form-filtros" onSubmit={formularioFiltro.handleSubmit(onSubmit)}>
-              <FieldGroup className="p-4 border-b">
-                <Controller name="nombre" control={formularioFiltro.control} render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-filtros">
-                      Nombre alerta
-                  </FieldLabel>
-                  <Input
-                      {...field}
-                      id="form-filtros"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Laptop Asus negra perdida"
-                      autoComplete="on"
-                  />
-                  {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                  )}
-                  </Field>
-                )}/>
-                <Controller name="palabrasClave" control={formularioFiltro.control} render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-filtros">
-                      Palabras clave
-                  </FieldLabel>
-                  <Input
-                      {...field}
-                      id="form-filtros"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="laptop negro stickers"
-                      autoComplete="off"
-                  />
-                  <FieldDescription>Palabras separadas por espacio</FieldDescription>
-                  {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                  )}
-                  </Field>
-                )}/>
-                <Controller
-                name="etiquetasObjeto"
-                control={formularioFiltro.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="form-filtros">Etiquetas de objeto</FieldLabel>
-                    
-                    <SelectorEtiquetasObjeto
-                      id="form-filtros"
-                      filtro={filtroEtiqueta}
-                      field={field}
-                    />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
+      <PanelFiltro controlador={controladorPanelFiltro}>
+        <FieldGroup className="p-4 border-b">
+            <Controller
+              name="nombre"
+              control={controladorPanelFiltro.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={controladorPanelFiltro.idForm}>
+                    Nombre alerta
+                </FieldLabel>
+                <Input
+                    {...field}
+                    id={controladorPanelFiltro.idForm}
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Laptop Asus negra perdida"
+                    autoComplete="on"
                 />
-              </FieldGroup>
-            </form>
-          <DrawerFooter>
-            <Button type="submit" form="form-filtros" disabled={formularioFiltro.formState.isSubmitting}>
-                Aplicar filtros
-            </Button>
-            <DrawerClose render={<Button variant="outline"><XIcon/>Cancelar</Button>}/>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+                {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                )}
+                </Field>
+            )}/>
+            <Controller name="palabrasClave"
+              control={controladorPanelFiltro.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={controladorPanelFiltro.idForm}>
+                    Palabras clave
+                </FieldLabel>
+                <Input
+                    {...field}
+                    id={controladorPanelFiltro.idForm}
+                    aria-invalid={fieldState.invalid}
+                    placeholder="laptop negro stickers"
+                    autoComplete="off"
+                />
+                <FieldDescription>Palabras separadas por espacio</FieldDescription>
+                {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                )}
+                </Field>
+            )}/>
+            <Controller
+              name="etiquetasObjeto"
+              control={controladorPanelFiltro.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={controladorPanelFiltro.idForm}>Etiquetas de objeto</FieldLabel>
+                
+                <SelectorEtiquetasObjeto
+                    id={controladorPanelFiltro.idForm}
+                    filtro={filtroEtiqueta}
+                    field={field}
+                />
+
+                {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                )}
+                </Field>
+            )}
+            />
+        </FieldGroup>
+      </PanelFiltro>
       <Drawer open={Boolean(alertaAbierta)} onOpenChange={cerrarAlerta} swipeDirection='left' >
         <DrawerContent className="flex flex-col h-full max-h-[100dvh] w-full sm:max-w-md ml-auto">
             <DrawerHeader className="p-4 border-b">
@@ -196,7 +186,7 @@ export default function AtenderAlertasPage() {
             <Toggle onPressedChange={toggleMarcados} variant="outline" disabled={alertas.cargando}>
               <BookmarkIcon className="group-aria-pressed/toggle:fill-foreground"/>Solo marcadas
             </Toggle>
-            <Button onClick={abrirMenuFiltro} variant="outline" disabled={alertas.cargando}>
+            <Button onClick={()=>controladorPanelFiltro.setAbierto(true)} variant="outline" disabled={alertas.cargando}>
                 <SearchIcon />Abrir filtros
             </Button>
           </div>
