@@ -1,31 +1,39 @@
 import * as alertaBusquedaService from '../services/alertaBusquedaService.js';
-import * as etiquetaObjetoService from '../services/etiquetaObjetoService.js';
 import { useFetch } from '../hooks/useFetch.js';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
 import { Badge } from '../components/ui/badge.js'
 import { Toggle } from '../components/ui/toggle.js'
 import { Button } from '../components/ui/button.js'
 import { Input } from '../components/ui/input.js';
-import { AlertCircle, BookmarkIcon, EyeIcon, SearchIcon, XIcon } from 'lucide-react';
-import { Fragment, useState } from 'react';
+import { AlertCircle, ArrowRightCircleIcon, BookmarkIcon, EyeIcon, SearchIcon, XIcon } from 'lucide-react';
+import { useState } from 'react';
 import { FieldError, FieldGroup, Field, FieldLabel, FieldDescription } from "../components/ui/field.js"
+import { ScrollArea } from "../components/ui/scroll-area.js"
 import { Controller, useForm } from 'react-hook-form';
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
-import { Combobox, ComboboxChip, ComboboxChips, ComboboxChipsInput, ComboboxContent, ComboboxEmpty, ComboboxItem, ComboboxList, ComboboxValue, useComboboxAnchor } from '../components/ui/combobox.js';
-
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../components/ui/carousel.js';
+import { urlFoto } from '../utils/urlFoto.js';
+import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 
 const filtroEtiqueta = {valioso:true}
 const filtro = {}
 
 const LARGO_MAXIMO_DESCRIPCION_ALERTA = 100;
+
+const listarAlertas = alertaBusquedaService.listar
+
 export default function AtenderAlertasPage() {
   const [filtros, setFiltros] = useState(filtro);
-  const alertas = useFetch(alertaBusquedaService.listar,filtros);
+  const alertas = useFetch(listarAlertas,filtros);
 
   const [menuFiltro, setMenuFiltro] = useState(false);
-  const formularioFiltro = useForm();
-  const {datos: etiquetasObjeto, cargando: etiquetasObjetoCargando} = useFetch(etiquetaObjetoService.listar,filtroEtiqueta);
-  const anchor = useComboboxAnchor()
+  const formularioFiltro = useForm({
+    defaultValues: {
+      nombre: "",
+      palabrasClave: "",
+      etiquetasObjeto: []
+    }
+  });
 
   function onSubmit(data){
     data.marcado = filtros.marcado;
@@ -42,6 +50,39 @@ export default function AtenderAlertasPage() {
       marcado: data
     })
   }
+
+  
+  const [alertaAbierta, setAlertaAbierta] = useState(null);
+  const [alertaOriginal,setAlertaOriginal] = useState(null);
+  async function abrirAlerta(alerta){
+    alertaBusquedaService.registrarLectura(alerta.id);
+    setAlertaOriginal(alerta);
+    setAlertaAbierta(alerta);
+  }
+  function toggleMarcarAlerta(valor){
+    setAlertaAbierta({
+      ...alertaAbierta,
+      marcada: valor
+    })
+  }
+
+  async function cerrarAlerta(){
+    if(alertaOriginal.marcada !== alertaAbierta.marcada){
+      if(alertaAbierta.marcada)
+        await alertaBusquedaService.agregarMarcador(alertaAbierta.id)
+      else 
+        await alertaBusquedaService.quitarMarcador(alertaAbierta.id)
+    }
+    setAlertaAbierta(null);
+    setAlertaOriginal(null);
+    alertas.recargar();
+  }
+  
+  const [fotoAbierta, setFotoAbierta] = useState(null);
+  async function abrirFoto(foto){
+    setFotoAbierta(foto);
+  }
+
   return (
     <div>
       <Drawer open={menuFiltro} onOpenChange={setMenuFiltro} swipeDirection='right'>
@@ -93,46 +134,11 @@ export default function AtenderAlertasPage() {
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor="form-filtros">Etiquetas de objeto</FieldLabel>
                     
-                    <Combobox
+                    <SelectorEtiquetasObjeto
                       id="form-filtros"
-                      multiple
-                      autoHighlight
-                      value={field.value || []}
-                      onValueChange={field.onChange}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                      items={etiquetasObjeto}
-                      disabled={etiquetasObjetoCargando}
-                      itemToStringValue={(etiqueta)=> etiqueta.nombre}
-                    >
-                      <ComboboxChips ref={anchor} className="w-full max-w-xs">
-                        <ComboboxValue>
-                          {(values) => (
-                            <Fragment>
-                              {values?.map((value) => {
-                                const etiqueta = etiquetasObjeto.find((item) => item.id === value)
-                                return (
-                                <ComboboxChip key={etiqueta.id}>
-                                  {etiqueta.nombre}
-                                </ComboboxChip>
-                              )})}
-                              <ComboboxChipsInput />
-                            </Fragment>
-                          )}
-                        </ComboboxValue>
-                      </ComboboxChips>
-
-                      <ComboboxContent anchor={anchor}>
-                        <ComboboxEmpty>No items found.</ComboboxEmpty>
-                        <ComboboxList>
-                          {etiquetasObjeto?.map((etiqueta) => (
-                            <ComboboxItem key={etiqueta.id} value={etiqueta.id}>
-                              {etiqueta.nombre}
-                            </ComboboxItem>
-                          ))}
-                        </ComboboxList>
-                      </ComboboxContent>
-                    </Combobox>
+                      filtro={filtroEtiqueta}
+                      field={field}
+                    />
 
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -150,8 +156,72 @@ export default function AtenderAlertasPage() {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
+      <Drawer open={Boolean(alertaAbierta)} onOpenChange={cerrarAlerta} swipeDirection='left' >
+        <DrawerContent className="flex flex-col h-full max-h-[100dvh] w-full sm:max-w-md ml-auto">
+            <DrawerHeader className="p-4 border-b">
+              <DrawerTitle className="font-semibold text-lg">{alertaAbierta?.nombre}</DrawerTitle>
+              <div className="flex flex-wrap gap-1">
+                {alertaAbierta?.etiquetas?.map((etiqueta)=>(
+                  <Badge variant={'default'}  key={`${alertaAbierta.id}-${etiqueta.id}`}>{etiqueta.nombre}</Badge>
+                ))}
+              </div>
+              <Toggle pressed={alertaAbierta && alertaAbierta.marcada} onPressedChange={toggleMarcarAlerta} variant="outline">
+                <BookmarkIcon className="group-aria-pressed/toggle:fill-foreground"/>Marcar
+              </Toggle>
+            </DrawerHeader>
+            <div className="flex-1 min-h-0 flex flex-col p-4 gap-2 overflow-hidden">
+              <Drawer open={Boolean(fotoAbierta)} onOpenChange={() => setFotoAbierta(null)} swipeDirection='left'>
+                <DrawerContent>
+                  <div className="flex-1 min-h-0 flex items-center justify-center p-4">
+                    <img
+                      src={urlFoto(fotoAbierta?.url)}
+                      alt={`Imagen ${fotoAbierta?.id}`}
+                      className="max-h-full max-w-full w-auto h-auto object-contain rounded-md shadow-sm"
+                    />
+                  </div>
+                  <DrawerFooter>
+                    <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
+                  </DrawerFooter>
+                </DrawerContent>
+              </Drawer>
+              <Carousel>
+                <CarouselContent>
+                  {alertaAbierta?.fotos.map((foto) => (
+                    <CarouselItem key={foto.id}>
+                      <div className="relative flex items-center justify-center h-48 w-full bg-background/50 rounded-md overflow-hidden border">
+                        <img
+                          src={urlFoto(foto.url)}
+                          alt={`Imagen ${foto.id}`}
+                          className="h-full w-full object-contain p-1"
+                          onClick={()=>abrirFoto(foto)}
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="left-2 h-7 w-7" />
+                <CarouselNext className="right-2 h-7 w-7" />
+              </Carousel>
+              <div className="flex-1 min-h-0 flex flex-col">
+                <ScrollArea className="h-full w-full rounded-md border p-3">
+                  <DrawerDescription className="text-sm text-foreground/90 whitespace-pre-wrap">
+                    {alertaAbierta?.descripcion}
+                  </DrawerDescription>
+                </ScrollArea>
+              </div>
+            </div>
+            <DrawerFooter>
+              <Button variant="secondary">
+                  Solicitar más información
+              </Button>
+              <Button>
+                  Revelar oficina
+              </Button>
+              <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
+            </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
       <div>
-        
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b mb-6">
           {/* Lado izquierdo: Título e identidad visual */}
           <div className="flex items-center gap-3">
@@ -161,7 +231,7 @@ export default function AtenderAlertasPage() {
           {/* Lado derecho: Acciones y Filtros */}
           <div className="flex items-center gap-2">
             <Toggle onPressedChange={toggleMarcados} variant="outline" disabled={alertas.cargando}>
-              <BookmarkIcon className="group-aria-pressed/toggle:fill-foreground"/>Solo guardadas
+              <BookmarkIcon className="group-aria-pressed/toggle:fill-foreground"/>Solo marcadas
             </Toggle>
             <Button onClick={abrirMenuFiltro} variant="outline" disabled={alertas.cargando}>
                 <SearchIcon />Abrir filtros
@@ -175,16 +245,20 @@ export default function AtenderAlertasPage() {
             <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
               {alertas.datos.map((alerta)=>{
                 return (
-                    <Card key={alerta.id} size="default" >
+                    <Card key={alerta.id} size="default" onClick={()=>abrirAlerta(alerta)}>
                       <CardHeader>
                         <CardTitle>
                           {alerta.nombre}
-                          <span className='p-1'>
+                          <div className='p-1'>
                             {alerta.leida ? 
                               (<Badge variant="secondary"><EyeIcon/>Leída</Badge>) : 
                               (alerta.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
                             }
-                          </span>
+                            {alerta.marcada ? 
+                              (<Badge variant="secondary"><BookmarkIcon/>Marcada</Badge>) : 
+                              (alerta.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
+                            }
+                          </div>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -193,11 +267,9 @@ export default function AtenderAlertasPage() {
                           alerta.descripcion
                         }</CardDescription>
                       </CardContent>
-                      <CardFooter>
+                      <CardFooter className="flex flex-wrap gap-1">
                         {alerta.etiquetas?.map((etiqueta)=>(
-                          <span className='p-0.5'>
-                            <Badge variant={'default'} key={`${alerta.id}-${etiqueta.id}`}>{etiqueta.nombre}</Badge>
-                          </span>
+                          <Badge variant={'default'}  key={`${alerta.id}-${etiqueta.id}`}>{etiqueta.nombre}</Badge>
                         ))}
                       </CardFooter>
                     </Card>
