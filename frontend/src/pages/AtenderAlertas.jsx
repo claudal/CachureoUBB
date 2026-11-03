@@ -1,228 +1,212 @@
 import * as alertaBusquedaService from '../services/alertaBusquedaService.js';
+import * as etiquetaObjetoService from '../services/etiquetaObjetoService.js';
 import { useFetch } from '../hooks/useFetch.js';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
 import { Badge } from '../components/ui/badge.js'
-import { AlertCircle, EyeIcon } from 'lucide-react';
+import { Toggle } from '../components/ui/toggle.js'
+import { Button } from '../components/ui/button.js'
+import { Input } from '../components/ui/input.js';
+import { AlertCircle, BookmarkIcon, EyeIcon, SearchIcon, XIcon } from 'lucide-react';
+import { Fragment, useState } from 'react';
+import { FieldError, FieldGroup, Field, FieldLabel, FieldDescription } from "../components/ui/field.js"
+import { Controller, useForm } from 'react-hook-form';
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
+import { Combobox, ComboboxChip, ComboboxChips, ComboboxChipsInput, ComboboxContent, ComboboxEmpty, ComboboxItem, ComboboxList, ComboboxValue, useComboboxAnchor } from '../components/ui/combobox.js';
 
 
+const filtroEtiqueta = {valioso:true}
+const filtro = {}
 
+const LARGO_MAXIMO_DESCRIPCION_ALERTA = 100;
 export default function AtenderAlertasPage() {
-  const alertas = useFetch(alertaBusquedaService.listar);
-  if (alertas.cargando){
-    return (<h1>Cargando</h1>);
+  const [filtros, setFiltros] = useState(filtro);
+  const alertas = useFetch(alertaBusquedaService.listar,filtros);
+
+  const [menuFiltro, setMenuFiltro] = useState(false);
+  const formularioFiltro = useForm();
+  const {datos: etiquetasObjeto, cargando: etiquetasObjetoCargando} = useFetch(etiquetaObjetoService.listar,filtroEtiqueta);
+  const anchor = useComboboxAnchor()
+
+  function onSubmit(data){
+    data.marcado = filtros.marcado;
+    setFiltros(data);
+    setMenuFiltro(false);
+  }
+
+  function abrirMenuFiltro(){
+    setMenuFiltro(true)
+  }
+  function toggleMarcados(data){
+    setFiltros({
+      ...filtros,
+      marcado: data
+    })
   }
   return (
-    <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
-      {alertas.datos.map((alerta)=>{
-        return (
-            <Card size="default" >
-              <CardHeader>
-                <CardTitle>
-                  {alerta.nombre}
-                  <span className='p-1'>
-                    {alerta.leida ? 
-                      (<Badge variant="secondary"><EyeIcon/>Leída</Badge>) : 
-                      (alerta.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
-                    }
-                  </span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>{alerta.descripcion}</CardDescription>
-              </CardContent>
-            </Card>
-        )
-      })}
+    <div>
+      <Drawer open={menuFiltro} onOpenChange={setMenuFiltro} swipeDirection='right'>
+        <DrawerContent>
+          <DrawerHeader className="p-4 border-b">
+            <DrawerTitle className="font-semibold text-lg">Filtros</DrawerTitle>
+          </DrawerHeader>
+            <form id="form-filtros" onSubmit={formularioFiltro.handleSubmit(onSubmit)}>
+              <FieldGroup className="p-4 border-b">
+                <Controller name="nombre" control={formularioFiltro.control} render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-filtros">
+                      Nombre alerta
+                  </FieldLabel>
+                  <Input
+                      {...field}
+                      id="form-filtros"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Laptop Asus negra perdida"
+                      autoComplete="on"
+                  />
+                  {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                  )}
+                  </Field>
+                )}/>
+                <Controller name="palabrasClave" control={formularioFiltro.control} render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-filtros">
+                      Palabras clave
+                  </FieldLabel>
+                  <Input
+                      {...field}
+                      id="form-filtros"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="laptop negro stickers"
+                      autoComplete="off"
+                  />
+                  <FieldDescription>Palabras separadas por espacio</FieldDescription>
+                  {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                  )}
+                  </Field>
+                )}/>
+                <Controller
+                name="etiquetasObjeto"
+                control={formularioFiltro.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="form-filtros">Etiquetas de objeto</FieldLabel>
+                    
+                    <Combobox
+                      id="form-filtros"
+                      multiple
+                      autoHighlight
+                      value={field.value || []}
+                      onValueChange={field.onChange}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
+                      items={etiquetasObjeto}
+                      disabled={etiquetasObjetoCargando}
+                      itemToStringValue={(etiqueta)=> etiqueta.nombre}
+                    >
+                      <ComboboxChips ref={anchor} className="w-full max-w-xs">
+                        <ComboboxValue>
+                          {(values) => (
+                            <Fragment>
+                              {values?.map((value) => {
+                                const etiqueta = etiquetasObjeto.find((item) => item.id === value)
+                                return (
+                                <ComboboxChip key={etiqueta.id}>
+                                  {etiqueta.nombre}
+                                </ComboboxChip>
+                              )})}
+                              <ComboboxChipsInput />
+                            </Fragment>
+                          )}
+                        </ComboboxValue>
+                      </ComboboxChips>
+
+                      <ComboboxContent anchor={anchor}>
+                        <ComboboxEmpty>No items found.</ComboboxEmpty>
+                        <ComboboxList>
+                          {etiquetasObjeto?.map((etiqueta) => (
+                            <ComboboxItem key={etiqueta.id} value={etiqueta.id}>
+                              {etiqueta.nombre}
+                            </ComboboxItem>
+                          ))}
+                        </ComboboxList>
+                      </ComboboxContent>
+                    </Combobox>
+
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+                />
+              </FieldGroup>
+            </form>
+          <DrawerFooter>
+            <Button type="submit" form="form-filtros" disabled={formularioFiltro.formState.isSubmitting}>
+                Aplicar filtros
+            </Button>
+            <DrawerClose render={<Button variant="outline"><XIcon/>Cancelar</Button>}/>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+      <div>
+        
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b mb-6">
+          {/* Lado izquierdo: Título e identidad visual */}
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold tracking-tight">Alertas de Búsqueda</h1>
+          </div>
+
+          {/* Lado derecho: Acciones y Filtros */}
+          <div className="flex items-center gap-2">
+            <Toggle onPressedChange={toggleMarcados} variant="outline" disabled={alertas.cargando}>
+              <BookmarkIcon className="group-aria-pressed/toggle:fill-foreground"/>Solo guardadas
+            </Toggle>
+            <Button onClick={abrirMenuFiltro} variant="outline" disabled={alertas.cargando}>
+                <SearchIcon />Abrir filtros
+            </Button>
+          </div>
+        </header>
+        <div>
+          {alertas.cargando ? (
+            <h1>Cargando</h1>
+          ) : (
+            <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
+              {alertas.datos.map((alerta)=>{
+                return (
+                    <Card key={alerta.id} size="default" >
+                      <CardHeader>
+                        <CardTitle>
+                          {alerta.nombre}
+                          <span className='p-1'>
+                            {alerta.leida ? 
+                              (<Badge variant="secondary"><EyeIcon/>Leída</Badge>) : 
+                              (alerta.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
+                            }
+                          </span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <CardDescription>{alerta.descripcion.length > LARGO_MAXIMO_DESCRIPCION_ALERTA ? 
+                          `${alerta.descripcion.substring(0,LARGO_MAXIMO_DESCRIPCION_ALERTA)}...` : 
+                          alerta.descripcion
+                        }</CardDescription>
+                      </CardContent>
+                      <CardFooter>
+                        {alerta.etiquetas?.map((etiqueta)=>(
+                          <span className='p-0.5'>
+                            <Badge variant={'default'} key={`${alerta.id}-${etiqueta.id}`}>{etiqueta.nombre}</Badge>
+                          </span>
+                        ))}
+                      </CardFooter>
+                    </Card>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
-  /*const [alertas, setAlertas] = useState([]);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState('');
-  const [detallesError, setDetallesError] = useState([]);
-  
-  // Modos de filtro: 'TODAS' | 'MARCADAS'
-  const [filtro, setFiltro] = useState('TODAS');
-
-  // Cargar alertas desde la API pasando la query param según el filtro
-  const cargarAlertas = useCallback(async () => {
-    setCargando(true);
-    setError('');
-    setDetallesError([]);
-
-    try {
-      const datos = await alertaBusquedaService.listar({idEstado: 1,marcado:filtro === 'MARCADAS'});
-      
-      setAlertas(datos);
-    } catch (err) {
-      setError(err.message || 'Error al obtener las alertas');
-      if (err.detalles) {
-        setDetallesError(err.detalles);
-      }
-    } finally {
-      setCargando(false);
-    }
-  }, [filtro]); // Se ejecuta cada vez que 'filtro' cambia
-
-  useEffect(() => {
-    cargarAlertas();
-  }, [cargarAlertas]);
-
-  // Alternar el estado de marcador de una alerta (POST / DELETE subrecurso)
-  const toggleMarcador = async (idAlerta, estaMarcada) => {
-    try {
-      if (estaMarcada) {
-        // Quitar marcador (DELETE /api/alertas/:id/marcador)
-        await alertaBusquedaService.quitarMarcador(idAlerta)
-      } else {
-        // Agregar marcador (POST /api/alertas/:id/marcador)
-        await alertaBusquedaService.agregarMarcador(idAlerta);
-      }
-
-      // Actualización optimista de la interfaz local
-      if (filtro === 'MARCADAS' && estaMarcada) {
-        // Si estamos en la vista de "Marcadas" y se desmarca, se remueve de la lista inmediatamente
-        setAlertas((prev) => prev.filter((alerta) => alerta.id !== idAlerta));
-      } else {
-        // Si estamos en "Todas", solo alternamos su flag 'marcada'
-        setAlertas((prev) =>
-          prev.map((alerta) =>
-            alerta.id === idAlerta ? { ...alerta, marcada: !estaMarcada } : alerta
-          )
-        );
-      }
-    } catch (err) {
-      alert(`No se pudo actualizar el marcador: ${err.message}`);
-    }
-  };
-
-    // Alternar el estado de marcador de una alerta (POST / DELETE subrecurso)
-  const registrarLectura = async (idAlerta) => {
-    try {
-        // Agregar marcador (POST /api/alertas/:id/marcador)
-        await alertaBusquedaService.registrarLectura(idAlerta);
-
-        setAlertas((prev) =>
-            prev.map((alerta) =>
-              alerta.id === idAlerta ? { ...alerta, leida: true } : alerta
-            )
-          );
-    } catch (err) {
-      alert(`No se pudo registrar la lectura: ${err.message}`);
-    }
-  };
-
-  return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <div>
-          <h1 style={styles.title}>Alertas Abiertas</h1>
-          <p style={styles.subtitle}>Gestión y seguimiento de alertas del sistema</p>
-        </div>
-
-        <div style={styles.filterContainer}>
-          <button
-            onClick={() => setFiltro('TODAS')}
-            style={{
-              ...styles.filterBtn,
-              ...(filtro === 'TODAS' ? styles.filterBtnActive : {}),
-            }}
-          >
-            Todas
-          </button>
-          <button
-            onClick={() => setFiltro('MARCADAS')}
-            style={{
-              ...styles.filterBtn,
-              ...(filtro === 'MARCADAS' ? styles.filterBtnActive : {}),
-            }}
-          >
-            ★ Marcadas
-          </button>
-        </div>
-      </header>
-
-      {error && (
-        <div style={styles.errorBanner}>
-          <strong>{error}</strong>
-          {detallesError.length > 0 && (
-            <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
-              {detallesError.map((det, index) => (
-                <li key={index}>
-                  {det.path ? `${det.path.join('.')}: ` : ''}{det.message}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
-      {cargando ? (
-        <div style={styles.loadingState}>
-          <div style={styles.spinner}></div>
-          <p>Consultando servidor ({filtro.toLowerCase()})...</p>
-        </div>
-      ) : (
-        <main>
-          {alertas.length === 0 ? (
-            <div style={styles.emptyState}>
-              <p>No hay alertas {filtro === 'MARCADAS' ? 'marcadas' : 'abiertas'} disponibles.</p>
-            </div>
-          ) : (
-            <div style={styles.grid}>
-              {alertas.map((alerta) => (
-                <article
-                  key={alerta.id}
-                  onClick={() => !alerta.leida && registrarLectura(alerta.id)}
-                  style={{
-                    ...styles.card,
-                    backgroundColor: alerta.leida ? '#f0f2f5' : '#ffffff', // Tono más gris si está leída
-                    cursor: alerta.leida ? 'default' : 'pointer',
-                    opacity: alerta.leida ? 0.85 : 1, // Opcional: atenúa ligeramente la tarjeta
-                  }}
-                >
-                  <div style={styles.cardHeader}>
-                    <span
-                      style={{
-                        ...styles.badge,
-                        backgroundColor: getPrioridadColor(alerta.prioridad),
-                      }}
-                    >
-                      {alerta.prioridad || 'NORMAL'}
-                    </span>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation(); // Evita que el clic en la estrella active el click de la tarjeta (marcar como leída)
-                        toggleMarcador(alerta.id, alerta.marcada);
-                      }}
-                      style={styles.starBtn}
-                      title={alerta.marcada ? 'Quitar marcador' : 'Marcar alerta'}
-                    >
-                      {alerta.marcada ? '★' : '☆'}
-                    </button>
-                  </div>
-
-                  <h3 style={{
-                    ...styles.cardTitle,
-                    fontWeight: alerta.leida ? 'normal' : 'bold' // Opcional: texto normal si ya se leyó
-                  }}>
-                    {alerta.titulo}
-                  </h3>
-                  
-                  <p style={styles.cardDescription}>{alerta.descripcion}</p>
-
-                  <div style={styles.cardFooter}>
-                    <span style={styles.dateText}>
-                      {new Date(alerta.fecha_creacion || alerta.createdAt).toLocaleDateString()}
-                    </span>
-                    <span style={styles.idText}>ID: #{alerta.id}</span>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </main>
-      )}
-    </div>
-  );*/
 }
