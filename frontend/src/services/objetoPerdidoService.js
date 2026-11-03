@@ -1,5 +1,5 @@
 import { api } from "./api.js";
 
-export function listar(){
-    return api.get('/objetos');
+export function listarPublico(){
+    return api.get('/objetoPerdido');
 }

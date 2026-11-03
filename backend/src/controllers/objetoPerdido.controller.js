@@ -1,6 +1,6 @@
 import { prisma } from '../config/prisma.js';
 
-export const getObjetosPerdidos = async (req, res) => {
+export const getObjetosPerdidosPublico = async (req, res) => {
   try {
     const objetos = await prisma.objetoPerdido.findMany({
       include: {

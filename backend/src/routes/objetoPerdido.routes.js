@@ -3,6 +3,6 @@ import { getObjetosPerdidos } from '../controllers/objetoPerdido.controller.js';
 
 const router = Router();
 
-router.get('/', getObjetosPerdidos);
+router.get('/public', getObjetosPerdidosPublico);
 
 export default router;

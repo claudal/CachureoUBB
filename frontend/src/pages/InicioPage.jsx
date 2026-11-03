@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { listar } from '../services/objetoPerdidoService';
+import { listarPublico } from '../services/objetoPerdidoService';
 
 export default function InicioPage() {
   const navigate = useNavigate();
@@ -8,7 +8,7 @@ export default function InicioPage() {
   const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    listar()
+    listarPublico()
       .then(data => {
         setObjetos(data);
         setCargando(false);
