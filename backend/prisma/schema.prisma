@@ -41,10 +41,12 @@ model EstadoAlerta {
 }
 
 model EtiquetaObjeto {
-  id     Int    @id @default(autoincrement())
-  nombre String @db.VarChar(50)
+  id      Int     @id @default(autoincrement())
+  nombre  String  @db.VarChar(50)
+  valioso Boolean
 
   objetos ObjetoTieneEtiqueta[]
+  alertas AlertaTieneEtiqueta[]
 
   @@map("etiqueta_objeto")
 }
@@ -153,6 +155,7 @@ model AlertaBusqueda {
 
   marcadores          MarcadorEncargado[]
   alertasLeidas       AlertaLeida[]
+  etiquetas           AlertaTieneEtiqueta[]
   fotos               FotoAlerta[]
   cierre              CierreAlerta?
   solicitudesDetalles SolicitudDetalles[]
@@ -243,6 +246,18 @@ model ObjetoTieneEtiqueta {
 
   @@id([idObjeto, idEtiqueta])
   @@map("objeto_tiene_etiqueta")
+}
+
+model AlertaTieneEtiqueta {
+  idAlerta   String @map("id_alerta")
+  idEtiqueta Int @map("id_etiqueta")
+
+  // Relaciones con @relation explícito
+  alerta   AlertaBusqueda  @relation(fields: [idAlerta], references: [id], onDelete: Cascade)
+  etiqueta EtiquetaObjeto @relation(fields: [idEtiqueta], references: [id], onDelete: Cascade)
+
+  @@id([idAlerta, idEtiqueta])
+  @@map("alerta_tiene_etiqueta")
 }
 
 model MarcadorEncargado {

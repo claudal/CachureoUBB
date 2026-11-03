@@ -12,11 +12,49 @@ async function main() {
     return;
 
   try {
+    await prisma.etiquetaObjeto.deleteMany();
     await prisma.alertaBusqueda.deleteMany();
     await prisma.encargadoOficina.deleteMany();
     await prisma.oficina.deleteMany();
     await prisma.campus.deleteMany();
   } catch (err){}
+
+  console.log('=> Creando etiquetas de objeto');
+  const nombreEtiquetasNormales = [
+    "Mochila vacía",
+    "Ropa",
+    "Estuche",
+    "Útiles de estudio",
+    "Tecnología",
+    "Calculadora",
+    "Audífonos"
+  ];
+  const etiquetasNormales = await Promise.all(
+    nombreEtiquetasNormales.map((nombre) =>
+      prisma.etiquetaObjeto.create({
+        data: {
+          nombre,
+          valioso: false
+        }
+      })
+    )
+  );
+  const nombreEtiquetasValiosos = [
+    "Tecnología (valiosa)",
+    "Joya",
+    "Credenciales",
+    "Mochila (con cosas)"
+  ];
+  const etiquetasValiosos = await Promise.all(
+    nombreEtiquetasValiosos.map((nombre) =>
+      prisma.etiquetaObjeto.create({
+        data: {
+          nombre,
+          valioso: true
+        }
+      })
+    )
+  );
 
   console.log('=> Creando campus');
   const nombreCampus = ['Concepción', 'La Castilla', 'Fernando May'];
@@ -88,12 +126,26 @@ async function main() {
 
   console.log('=> Creando alertas de búsqueda abiertas');
   for(let i = 0;i<30;++i){
-    await prisma.alertaBusqueda.create({
+    const alerta = await prisma.alertaBusqueda.create({
       data: {
         idEstado: estadosAlerta.abierto.id,
         idCampus: faker.helpers.arrayElement(campus).id,
         nombre: faker.lorem.sentence({min:1,max:4}),
         descripcion: faker.lorem.paragraph()
+      }
+    })
+    let idEtiqueta = faker.helpers.arrayElement(etiquetasValiosos).id
+    await prisma.alertaTieneEtiqueta.create({
+      data:{
+        idEtiqueta: idEtiqueta,
+        idAlerta: alerta.id
+      }
+    })
+    let idEtiqueta2 = faker.helpers.arrayElement(etiquetasValiosos).id
+    if(Math.random() > 0.5 && idEtiqueta2 !== idEtiqueta) prisma.objetoTieneEtiqueta.create({
+      data:{
+        idEtiqueta: idEtiqueta2,
+        idAlerta: alerta.id
       }
     })
   }
