@@ -54,7 +54,7 @@ export default function EncargadoLoginPage() {
                     )}
                 </CardHeader>
                 <CardContent>
-                    <form id="form-rhf-demo" onSubmit={formulario.handleSubmit(onSubmit)}>
+                    <form id="form-rhf" onSubmit={formulario.handleSubmit(onSubmit)}>
                     <FieldGroup>
                         <Controller
                         name="rut"
@@ -104,7 +104,7 @@ export default function EncargadoLoginPage() {
                 </CardContent>
                 <CardFooter>
                     <Field orientation="horizontal">
-                    <Button type="submit" form="form-rhf-demo" disabled={formulario.formState.isSubmitting}>
+                    <Button type="submit" form="form-rhf" disabled={formulario.formState.isSubmitting}>
                         {formulario.formState.isSubmitting ? "Ingresando..." : "Ingresar"}
                     </Button>
                     </Field>
