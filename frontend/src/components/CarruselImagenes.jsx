@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button } from './ui/button.js';
 import { ArrowRightCircleIcon } from 'lucide-react';
 
-export function CarruselImagenes({fotos, swipeDirection}){
+export default function CarruselImagenes({fotos, swipeDirection}){
     const [fotoAbierta, setFotoAbierta] = useState(null);
     async function abrirFoto(foto){
         setFotoAbierta(foto);
