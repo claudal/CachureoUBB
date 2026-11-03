@@ -143,7 +143,7 @@ async function main() {
         idEstado: estadosAlerta.abierto.id,
         idCampus: faker.helpers.arrayElement(campus).id,
         nombre: faker.lorem.sentence({min:1,max:4}),
-        descripcion: faker.lorem.paragraph()
+        descripcion: faker.lorem.paragraphs({min:2,max:15})
       }
     })
     const listaFotos = faker.helpers.arrayElements(fotos,{min:1,max:3});
