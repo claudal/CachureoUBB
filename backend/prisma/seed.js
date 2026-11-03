@@ -43,7 +43,10 @@ async function main() {
     "Tecnología (valiosa)",
     "Joya",
     "Credenciales",
-    "Mochila (con cosas)"
+    "Mochila (con cosas)",
+    "Teléfono",
+    "Tablet",
+    "Laptop"
   ];
   const etiquetasValiosos = await Promise.all(
     nombreEtiquetasValiosos.map((nombre) =>
@@ -142,9 +145,16 @@ async function main() {
       }
     })
     let idEtiqueta2 = faker.helpers.arrayElement(etiquetasValiosos).id
-    if(Math.random() > 0.5 && idEtiqueta2 !== idEtiqueta) prisma.objetoTieneEtiqueta.create({
+    if(Math.random() < 0.7 && idEtiqueta2 !== idEtiqueta) await prisma.alertaTieneEtiqueta.create({
       data:{
         idEtiqueta: idEtiqueta2,
+        idAlerta: alerta.id
+      }
+    })
+    let idEtiqueta3 = faker.helpers.arrayElement(etiquetasValiosos).id
+    if(Math.random() < 0.5 && idEtiqueta3 !== idEtiqueta2 && idEtiqueta3 !== idEtiqueta) await  prisma.alertaTieneEtiqueta.create({
+      data:{
+        idEtiqueta: idEtiqueta3,
         idAlerta: alerta.id
       }
     })
