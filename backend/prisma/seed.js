@@ -12,6 +12,7 @@ async function main() {
     return;
 
   try {
+    await prisma.foto.deleteMany();
     await prisma.etiquetaObjeto.deleteMany();
     await prisma.alertaBusqueda.deleteMany();
     await prisma.encargadoOficina.deleteMany();
@@ -29,12 +30,20 @@ async function main() {
     "Calculadora",
     "Audífonos"
   ];
-  const etiquetasNormales = await Promise.all(
-    nombreEtiquetasNormales.map((nombre) =>
-      prisma.etiquetaObjeto.create({
+
+  console.log('=> Creando fotos');
+  
+  const nombreFotos = [
+    "test0.jpg",
+    "test1.jpg",
+    "test2.jpg",
+    "test3.jpg"
+  ];
+  const fotos = await Promise.all(
+    nombreFotos.map((nombre) =>
+      prisma.foto.create({
         data: {
-          nombre,
-          valioso: false
+          url: nombre
         }
       })
     )
@@ -137,24 +146,17 @@ async function main() {
         descripcion: faker.lorem.paragraph()
       }
     })
-    let idEtiqueta = faker.helpers.arrayElement(etiquetasValiosos).id
-    await prisma.alertaTieneEtiqueta.create({
-      data:{
-        idEtiqueta: idEtiqueta,
-        idAlerta: alerta.id
+    const listaFotos = faker.helpers.arrayElements(fotos,{min:1,max:3});
+    for(const foto of listaFotos) await prisma.fotoAlerta.create({
+      data: {
+        idAlerta: alerta.id,
+        idFoto: foto.id
       }
     })
-    let idEtiqueta2 = faker.helpers.arrayElement(etiquetasValiosos).id
-    if(Math.random() < 0.7 && idEtiqueta2 !== idEtiqueta) await prisma.alertaTieneEtiqueta.create({
+    const listaEtiquetas = faker.helpers.arrayElements(etiquetasValiosos,{min:1,max:3});
+    for(const etiqueta of listaEtiquetas) await prisma.alertaTieneEtiqueta.create({
       data:{
-        idEtiqueta: idEtiqueta2,
-        idAlerta: alerta.id
-      }
-    })
-    let idEtiqueta3 = faker.helpers.arrayElement(etiquetasValiosos).id
-    if(Math.random() < 0.5 && idEtiqueta3 !== idEtiqueta2 && idEtiqueta3 !== idEtiqueta) await  prisma.alertaTieneEtiqueta.create({
-      data:{
-        idEtiqueta: idEtiqueta3,
+        idEtiqueta: etiqueta.id,
         idAlerta: alerta.id
       }
     })
