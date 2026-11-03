@@ -1,18 +1,23 @@
 import * as alertaBusquedaService from '../services/alertaBusquedaService.js';
 import { useFetch } from '../hooks/useFetch.js';
+import { useState } from 'react';
+import { Controller } from 'react-hook-form';
+
+import { AlertCircle, ArrowRightCircleIcon, BookmarkIcon, EyeIcon, SearchIcon } from 'lucide-react';
+
+import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
+import CarruselImagenes from '../components/CarruselImagenes.jsx';
+
+import { FieldError, FieldGroup, Field, FieldLabel, FieldDescription } from "../components/ui/field.js"
+import { ScrollArea } from "../components/ui/scroll-area.js"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
 import { Badge } from '../components/ui/badge.js'
 import { Toggle } from '../components/ui/toggle.js'
 import { Button } from '../components/ui/button.js'
 import { Input } from '../components/ui/input.js';
-import { AlertCircle, ArrowRightCircleIcon, BookmarkIcon, EyeIcon, SearchIcon, XIcon } from 'lucide-react';
-import { useState } from 'react';
-import { FieldError, FieldGroup, Field, FieldLabel, FieldDescription } from "../components/ui/field.js"
-import { ScrollArea } from "../components/ui/scroll-area.js"
-import { Controller } from 'react-hook-form';
-import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
+import { ItemCargando } from '../components/ui/item-cargando.jsx';
+import { ItemSinDatos } from '../components/ui/item-sin-datos.jsx';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerDescription, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
-import { CarruselImagenes } from '../components/CarruselImagenes.jsx';
 import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
 
 const filtroEtiqueta = {valioso:true}
@@ -66,9 +71,9 @@ export default function AtenderAlertasPage() {
   async function cerrarAlerta(){
     if(alertaOriginal.marcada !== alertaAbierta.marcada){
       if(alertaAbierta.marcada)
-        await alertaBusquedaService.agregarMarcador(alertaAbierta.id)
+        await alertaBusquedaService.agregarMarcador(alertaAbierta.id);
       else 
-        await alertaBusquedaService.quitarMarcador(alertaAbierta.id)
+        await alertaBusquedaService.quitarMarcador(alertaAbierta.id);
     }
     setAlertaAbierta(null);
     setAlertaOriginal(null);
@@ -176,12 +181,10 @@ export default function AtenderAlertasPage() {
       </Drawer>
       <div>
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b mb-6">
-          {/* Lado izquierdo: Título e identidad visual */}
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight">Alertas de Búsqueda</h1>
           </div>
 
-          {/* Lado derecho: Acciones y Filtros */}
           <div className="flex items-center gap-2">
             <Toggle onPressedChange={toggleMarcados} variant="outline" disabled={alertas.cargando}>
               <BookmarkIcon className="group-aria-pressed/toggle:fill-foreground"/>Solo marcadas
@@ -191,46 +194,53 @@ export default function AtenderAlertasPage() {
             </Button>
           </div>
         </header>
-        <div>
-          {alertas.cargando ? (
-            <h1>Cargando</h1>
-          ) : (
-            <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
-              {alertas.datos.map((alerta)=>{
-                return (
-                    <Card key={alerta.id} size="default" onClick={()=>abrirAlerta(alerta)}>
-                      <CardHeader>
-                        <CardTitle>
-                          {alerta.nombre}
-                          <div className='p-1'>
-                            {alerta.leida ? 
-                              (<Badge variant="secondary"><EyeIcon/>Leída</Badge>) : 
-                              (alerta.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
-                            }
-                            {alerta.marcada ? 
-                              (<Badge variant="secondary"><BookmarkIcon/>Marcada</Badge>) : 
-                              (alerta.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
-                            }
-                          </div>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <CardDescription>{alerta.descripcion.length > LARGO_MAXIMO_DESCRIPCION_ALERTA ? 
-                          `${alerta.descripcion.substring(0,LARGO_MAXIMO_DESCRIPCION_ALERTA)}...` : 
-                          alerta.descripcion
-                        }</CardDescription>
-                      </CardContent>
-                      <CardFooter className="flex flex-wrap gap-1">
-                        {alerta.etiquetas?.map((etiqueta)=>(
-                          <Badge variant={'default'}  key={`${alerta.id}-${etiqueta.id}`}>{etiqueta.nombre}</Badge>
-                        ))}
-                      </CardFooter>
-                    </Card>
-                )
-              })}
+        { alertas.cargando ? (
+            <div className='align-middle justify-items-center'>
+              <ItemCargando className="max-w-100" texto='Cargando alertas...' />
             </div>
-          )}
-        </div>
+          ) : (
+            alertas.datos.length > 0 ? ( 
+              <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
+                {alertas.datos.map((alerta)=>{
+                  return (
+                      <Card key={alerta.id} size="default" onClick={()=>abrirAlerta(alerta)}>
+                        <CardHeader>
+                          <CardTitle>
+                            {alerta.nombre}
+                            <div className='p-1'>
+                              {alerta.leida ? 
+                                (<Badge variant="secondary" className='p-1'><EyeIcon/>Leída</Badge>) : 
+                                (alerta.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
+                              }
+                              {alerta.marcada ? 
+                                (<Badge variant="secondary"className='p-1'><BookmarkIcon/>Marcada</Badge>) : 
+                                (alerta.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
+                              }
+                            </div>
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <CardDescription>{alerta.descripcion.length > LARGO_MAXIMO_DESCRIPCION_ALERTA ? 
+                            `${alerta.descripcion.substring(0,LARGO_MAXIMO_DESCRIPCION_ALERTA)}...` : 
+                            alerta.descripcion
+                          }</CardDescription>
+                        </CardContent>
+                        <CardFooter className="flex flex-wrap gap-1">
+                          {alerta.etiquetas?.map((etiqueta)=>(
+                            <Badge variant={'default'}  key={`${alerta.id}-${etiqueta.id}`}>{etiqueta.nombre}</Badge>
+                          ))}
+                        </CardFooter>
+                      </Card>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className='align-middle justify-items-center'>
+                <ItemSinDatos className="max-w-100"/>
+              </div>
+            )
+          )
+        }
       </div>
     </div>
   )
