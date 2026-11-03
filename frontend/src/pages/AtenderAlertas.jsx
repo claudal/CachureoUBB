@@ -10,10 +10,9 @@ import { useState } from 'react';
 import { FieldError, FieldGroup, Field, FieldLabel, FieldDescription } from "../components/ui/field.js"
 import { ScrollArea } from "../components/ui/scroll-area.js"
 import { Controller, useForm } from 'react-hook-form';
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../components/ui/carousel.js';
-import { urlFoto } from '../utils/urlFoto.js';
 import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerDescription, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
+import { CarruselImagenes } from '../components/CarruselImagenes.jsx';
 
 const filtroEtiqueta = {valioso:true}
 const filtro = {}
@@ -76,11 +75,6 @@ export default function AtenderAlertasPage() {
     setAlertaAbierta(null);
     setAlertaOriginal(null);
     alertas.recargar();
-  }
-  
-  const [fotoAbierta, setFotoAbierta] = useState(null);
-  async function abrirFoto(foto){
-    setFotoAbierta(foto);
   }
 
   return (
@@ -170,38 +164,7 @@ export default function AtenderAlertasPage() {
               </Toggle>
             </DrawerHeader>
             <div className="flex-1 min-h-0 flex flex-col p-4 gap-2 overflow-hidden">
-              <Drawer open={Boolean(fotoAbierta)} onOpenChange={() => setFotoAbierta(null)} swipeDirection='left'>
-                <DrawerContent>
-                  <div className="flex-1 min-h-0 flex items-center justify-center p-4">
-                    <img
-                      src={urlFoto(fotoAbierta?.url)}
-                      alt={`Imagen ${fotoAbierta?.id}`}
-                      className="max-h-full max-w-full w-auto h-auto object-contain rounded-md shadow-sm"
-                    />
-                  </div>
-                  <DrawerFooter>
-                    <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
-                  </DrawerFooter>
-                </DrawerContent>
-              </Drawer>
-              <Carousel>
-                <CarouselContent>
-                  {alertaAbierta?.fotos.map((foto) => (
-                    <CarouselItem key={foto.id}>
-                      <div className="relative flex items-center justify-center h-48 w-full bg-background/50 rounded-md overflow-hidden border">
-                        <img
-                          src={urlFoto(foto.url)}
-                          alt={`Imagen ${foto.id}`}
-                          className="h-full w-full object-contain p-1"
-                          onClick={()=>abrirFoto(foto)}
-                        />
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="left-2 h-7 w-7" />
-                <CarouselNext className="right-2 h-7 w-7" />
-              </Carousel>
+              <CarruselImagenes fotos={alertaAbierta?.fotos} swipeDirection={'left'}/>
               <div className="flex-1 min-h-0 flex flex-col">
                 <ScrollArea className="h-full w-full rounded-md border p-3">
                   <DrawerDescription className="text-sm text-foreground/90 whitespace-pre-wrap">
