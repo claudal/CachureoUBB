@@ -9,6 +9,11 @@ export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
     const include = {
         etiquetas: {
             include:{etiqueta:{omit:{valioso:true}}}
+        },
+        fotos: {
+            include: {
+                foto: true
+            }
         }
     };
     if(filtros.idEstado) where.idEstado = filtros.idEstado;
@@ -50,12 +55,13 @@ export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
     }
     const alertas = await prisma.alertaBusqueda.findMany({where,include,orderBy:{fechaEdicion:'desc'}});
     return alertas.map((alerta)=>{
-        const { alertasLeidas,marcadores, etiquetas, ...restoAlerta} = alerta;
+        const { alertasLeidas,marcadores, etiquetas, fotos, ...restoAlerta} = alerta;
         return {
             ...restoAlerta,
             leida: alertasLeidas.length > 0,
             marcada: marcadores.length > 0,
-            etiquetas: etiquetas.map((e)=> e.etiqueta)
+            etiquetas: etiquetas.map((e)=> e.etiqueta),
+            fotos: fotos.map((e)=> e.foto)
         }
     });
 }
