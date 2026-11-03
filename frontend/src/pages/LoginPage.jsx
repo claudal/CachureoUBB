@@ -28,7 +28,13 @@ export default function EncargadoLoginPage() {
     const [apiError, setApiError] = useState(null);
     const { loginEncargadoOficina } = useAuth();
     const navigate = useNavigate();
-    const formulario = useForm({resolver: zodResolver(LoginEncargadoSchema)});
+    const formulario = useForm({
+        resolver: zodResolver(LoginEncargadoSchema),
+        defaultValues: {
+            rut: "",
+            clave: ""
+        }
+    });
     const onSubmit = async (data) => {
         setApiError(null);
         try{
