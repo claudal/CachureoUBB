@@ -14,6 +14,12 @@ export const updateAnimalSchema = createAnimalSchema.partial();*/
 
 export const filtroAlertaBusquedaSchema = z.object({
   idEstado: z.string().regex(/^\d+$/).transform(Number).optional(),
+  etiquetaObjeto: z.preprocess((val) => {
+      return Array.isArray(val) ? val : [val];
+    }, z.array(z.string().regex(/^\d+$/).transform(Number)))
+    .optional(),
+  nombre: z.string().optional(),
+  palabrasClave: z.string().optional(),
   marcado: z.enum(['true','false'],{error: "El valor del parámetro debe ser booleano"}).transform((valor) => valor === 'true').optional()
 });
 

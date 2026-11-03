@@ -4,8 +4,10 @@ export function listar(filtros){
     if(!filtros)
         filtros = {}
     const query = new URLSearchParams();
-    if(filtros.idEstado) query.set('idEstado',filtros.idEstado);
     if(filtros.marcado) query.set('marcado',filtros.marcado);
+    if(filtros.nombre) query.set('nombre',filtros.nombre);
+    if(filtros.palabrasClave) query.set('palabrasClave',filtros.palabrasClave);
+    filtros.etiquetasObjeto?.map((id)=>query.append('etiquetaObjeto',id));
     return api.get(`/alertasBusqueda/?${query.toString()}`);
 }
 
