@@ -14,6 +14,7 @@ async function main() {
   try {
     await prisma.foto.deleteMany();
     await prisma.etiquetaObjeto.deleteMany();
+    await prisma.objetoPerdido.deleteMany();
     await prisma.alertaBusqueda.deleteMany();
     await prisma.encargadoOficina.deleteMany();
     await prisma.oficina.deleteMany();
@@ -30,24 +31,18 @@ async function main() {
     "Calculadora",
     "Audífonos"
   ];
-
-  console.log('=> Creando fotos');
-  
-  const nombreFotos = [
-    "test0.jpg",
-    "test1.jpg",
-    "test2.jpg",
-    "test3.jpg"
-  ];
-  const fotos = await Promise.all(
-    nombreFotos.map((nombre) =>
-      prisma.foto.create({
+  const etiquetasNormales = await Promise.all(
+    nombreEtiquetasNormales.map((nombre) =>
+      prisma.etiquetaObjeto.create({
         data: {
-          url: nombre
+          nombre,
+          valioso: false
         }
       })
     )
   );
+
+  
   const nombreEtiquetasValiosos = [
     "Tecnología (valiosa)",
     "Joya",
@@ -63,6 +58,24 @@ async function main() {
         data: {
           nombre,
           valioso: true
+        }
+      })
+    )
+  );
+
+  console.log('=> Creando fotos');
+  
+  const nombreFotos = [
+    "test0.jpg",
+    "test1.jpg",
+    "test2.jpg",
+    "test3.jpg"
+  ];
+  const fotos = await Promise.all(
+    nombreFotos.map((nombre) =>
+      prisma.foto.create({
+        data: {
+          url: nombre
         }
       })
     )
@@ -89,6 +102,44 @@ async function main() {
           nombre: faker.book.title(),
           descripcion: faker.lorem.sentence(),
           idCampus: campu.id
+        }
+      }))
+    }
+  }
+
+  await prisma.estadoObjeto.deleteMany();
+  
+  const estadosOjeto = {
+    sinEntrega: await prisma.estadoObjeto.create({
+        data: {
+          id: 1,
+          nombre: "Sin entrega"
+        },
+      })
+  }
+
+  console.log('=> Creando objetos perdidos');
+  const objetos = []
+  for(let oficina of oficinas){
+    for(let i = 0;i<10;++i){
+      let valioso;
+      let etiquetas;
+      if(Math.random() < 0.5){
+        valioso = true;
+        etiquetas = faker.helpers.arrayElements(etiquetasValiosos,{min:1,max:3})
+      } else {
+        valioso = false
+        etiquetas = faker.helpers.arrayElements(etiquetasNormales,{min:1,max:3})
+      }
+      objetos.push(await prisma.objetoPerdido.create({
+        data: {
+          idOficina: oficina.id,
+          idEstado: estadosOjeto.sinEntrega.id,
+          nombre: faker.lorem.sentence({min:1,max:4}),
+          descripcion: faker.lorem.paragraphs({min:2,max:15}),
+          esValioso: valioso,
+          etiquetas: {createMany: {data: etiquetas.map((etiqueta)=> ({idEtiqueta: etiqueta.id}))}},
+          fotos: {createMany: {data: faker.helpers.arrayElements(fotos,{min: 1, max: 3}).map((foto)=> ({idFoto: foto.id}))}}
         }
       }))
     }
