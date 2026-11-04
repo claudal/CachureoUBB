@@ -77,7 +77,6 @@ export default function AtenderAlertasPage() {
     }
     setAlertaAbierta(null);
     setAlertaOriginal(null);
-    alertas.recargar();
   }
 
   return (

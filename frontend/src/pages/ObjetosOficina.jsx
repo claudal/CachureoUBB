@@ -17,7 +17,6 @@ import { ButtonGroup } from '../components/ui/button-group.js'
 import { Input } from '../components/ui/input.js';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { ItemSinDatos } from '../components/ui/item-sin-datos.jsx';
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerDescription, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
 import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
 import { urlFoto } from '../utils/urlFoto.js';
@@ -58,7 +57,6 @@ export default function ObjetosOficinaPage() {
 
   async function cerrarObjeto(){
     setObjetoAbierto(null);
-    objetos.recargar();
   }
 
   return (
@@ -205,9 +203,9 @@ export default function ObjetosOficinaPage() {
           </div>
           <ButtonGroup >
             <ButtonGroup>
-            <Button onClick={()=>controladorPanelFiltro.setAbierto(true)} variant="outline" disabled={objetos.cargando}>
-                <SearchIcon />Abrir filtros
-            </Button>
+              <Button onClick={()=>controladorPanelFiltro.setAbierto(true)} variant="outline" disabled={objetos.cargando}>
+                  <SearchIcon />Abrir filtros
+              </Button>
             </ButtonGroup>
             <ButtonGroup>
               <Button onClick={() => navigate('../registrarObjeto')}>
@@ -216,7 +214,7 @@ export default function ObjetosOficinaPage() {
             </ButtonGroup>
           </ButtonGroup>
         </header>
-        { objetos.cargando ? (
+          { objetos.cargando ? (
             <div className='align-middle justify-items-center'>
               <ItemCargando className="max-w-100" texto='Cargando objetos...' />
             </div>
@@ -233,7 +231,7 @@ export default function ObjetosOficinaPage() {
                           className="h-40 w-full bg-muted object-cover"
                         />
                       )}
-                        <CardHeader>
+                      <CardHeader>
                         <CardTitle className="flex flex-wrap items-center gap-2">
                           {objeto.nombre}
                           {objeto.valioso && (
@@ -255,8 +253,8 @@ export default function ObjetosOficinaPage() {
                         {objeto.etiquetas.map((etiqueta) => (
                           <Badge key={`${objeto.id}-${etiqueta.id}`} variant="outline">{etiqueta.nombre}</Badge>
                         ))}
-                        </CardFooter>
-                      </Card>
+                      </CardFooter>
+                    </Card>
                   )
                 })}
               </div>
