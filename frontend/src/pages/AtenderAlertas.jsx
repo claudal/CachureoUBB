@@ -146,8 +146,8 @@ export default function AtenderAlertasPage() {
         </FieldGroup>
       </PanelFiltro>
       <Drawer open={Boolean(alertaAbierta)} onOpenChange={cerrarAlerta} swipeDirection='left' >
-        <DrawerContent className="flex flex-col h-full max-h-[100dvh] w-full sm:max-w-md ml-auto">
-            <DrawerHeader className="p-4 border-b">
+        <DrawerContent>
+            <DrawerHeader className="p-4">
               <DrawerTitle className="font-semibold text-lg">{alertaAbierta?.nombre}</DrawerTitle>
               <div className="flex flex-wrap gap-1">
                 {alertaAbierta?.etiquetas?.map((etiqueta)=>(
@@ -158,15 +158,25 @@ export default function AtenderAlertasPage() {
                 <BookmarkIcon className="group-aria-pressed/toggle:fill-foreground"/>Marcar
               </Toggle>
             </DrawerHeader>
-            <div className="flex-1 min-h-0 flex flex-col p-4 gap-2 overflow-hidden">
-              <CarruselImagenes fotos={alertaAbierta?.fotos} swipeDirection={'left'}/>
-              <div className="flex-1 min-h-0 flex flex-col">
-                <ScrollArea className="h-full w-full rounded-md border p-3">
-                  <DrawerDescription className="text-sm text-foreground/90 whitespace-pre-wrap">
+            <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2">
+              
+              <span className="font-semibold text-sm text-foreground">
+                Fotos <span className='font-light text-muted-foreground'>(presione en una para expandirlo)</span>
+              </span>
+              <CarruselImagenes fotos={alertaAbierta?.fotos} swipeDirection={'left'} />
+
+              <div className="flex-1 min-h-0 flex flex-col gap-1.5">
+                <span className="font-semibold text-sm text-foreground">
+                  Descripción:
+                </span>
+                
+                <div className="flex-1 overflow-y-auto p-4 border rounded-2xl">
+                  <p className="text-sm text-muted-foreground whitespace-pre-line">
                     {alertaAbierta?.descripcion}
-                  </DrawerDescription>
-                </ScrollArea>
+                  </p>
+                </div>
               </div>
+
             </div>
             <DrawerFooter>
               <Button variant="secondary">

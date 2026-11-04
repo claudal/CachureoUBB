@@ -9,8 +9,7 @@ import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
 
 import { FieldGroup, Field, FieldLabel, FieldDescription } from "../components/ui/field.js"
-import { ScrollArea } from "../components/ui/scroll-area.js"
-import { Card, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
 import { Badge } from '../components/ui/badge.js'
 import { ToggleGroup, ToggleGroupItem } from '../components/ui/toggle-group.js'
 import { Button } from '../components/ui/button.js'
@@ -19,6 +18,7 @@ import { Input } from '../components/ui/input.js';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { ItemSinDatos } from '../components/ui/item-sin-datos.jsx';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerDescription, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
 import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
 import { urlFoto } from '../utils/urlFoto.js';
 import { DatePicker } from '../components/ui/date-picker.jsx';
@@ -163,7 +163,7 @@ export default function ObjetosOficinaPage() {
         </FieldGroup>
       </PanelFiltro>
       <Drawer open={Boolean(objetoAbierto)} onOpenChange={cerrarObjeto} swipeDirection='left' >
-        <DrawerContent className="flex flex-col h-full max-h-dvh w-full sm:max-w-md ml-auto">
+        <DrawerContent>
             <DrawerHeader className="p-4 border-b">
               <DrawerTitle className="font-semibold text-lg">{objetoAbierto?.nombre}</DrawerTitle>
               <div className="flex flex-wrap gap-1">
@@ -172,17 +172,27 @@ export default function ObjetosOficinaPage() {
                 ))}
               </div>
             </DrawerHeader>
-            <div className="flex-1 min-h-0 flex flex-col p-4 gap-2 overflow-hidden">
-              <CarruselImagenes fotos={objetoAbierto?.fotos} swipeDirection={'left'}/>
-              <div className="flex-1 min-h-0 flex flex-col">
-                <ScrollArea className="h-full w-full rounded-md border p-3">
-                  <DrawerDescription className="text-sm text-foreground/90 whitespace-pre-wrap">
+            <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2">
+              
+              <span className="font-semibold text-sm text-foreground">
+                Fotos <span className='font-light text-muted-foreground'>(presione en una para expandirlo)</span>
+              </span>
+              <CarruselImagenes fotos={objetoAbierto?.fotos} swipeDirection={'left'} />
+
+              <div className="flex-1 min-h-0 flex flex-col gap-1.5">
+                <span className="font-semibold text-sm text-foreground">
+                  Descripción:
+                </span>
+                
+                <div className="flex-1 overflow-y-auto p-4 border rounded-2xl">
+                  <p className="text-sm text-muted-foreground whitespace-pre-line">
                     {objetoAbierto?.descripcion}
-                  </DrawerDescription>
-                </ScrollArea>
+                  </p>
+                </div>
               </div>
+
             </div>
-            <DrawerFooter>
+            <DrawerFooter > 
               <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
             </DrawerFooter>
         </DrawerContent>
