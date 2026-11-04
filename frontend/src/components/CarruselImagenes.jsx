@@ -1,11 +1,9 @@
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../components/ui/carousel.js';
 import { urlFoto } from '../utils/urlFoto.js';
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter } from '../components/ui/drawer.js';
 import { useState } from 'react';
-import { Button } from './ui/button.js';
-import { ArrowRightCircleIcon } from 'lucide-react';
+import VisorImagen from './ui/visor-imagen.jsx';
 
-export default function CarruselImagenes({fotos, swipeDirection}){
+export default function CarruselImagenes({fotos}){
     const [fotoAbierta, setFotoAbierta] = useState(null);
     async function abrirFoto(foto){
         setFotoAbierta(foto);
@@ -16,20 +14,7 @@ export default function CarruselImagenes({fotos, swipeDirection}){
 
     return (
         <div>
-            <Drawer open={Boolean(fotoAbierta)} onOpenChange={() => setFotoAbierta(null)} swipeDirection={swipeDirection}>
-                <DrawerContent>
-                    <div className="flex-1 min-h-0 flex items-center justify-center p-4">
-                    <img
-                        src={urlFoto(fotoAbierta?.url)}
-                        alt={`Imagen ${fotoAbierta?.id}`}
-                        className="max-h-full max-w-full w-auto h-auto object-contain rounded-md shadow-sm"
-                    />
-                    </div>
-                    <DrawerFooter>
-                    <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
-                    </DrawerFooter>
-                </DrawerContent>
-            </Drawer>
+            <VisorImagen imagen={fotoAbierta} onOpenChange={()=>setFotoAbierta(null)}/>
             <Carousel>
                 <CarouselContent>
                     {fotos.map((foto) => (
