@@ -113,3 +113,16 @@ export async function listar(filtros={}){
         }
     });
 }
+
+export async function buscarPorId(id){
+    const objeto = await prisma.objetoPerdido.findUniqueOrThrow({
+        where: {
+            id: id
+        },
+        include:{
+            fotos: {include:{foto:true}},
+            etiquetas: {include:{etiqueta:true}}
+        }
+    });
+    return formatear(objeto);
+}

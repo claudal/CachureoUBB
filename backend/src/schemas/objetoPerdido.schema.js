@@ -39,6 +39,6 @@ export const filtroObjetoOficinaSchema = z.object({
   valioso: z.enum(['true','false'],{error: "El valor del parámetro debe ser booleano"}).transform((valor) => valor === 'true').optional()
 });
 
-export const parametroAlertaBusquedaSchema = z.object({
-  id: z.uuid({error: "El identificador debe tener formato UUID"})
+export const parametroObjetoPerdidoSchema = z.object({
+  id: z.string().regex(/^\d+$/).transform(Number)
 })

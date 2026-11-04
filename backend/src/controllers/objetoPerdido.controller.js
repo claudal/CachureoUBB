@@ -73,3 +73,21 @@ export const getObjetosOficina = async (req, res) => {
   }
 };
 
+/**
+ * Lista los objetos de la oficina del encargado autenticado.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+export const getObjetoPerdido = async (req, res) => {
+  try {
+    const objeto = await services.buscarPorId(req.params.id);
+    return res.json(objeto);
+  } catch (error) {
+    console.error('Error fetching object:', error);
+    res.status(500).json({ error: 'Error al obtener objetos perdidos' });
+  }
+};
+
+

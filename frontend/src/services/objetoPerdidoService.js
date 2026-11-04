@@ -43,3 +43,6 @@ export function listarPublico(){
     return api.get('/objetoPerdido');
 }
 
+export function buscarPorId(id){
+    return api.get(`/objetoPerdido/${id}`);
+}
