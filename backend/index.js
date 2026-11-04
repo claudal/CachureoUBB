@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api", router);
 
-app.use('/imagen', express.static('uploads'));
+app.use('/imagen', express.static('./uploads'));
 
 async function bootstrap() {
   try {

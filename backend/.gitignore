@@ -3,3 +3,4 @@ node_modules
 /generated/prisma
 uploads/*
 !uploads/.gitkeep
+!uploads/test*.jpg
