@@ -5,13 +5,14 @@ import { Button } from './button.js';
 import { ArrowRightCircleIcon } from 'lucide-react';
 import { useIsMobile } from '../../hooks/use-mobile.js';
 
-export default function VisorImagen({imagen, onOpenChange}){
+export default function VisorImagen({url, nombre, onOpenChange, absolute=false}){
+    const src = absolute ? url : urlFoto(url);
     const isMobile = useIsMobile();
 
     if(isMobile)
         return (
             <Drawer 
-                open={Boolean(imagen)}
+                open={Boolean(url)}
                 onOpenChange={onOpenChange}
                 swipeDirection="down"
                 showSwipeHandle
@@ -20,8 +21,8 @@ export default function VisorImagen({imagen, onOpenChange}){
                 <DrawerContent>
                     <div className="flex-1 min-h-0 w-full flex items-center justify-center p-2 overflow-hidden">
                     <img
-                        src={urlFoto(imagen?.url)}
-                        alt={`Imagen ${imagen?.id}`}
+                        src={src}
+                        alt={`Imagen ${nombre}`}
                         className="h-full w-full object-contain"
                     />
                     </div>
@@ -33,12 +34,12 @@ export default function VisorImagen({imagen, onOpenChange}){
         )
 
     return (
-        <Dialog open={Boolean(imagen)} onOpenChange={onOpenChange}>
+        <Dialog open={Boolean(url)} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[90vw] sm:h-[90vh] flex flex-col p-6 overflow-hidden">
                 <div className="flex-1 min-h-0 w-full flex items-center justify-center p-2 overflow-hidden">
                 <img
-                    src={urlFoto(imagen?.url)}
-                    alt={`Imagen ${imagen?.id}`}
+                    src={src}
+                    alt={`Imagen ${nombre}`}
                     className="h-full w-full object-contain"
                 />
                 </div>

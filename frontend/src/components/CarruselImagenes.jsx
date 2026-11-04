@@ -14,7 +14,7 @@ export default function CarruselImagenes({fotos}){
 
     return (
         <div>
-            <VisorImagen imagen={fotoAbierta} onOpenChange={()=>setFotoAbierta(null)}/>
+            <VisorImagen url={fotoAbierta?.url} nombre={fotoAbierta?.nombre} onOpenChange={()=>setFotoAbierta(null)}/>
             <Carousel>
                 <CarouselContent>
                     {fotos.map((foto) => (
