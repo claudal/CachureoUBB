@@ -20,7 +20,7 @@ export const RegistrarObjetoSchema = z.object({
     .string({ error: "La descripción es obligatoria" })
     .trim()
     .min(5, { error: "La descripción debe tener al menos 5 carácteres" })
-    .max(2000, { error: "La descripción debe tener a lo más 2000 carácteres" }),
+    .max(500, { error: "La descripción debe tener a lo más 500 carácteres" }),
   etiquetas: z
     .array(z.number().int(), { error: "Debe seleccionar al menos una etiqueta" })
     .min(1, { error: "Debe seleccionar al menos una etiqueta" }),

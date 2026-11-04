@@ -11,7 +11,7 @@ export const crearObjetoPerdidoSchema = z.object({
     .string({ error: "La descripción es obligatoria" })
     .trim()
     .min(5, { error: "La descripción debe tener al menos 5 carácteres" })
-    .max(2000, { error: "La descripción debe tener a lo más 2000 carácteres" }),
+    .max(500, { error: "La descripción debe tener a lo más 500 carácteres" }),
   // un solo valor llega como string y varios como arreglo
   etiquetas: z.preprocess(
     (val) => (val === undefined || Array.isArray(val) ? val : [val]),

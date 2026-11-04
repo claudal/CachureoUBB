@@ -172,7 +172,7 @@ async function main() {
           idOficina: oficina.id,
           idEstado: estadosOjeto.sinEntrega.id,
           nombre: faker.lorem.sentence({min:1,max:4}),
-          descripcion: faker.lorem.paragraphs({min:2,max:15}),
+          descripcion: faker.lorem.words({min:5,max:55}),
           valioso: valioso,
           etiquetas: {createMany: {data: etiquetas.map((etiqueta)=> ({idEtiqueta: etiqueta.id}))}},
           fotos: {createMany: {data: faker.helpers.arrayElements(fotos,{min: 1, max: 3}).map((foto)=> ({idFoto: foto.id}))}}
