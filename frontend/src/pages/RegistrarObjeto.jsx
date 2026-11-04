@@ -76,12 +76,6 @@ export default function RegistrarObjetoPage() {
     }
   });
 
-  // al elegir una etiqueta valiosa (laptop, joya, ...) el objeto queda marcado como valioso
-  useEffect(() => {
-    if (hayEtiquetaValiosa)
-      formulario.setValue('valioso', true);
-  }, [hayEtiquetaValiosa, formulario]);
-
   async function onSubmit(datos) {
     setApiError(null);
     try {
@@ -168,7 +162,13 @@ export default function RegistrarObjetoPage() {
                       field={field}
                       filtro={filtroTodasEtiquetas}
                       invalido={fieldState.invalid}
-                      onSeleccion={(etiquetas) => setHayEtiquetaValiosa(etiquetas.some((e) => e.valioso))}
+                      onSeleccion={(etiquetas) => {
+                        const esValioso = etiquetas.some((e) => e.valioso);
+                        setHayEtiquetaValiosa(esValioso);
+                        if (esValioso) {
+                          formulario.setValue('valioso', true, { shouldValidate: true });
+                        }
+                      }}
                     />
                     <FieldDescription>Elija una o más etiquetas que describan el objeto.</FieldDescription>
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
