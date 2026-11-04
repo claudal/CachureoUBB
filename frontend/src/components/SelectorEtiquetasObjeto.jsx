@@ -2,6 +2,7 @@ import { Fragment } from "react"
 import { Combobox, ComboboxChip, ComboboxChips, ComboboxChipsInput, ComboboxContent, ComboboxEmpty, ComboboxItem, ComboboxList, ComboboxValue, useComboboxAnchor } from "./ui/combobox"
 import { useFetch } from "../hooks/useFetch";
 import { listar } from "../services/etiquetaObjetoService";
+import { ItemCargando } from "./ui/item-cargando";
 
 const listarEtiquetaObjeto = listar
 
@@ -9,6 +10,9 @@ export default function SelectorEtiquetasObjeto({id,field,filtro}){
     
     const {datos: etiquetasObjeto, cargando: etiquetasObjetoCargando} = useFetch(listarEtiquetaObjeto,filtro);
     const anchor = useComboboxAnchor();
+    if(etiquetasObjetoCargando) return (
+        <ItemCargando texto="Cargando etiquetas..." />
+    )
 
     return (
         <Combobox
