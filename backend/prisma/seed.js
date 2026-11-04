@@ -6,33 +6,101 @@ import { BCRYPT_SALT_ROUNDS } from '../src/config/auth.js';
 
 const prisma = new PrismaClient();
 
-async function main() {
+const ESTADOS_OBJETO = [
+  { id: 1, nombre: "Sin entrega" },
+  { id: 2, nombre: "Entregado" },
+  { id: 3, nombre: "Caducado" },
+  { id: 4, nombre: "Derivado" }
+];
 
-  if(process.env.NODE_ENV !== 'development')
-    return;
+const ESTADOS_ALERTA = [
+  { id: 1, nombre: "Abierto" },
+  { id: 2, nombre: "Cerrado" },
+  { id: 3, nombre: "Rectificado" }
+];
 
+const NOMBRE_ETIQUETAS_NORMALES = [
+  "Mochila vacía",
+  "Ropa",
+  "Estuche",
+  "Útiles de estudio",
+  "Tecnología",
+  "Calculadora",
+  "Audífonos"
+];
+
+const NOMBRE_ETIQUETAS_VALIOSAS = [
+  "Tecnología (valiosa)",
+  "Joya",
+  "Credenciales",
+  "Mochila (con cosas)",
+  "Teléfono",
+  "Tablet",
+  "Laptop"
+];
+
+/**
+ * Crea (o actualiza) los registros que el sistema necesita para funcionar.
+ * Se ejecuta en cualquier entorno y se puede correr varias veces sin duplicar datos.
+ */
+async function crearCatalogos() {
+  console.log('=> Creando estados de objeto');
+  const estadosObjeto = await Promise.all(
+    ESTADOS_OBJETO.map(({ id, nombre }) =>
+      prisma.estadoObjeto.upsert({ where: { id }, update: { nombre }, create: { id, nombre } })
+    )
+  );
+
+  console.log('=> Creando estados de alerta');
+  const estadosAlerta = await Promise.all(
+    ESTADOS_ALERTA.map(({ id, nombre }) =>
+      prisma.estadoAlerta.upsert({ where: { id }, update: { nombre }, create: { id, nombre } })
+    )
+  );
+
+  console.log('=> Creando etiquetas de objeto');
+  // nombre no es único en la tabla, así que se busca antes de crear para no duplicar
+  const crearEtiqueta = async (nombre, valioso) =>
+    (await prisma.etiquetaObjeto.findFirst({ where: { nombre } })) ??
+    prisma.etiquetaObjeto.create({ data: { nombre, valioso } });
+
+  const etiquetasNormales = await Promise.all(
+    NOMBRE_ETIQUETAS_NORMALES.map((nombre) => crearEtiqueta(nombre, false))
+  );
+  const etiquetasValiosas = await Promise.all(
+    NOMBRE_ETIQUETAS_VALIOSAS.map((nombre) => crearEtiqueta(nombre, true))
+  );
+
+  return { estadosObjeto, estadosAlerta, etiquetasNormales, etiquetasValiosas };
+}
+
+async function limpiarDatosPrueba() {
+  // el orden importa: primero lo que depende de otras tablas
   try {
+    await prisma.objetoPerdido.deleteMany();
     await prisma.foto.deleteMany();
-    await prisma.etiquetaObjeto.deleteMany();
     await prisma.alertaBusqueda.deleteMany();
+    await prisma.etiquetaObjeto.deleteMany();
     await prisma.encargadoOficina.deleteMany();
     await prisma.oficina.deleteMany();
     await prisma.campus.deleteMany();
-  } catch (err){}
+  } catch (err){
+    console.warn('=> No se pudieron borrar todos los datos anteriores:', err.message);
+  }
+}
 
-  console.log('=> Creando etiquetas de objeto');
-  const nombreEtiquetasNormales = [
-    "Mochila vacía",
-    "Ropa",
-    "Estuche",
-    "Útiles de estudio",
-    "Tecnología",
-    "Calculadora",
-    "Audífonos"
-  ];
+async function main() {
+  const esDesarrollo = process.env.NODE_ENV === 'development';
+
+  if(esDesarrollo)
+    await limpiarDatosPrueba();
+
+  const { estadosAlerta, etiquetasValiosas } = await crearCatalogos();
+
+  if(!esDesarrollo)
+    return;
 
   console.log('=> Creando fotos');
-  
   const nombreFotos = [
     "test0.jpg",
     "test1.jpg",
@@ -44,25 +112,6 @@ async function main() {
       prisma.foto.create({
         data: {
           url: nombre
-        }
-      })
-    )
-  );
-  const nombreEtiquetasValiosos = [
-    "Tecnología (valiosa)",
-    "Joya",
-    "Credenciales",
-    "Mochila (con cosas)",
-    "Teléfono",
-    "Tablet",
-    "Laptop"
-  ];
-  const etiquetasValiosos = await Promise.all(
-    nombreEtiquetasValiosos.map((nombre) =>
-      prisma.etiquetaObjeto.create({
-        data: {
-          nombre,
-          valioso: true
         }
       })
     )
@@ -97,7 +146,7 @@ async function main() {
   const clave = "123456";
 
   console.log('=> Creando encargados');
-  const rutEncargados = ['20000000', '20000001', '20000002']; // sin código verificador 
+  const rutEncargados = ['20000000', '20000001', '20000002']; // sin código verificador
   const encargados = await Promise.all(
     rutEncargados.map((rut) =>
       prisma.encargadoOficina.create({
@@ -112,35 +161,13 @@ async function main() {
     )
   );
 
-  await prisma.estadoAlerta.deleteMany();
-
-  console.log('=> Creando estados de alerta');
-  const estadosAlerta = {
-    abierto: await prisma.estadoAlerta.create({
-        data: {
-          id: 1,
-          nombre: "Abierto"
-        },
-      }),
-    cerrado: await prisma.estadoAlerta.create({
-        data: {
-          id: 2,
-          nombre: "Cerrado"
-        },
-      }),
-    rectificado: await prisma.estadoAlerta.create({
-        data: {
-          id: 3,
-          nombre: "Rectificado"
-        },
-      })
-  }
+  const estadoAlertaAbierto = estadosAlerta.find((estado) => estado.nombre === "Abierto");
 
   console.log('=> Creando alertas de búsqueda abiertas');
   for(let i = 0;i<30;++i){
     const alerta = await prisma.alertaBusqueda.create({
       data: {
-        idEstado: estadosAlerta.abierto.id,
+        idEstado: estadoAlertaAbierto.id,
         idCampus: faker.helpers.arrayElement(campus).id,
         nombre: faker.lorem.sentence({min:1,max:4}),
         descripcion: faker.lorem.paragraphs({min:2,max:15})
@@ -153,7 +180,7 @@ async function main() {
         idFoto: foto.id
       }
     })
-    const listaEtiquetas = faker.helpers.arrayElements(etiquetasValiosos,{min:1,max:3});
+    const listaEtiquetas = faker.helpers.arrayElements(etiquetasValiosas,{min:1,max:3});
     for(const etiqueta of listaEtiquetas) await prisma.alertaTieneEtiqueta.create({
       data:{
         idEtiqueta: etiqueta.id,
