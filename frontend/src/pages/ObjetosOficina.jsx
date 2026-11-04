@@ -77,7 +77,7 @@ export default function ObjetosOficinaPage() {
                     <ToggleGroup
                       type="single"
                       value={field.value}
-                      onValueChange={field.onChange}
+                      onValueChange={(val)=> {if(val) field.onChange(val);}}
                       size="sm"
                       variant="outline"
                       spacing={1}
