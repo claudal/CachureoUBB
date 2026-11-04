@@ -3,54 +3,51 @@ import { useFetch } from '../hooks/useFetch.js';
 import { useState } from 'react';
 import { Controller } from 'react-hook-form';
 
-import { AlertCircle, ArrowRightCircleIcon, BookmarkIcon, EyeIcon, SearchIcon } from 'lucide-react';
+import { ArrowRightCircleIcon, CircleCheckIcon, GhostIcon, PackageSearchIcon, SearchIcon, StarIcon } from 'lucide-react';
 
 import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
 
-import { FieldError, FieldGroup, Field, FieldLabel, FieldDescription } from "../components/ui/field.js"
+import { FieldGroup, Field, FieldLabel, FieldDescription } from "../components/ui/field.js"
 import { ScrollArea } from "../components/ui/scroll-area.js"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
+import { Card, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
 import { Badge } from '../components/ui/badge.js'
-import { Toggle } from '../components/ui/toggle.js'
+import { ToggleGroup, ToggleGroupItem } from '../components/ui/toggle-group.js'
 import { Button } from '../components/ui/button.js'
 import { Input } from '../components/ui/input.js';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { ItemSinDatos } from '../components/ui/item-sin-datos.jsx';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerDescription, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
 import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
+import { urlFoto } from '../utils/urlFoto.js';
+import { DatePicker } from '../components/ui/date-picker.jsx';
 
 const filtroEtiqueta = {}
-const filtro = {
-  idEstado: 1
+const filtroBase = {
+  idEstado: "1"
 }
 const VALOR_DEFECTO_FILTRO = {
+  "idEstado": ["1"],
   "nombre": "",
   "palabrasClave": "",
-  "etiquetasObjeto": []
+  "etiquetasObjeto": [],
+  "fechaIngreso": undefined
 }
 
-const LARGO_MAXIMO_DESCRIPCION_OBJETO = 100;
-
 export default function ObjetosOficinaPage() {
-  const [filtros, setFiltros] = useState(filtro);
+  const [filtros, setFiltros] = useState(filtroBase);
   const objetos = useFetch(listarOficina,filtros);
 
   const onSubmitFiltros = (data) => {
-    data.valioso = filtros.valioso;
-    data.idEstado = 1;
-    setFiltros(data);
+    const { idEstado, ...filtro } = data;
+    setFiltros({
+      ...filtro,
+      idEstado: idEstado[0]
+    });
+    controladorPanelFiltro.formulario.resetField("fechaIngreso")
   }
 
   const controladorPanelFiltro = usePanelFiltro(VALOR_DEFECTO_FILTRO,onSubmitFiltros);
-
-  function toggleFiltroValioso(data){
-    setFiltros({
-      ...filtros,
-      valioso: data
-    })
-  }
-
   
   const [objetoAbierto, setObjetoAbierto] = useState(null);
 
@@ -68,68 +65,104 @@ export default function ObjetosOficinaPage() {
       <PanelFiltro controlador={controladorPanelFiltro}>
         <FieldGroup className="p-4 border-b">
             <Controller
+              name="idEstado"
+              control={controladorPanelFiltro.control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor={controladorPanelFiltro.idForm}>
+                      Estado del objeto
+                  </FieldLabel>
+                  <div className="flex flex-col gap-5">
+                    <ToggleGroup
+                      type="single"
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      size="sm"
+                      variant="outline"
+                      spacing={1}
+                      orientation="vertical"
+                    >
+                      <ToggleGroupItem value="1" aria-label="Sin entregar">
+                        <PackageSearchIcon /> Sin entregar
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="2" aria-label="Entregados">
+                        <CircleCheckIcon /> Entregados
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="3" aria-label="Vencidos">
+                        <GhostIcon /> Abandonados
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                  </div>
+                </Field>
+            )}/>
+            <Controller
               name="nombre"
               control={controladorPanelFiltro.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={controladorPanelFiltro.idForm}>
-                    Nombre objeto
-                </FieldLabel>
-                <Input
-                    {...field}
-                    id={controladorPanelFiltro.idForm}
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Laptop Asus"
-                    autoComplete="on"
-                />
-                {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                )}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor={controladorPanelFiltro.idForm}>
+                      Nombre objeto
+                  </FieldLabel>
+                  <Input
+                      {...field}
+                      id={controladorPanelFiltro.idForm}
+                      placeholder="Laptop Asus"
+                      autoComplete="on"
+                  />
                 </Field>
             )}/>
             <Controller name="palabrasClave"
               control={controladorPanelFiltro.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={controladorPanelFiltro.idForm}>
-                    Palabras clave
-                </FieldLabel>
-                <Input
-                    {...field}
-                    id={controladorPanelFiltro.idForm}
-                    aria-invalid={fieldState.invalid}
-                    placeholder="laptop negro stickers"
-                    autoComplete="off"
-                />
-                <FieldDescription>Palabras separadas por espacio</FieldDescription>
-                {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                )}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor={controladorPanelFiltro.idForm}>
+                      Palabras clave
+                  </FieldLabel>
+                  <Input
+                      {...field}
+                      id={controladorPanelFiltro.idForm}
+                      placeholder="laptop negro stickers"
+                      autoComplete="off"
+                  />
+                  <FieldDescription>Palabras separadas por espacio</FieldDescription>
                 </Field>
             )}/>
             <Controller
               name="etiquetasObjeto"
               control={controladorPanelFiltro.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={controladorPanelFiltro.idForm}>Etiquetas de objeto</FieldLabel>
-                
-                <SelectorEtiquetasObjeto
-                    id={controladorPanelFiltro.idForm}
-                    filtro={filtroEtiqueta}
-                    field={field}
-                />
-
-                {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                )}
+              render={({ field}) => (
+                <Field>
+                  <FieldLabel htmlFor={controladorPanelFiltro.idForm}>Etiquetas de objeto</FieldLabel>
+                  
+                  <SelectorEtiquetasObjeto
+                      id={controladorPanelFiltro.idForm}
+                      filtro={filtroEtiqueta}
+                      field={field}
+                  />
                 </Field>
             )}
             />
+
+            
+            <Controller name="fechaIngreso"
+              control={controladorPanelFiltro.control}
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel htmlFor={controladorPanelFiltro.idForm}>
+                      Fecha de ingreso
+                  </FieldLabel>
+                  <DatePicker
+                      id={controladorPanelFiltro.idForm}
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) => date > new Date()}
+                  />
+                </Field>
+            )}/>
         </FieldGroup>
       </PanelFiltro>
       <Drawer open={Boolean(objetoAbierto)} onOpenChange={cerrarObjeto} swipeDirection='left' >
-        <DrawerContent className="flex flex-col h-full max-h-[100dvh] w-full sm:max-w-md ml-auto">
+        <DrawerContent className="flex flex-col h-full max-h-dvh w-full sm:max-w-md ml-auto">
             <DrawerHeader className="p-4 border-b">
               <DrawerTitle className="font-semibold text-lg">{objetoAbierto?.nombre}</DrawerTitle>
               <div className="flex flex-wrap gap-1">
@@ -149,12 +182,6 @@ export default function ObjetosOficinaPage() {
               </div>
             </div>
             <DrawerFooter>
-              <Button variant="secondary">
-                  Solicitar más información
-              </Button>
-              <Button>
-                  Revelar oficina
-              </Button>
               <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
             </DrawerFooter>
         </DrawerContent>
@@ -162,13 +189,10 @@ export default function ObjetosOficinaPage() {
       <div>
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b mb-6">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight">Objetos de Búsqueda</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Objetos Perdidos</h1>
           </div>
 
           <div className="flex items-center gap-2">
-            <Toggle onPressedChange={toggleFiltroValioso} variant="outline" disabled={objetos.cargando}>
-              <BookmarkIcon className="group-aria-pressed/toggle:fill-foreground"/>Solo marcadas
-            </Toggle>
             <Button onClick={()=>controladorPanelFiltro.setAbierto(true)} variant="outline" disabled={objetos.cargando}>
                 <SearchIcon />Abrir filtros
             </Button>
@@ -184,31 +208,34 @@ export default function ObjetosOficinaPage() {
                 {objetos.datos.map((objeto)=>{
                   return (
                       <Card key={objeto.id} size="default" onClick={()=>abrirObjeto(objeto)}>
+                        <img
+                          src={urlFoto(objeto.fotos[0].url)}
+                          alt="Foto objeto"
+                          className="h-44 w-full object-contain bg-secondary"
+                        />
                         <CardHeader>
-                          <CardTitle>
-                            {objeto.nombre}
-                            <div className='p-1'>
-                              {objeto.leida ? 
-                                (<Badge variant="secondary" className='p-1'><EyeIcon/>Leída</Badge>) : 
-                                (objeto.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
-                              }
-                              {objeto.marcada ? 
-                                (<Badge variant="secondary"className='p-1'><BookmarkIcon/>Marcada</Badge>) : 
-                                (objeto.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
-                              }
+                            <div className="flex items-baseline justify-between gap-2 p-1">
+                              <CardTitle className="truncate">{objeto.nombre}</CardTitle>
+                              <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                {new Date(objeto.fechaIngreso).toLocaleDateString()}
+                              </span>
                             </div>
-                          </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                          <CardDescription>{objeto.descripcion.length > LARGO_MAXIMO_DESCRIPCION_OBJETO ? 
-                            `${objeto.descripcion.substring(0,LARGO_MAXIMO_DESCRIPCION_OBJETO)}...` : 
-                            objeto.descripcion
-                          }</CardDescription>
-                        </CardContent>
-                        <CardFooter className="flex flex-wrap gap-1">
-                          {objeto.etiquetas?.map((etiqueta)=>(
-                            <Badge variant={'default'}  key={`${objeto.id}-${etiqueta.id}`}>{etiqueta.nombre}</Badge>
-                          ))}
+                        <CardFooter className="flex items-center gap-1">
+                          <div className="flex flex-wrap gap-1 flex-1">
+                            {objeto.etiquetas?.map((etiqueta) => (
+                              <Badge variant="default" key={`${objeto.id}-${etiqueta.id}`}>
+                                {etiqueta.nombre}
+                              </Badge>
+                            ))}
+                          </div>
+
+                          {objeto.valioso && (
+                            <Badge variant="secondary" className="ml-auto flex items-center gap-1 whitespace-nowrap">
+                              <StarIcon className="size-3.5" />
+                              Valioso
+                            </Badge>
+                          )}
                         </CardFooter>
                       </Card>
                   )
