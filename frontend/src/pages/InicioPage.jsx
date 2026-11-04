@@ -35,7 +35,7 @@ export default function InicioPage() {
           <h1 className="text-2xl font-bold tracking-tight">Objetos perdidos</h1>
           <p className="text-sm text-muted-foreground">Objetos registrados en su oficina.</p>
         </div>
-        <Button size="lg" onClick={() => navigate('registrarObjeto')}>
+        <Button size="lg" onClick={() => navigate('../registrarObjeto')}>
           <PlusIcon /> Registrar objeto
         </Button>
       </header>
