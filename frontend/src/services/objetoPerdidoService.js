@@ -9,7 +9,7 @@ function conTipoHeic(foto){
 }
 
 export function listar(){
-    return api.get('/objetos');
+    return api.get('/objetoPerdido/oficina');
 }
 
 /**
@@ -23,7 +23,7 @@ export function crear({ nombre, descripcion, etiquetas, valioso, fotos }){
     formData.append('valioso', String(Boolean(valioso)));
     etiquetas.forEach((id) => formData.append('etiquetas', String(id)));
     fotos.forEach((foto) => formData.append('fotos', conTipoHeic(foto)));
-    return api.postForm('/objetos', formData);
+    return api.postForm('/objetoPerdido', formData);
 }
 export function listarOficina(filtros){
     if(!filtros)
