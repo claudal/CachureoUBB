@@ -9,14 +9,7 @@ async function buscarEncargadoSesion(req, res) {
   return encargado;
 }
 
-/**
- * Lista los objetos de la oficina del encargado autenticado.
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @param {import("express").NextFunction} next
- */
-export async function getObjetosPerdidos(req, res, next) {
+export const getObjetosPerdidosPublico = async (req, res) => {
   try {
     const encargado = await buscarEncargadoSesion(req, res);
     if (!encargado) return;
@@ -60,3 +53,23 @@ export async function postObjetoPerdido(req, res, next) {
     next(err);
   }
 }
+
+/**
+ * Lista los objetos de la oficina del encargado autenticado.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+export const getObjetosOficina = async (req, res) => {
+  try {
+    const encargado = await buscarPorRut(req.user.rut);
+    if(!encargado)
+      return res.status(401).json({"error": "El usuario no es válido"});
+    return res.json(await services.listar({...req.vQuery, idOficina: encargado.idOficina}));
+  } catch (error) {
+    console.error('Error fetching objects:', error);
+    res.status(500).json({ error: 'Error al obtener objetos perdidos' });
+  }
+};
+

@@ -9,6 +9,6 @@ export const router = Router();
 
 router.use("/alertasBusqueda", alertaBusquedaRoutes);
 router.use("/autenticacion", autenticacionRoutes);
-router.use("/objetos", objetoPerdidoRoutes);
+router.use("/objetoPerdido", objetoPerdidoRoutes);
 router.use("/encargadoOficina", encargadoOficinaRoutes);
 router.use("/etiquetaObjeto", etiquetaObjetoRoutes);

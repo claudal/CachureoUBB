@@ -7,6 +7,7 @@ import MenuOficinaPage from './pages/MenuOficina';
 import ProtectedRoute from './pages/ProtectedRoute';
 import AtenderAlertasPage from './pages/AtenderAlertas';
 import RegistrarObjetoPage from './pages/RegistrarObjeto';
+import ObjetosOficinaPage from './pages/ObjetosOficina';
 
 function App() {
 
@@ -23,7 +24,7 @@ function App() {
           }>
             <Route
               index
-              element={<InicioPage />}
+              element={<ObjetosOficinaPage />}
             />
             <Route
               path="registrarObjeto"
