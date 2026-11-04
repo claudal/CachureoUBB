@@ -3,7 +3,7 @@ import { useFetch } from '../hooks/useFetch.js';
 import { useState } from 'react';
 import { Controller } from 'react-hook-form';
 
-import { ArrowRightCircleIcon, CircleCheckIcon, GhostIcon, PackageSearchIcon, SearchIcon, StarIcon } from 'lucide-react';
+import { ArrowRightCircleIcon, CircleCheckIcon, GemIcon, GhostIcon, PackageSearchIcon, PlusIcon, SearchIcon, StarIcon } from 'lucide-react';
 
 import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
@@ -14,6 +14,7 @@ import { Card, CardFooter, CardHeader, CardTitle } from '../components/ui/card.j
 import { Badge } from '../components/ui/badge.js'
 import { ToggleGroup, ToggleGroupItem } from '../components/ui/toggle-group.js'
 import { Button } from '../components/ui/button.js'
+import { ButtonGroup } from '../components/ui/button-group.js'
 import { Input } from '../components/ui/input.js';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { ItemSinDatos } from '../components/ui/item-sin-datos.jsx';
@@ -187,16 +188,23 @@ export default function ObjetosOficinaPage() {
         </DrawerContent>
       </Drawer>
       <div>
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b mb-6">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight">Objetos Perdidos</h1>
+        <header className="flex flex-col gap-4 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Objetos perdidos</h1>
+            <p className="text-sm text-muted-foreground">Objetos registrados en su oficina.</p>
           </div>
-
-          <div className="flex items-center gap-2">
+          <ButtonGroup >
+            <ButtonGroup>
             <Button onClick={()=>controladorPanelFiltro.setAbierto(true)} variant="outline" disabled={objetos.cargando}>
                 <SearchIcon />Abrir filtros
             </Button>
-          </div>
+            </ButtonGroup>
+            <ButtonGroup>
+              <Button onClick={() => navigate('../registrarObjeto')}>
+                <PlusIcon /> Registrar objeto
+              </Button>
+            </ButtonGroup>
+          </ButtonGroup>
         </header>
         { objetos.cargando ? (
             <div className='align-middle justify-items-center'>
@@ -207,35 +215,36 @@ export default function ObjetosOficinaPage() {
               <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
                 {objetos.datos.map((objeto)=>{
                   return (
-                      <Card key={objeto.id} size="default" onClick={()=>abrirObjeto(objeto)}>
+                    <Card key={objeto.id} className="overflow-hidden pt-0" onClick={()=>abrirObjeto(objeto)}>
+                      {objeto.fotos[0] && (
                         <img
                           src={urlFoto(objeto.fotos[0].url)}
-                          alt="Foto objeto"
-                          className="h-44 w-full object-contain bg-secondary"
+                          alt={objeto.nombre}
+                          className="h-40 w-full bg-muted object-cover"
                         />
+                      )}
                         <CardHeader>
-                            <div className="flex items-baseline justify-between gap-2 p-1">
-                              <CardTitle className="truncate">{objeto.nombre}</CardTitle>
-                              <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                {new Date(objeto.fechaIngreso).toLocaleDateString()}
-                              </span>
-                            </div>
-                        </CardHeader>
-                        <CardFooter className="flex items-center gap-1">
-                          <div className="flex flex-wrap gap-1 flex-1">
-                            {objeto.etiquetas?.map((etiqueta) => (
-                              <Badge variant="default" key={`${objeto.id}-${etiqueta.id}`}>
-                                {etiqueta.nombre}
-                              </Badge>
-                            ))}
-                          </div>
-
+                        <CardTitle className="flex flex-wrap items-center gap-2">
+                          {objeto.nombre}
                           {objeto.valioso && (
-                            <Badge variant="secondary" className="ml-auto flex items-center gap-1 whitespace-nowrap">
-                              <StarIcon className="size-3.5" />
-                              Valioso
-                            </Badge>
+                            <Badge variant="secondary"><GemIcon /> De valor</Badge>
                           )}
+                        </CardTitle>
+                        <CardDescription>
+                          Registrado el {new Date(objeto.fechaIngreso).toLocaleString(undefined,{dateStyle: "medium", timeStyle: 'short'})}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex flex-col gap-2">
+                        <div>
+                          <Badge variant={objeto.estado.nombre === 'Sin entrega' ? 'default' : 'outline'}>
+                            {objeto.estado.nombre}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="flex flex-wrap gap-1">
+                        {objeto.etiquetas.map((etiqueta) => (
+                          <Badge key={`${objeto.id}-${etiqueta.id}`} variant="outline">{etiqueta.nombre}</Badge>
+                        ))}
                         </CardFooter>
                       </Card>
                   )

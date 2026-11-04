@@ -1,7 +1,6 @@
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import TestAuditPage from './pages/TestAuditPage';
 import EncargadoLoginPage from './pages/LoginPage';
-import InicioPage from './pages/InicioPage';
 import { AuthProvider } from './context/AutenticacionContext';
 import MenuOficinaPage from './pages/MenuOficina';
 import ProtectedRoute from './pages/ProtectedRoute';
@@ -36,11 +35,11 @@ function App() {
             />
             <Route
               path="perfil"
-              element={<InicioPage />}
+              element={<ObjetosOficinaPage />}
             />
             <Route
               path="entregas"
-              element={<InicioPage />}
+              element={<ObjetosOficinaPage />}
             />
           </Route>
         </Routes>
