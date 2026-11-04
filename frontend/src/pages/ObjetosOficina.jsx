@@ -21,6 +21,7 @@ import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerT
 import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
 import { urlFoto } from '../utils/urlFoto.js';
 import { DatePicker } from '../components/ui/date-picker.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const filtroEtiqueta = {}
 const filtroBase = {
@@ -35,6 +36,7 @@ const VALOR_DEFECTO_FILTRO = {
 }
 
 export default function ObjetosOficinaPage() {
+  const navigate = useNavigate()
   const [filtros, setFiltros] = useState(filtroBase);
   const objetos = useFetch(listarOficina,filtros);
 
@@ -208,7 +210,7 @@ export default function ObjetosOficinaPage() {
               </Button>
             </ButtonGroup>
             <ButtonGroup>
-              <Button onClick={() => navigate('../registrarObjeto')}>
+              <Button onClick={() => navigate('registrarObjeto')}>
                 <PlusIcon /> Registrar objeto
               </Button>
             </ButtonGroup>
