@@ -1,13 +1,14 @@
 import { ImagePlusIcon, XIcon } from "lucide-react";
-import { Attachment, AttachmentAction, AttachmentActions, AttachmentGroup, AttachmentMedia } from "./ui/attachment";
+import { Attachment, AttachmentAction, AttachmentActions, AttachmentGroup, AttachmentMedia, AttachmentTrigger } from "./ui/attachment";
 import { Field, FieldDescription, FieldError, FieldLabel } from "./ui/field";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
+import VisorImagen from "./ui/visor-imagen";
 
-function MiniaturaFoto({ archivo, onQuitar }) {
+function MiniaturaFoto({ archivo, onQuitar, onClick }) {
   const imagen = useRef(null);
   const [sinVistaPrevia, setSinVistaPrevia] = useState(false);
 
@@ -28,6 +29,7 @@ function MiniaturaFoto({ archivo, onQuitar }) {
             alt={archivo.name}
             className="h-full w-full object-cover"
             onError={() => setSinVistaPrevia(true)}
+            onClick={()=>onClick({url: imagen.current.src, nombre:archivo.name})}
           />
         ) : (
           // p. ej. fotos HEIC en navegadores que no las pueden mostrar
@@ -49,6 +51,7 @@ function MiniaturaFoto({ archivo, onQuitar }) {
 
 export default function CargaImagenes({field, fieldState, max}){
   const inputFotos = useRef(null);
+
   function agregarFotos(evento) {
     const nuevas = Array.from(evento.target.files ?? []);
     const disponible = max - field.value.length;
@@ -59,9 +62,14 @@ export default function CargaImagenes({field, fieldState, max}){
     // permite volver a elegir el mismo archivo después de quitarlo
     evento.target.value = '';
   };
+  
   const quitarFoto = (indice) => field.onChange(field.value.filter((_, i) => i !== indice));
+
+  const [fotoAbierta, setFotoAbierta] = useState(null);
+
   return (
     <Field data-invalid={fieldState.invalid}>
+      <VisorImagen url={fotoAbierta?.url} nombre={fotoAbierta?.name} absolute={true} onOpenChange={()=>setFotoAbierta(null)}/>
       <FieldLabel htmlFor="objeto-fotos">Fotos ({field.value.length} de {max})</FieldLabel>
       <Input
         ref={(elemento) => { inputFotos.current = elemento; field.ref(elemento); }}
@@ -77,6 +85,7 @@ export default function CargaImagenes({field, fieldState, max}){
         <AttachmentGroup>
           {field.value.map((foto, indice) => (
             <MiniaturaFoto
+              onClick={setFotoAbierta}
               key={`${foto.name}-${foto.lastModified}-${indice}`}
               archivo={foto}
               onQuitar={() => quitarFoto(indice)}
