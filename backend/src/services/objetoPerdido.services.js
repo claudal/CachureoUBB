@@ -100,7 +100,8 @@ export async function listar(filtros={}){
         where,
         include: {
             fotos: {include:{foto:true}},
-            etiquetas: {include:{etiqueta:true}}
+            etiquetas: {include:{etiqueta:true}},
+            estado: true
         },
         orderBy: {fechaIngreso:'desc'}});
     return objetos.map((objeto)=>{
