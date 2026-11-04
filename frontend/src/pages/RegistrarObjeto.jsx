@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon, ImagePlusIcon, XIcon } from 'lucide-react';
+import { ArrowLeftIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,56 +14,17 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import { RegistrarObjetoSchema, MAXIMO_FOTOS_OBJETO } from '../schemas/objetoPerdido.schema.js';
 import * as objetoPerdidoService from '../services/objetoPerdidoService.js';
+import CargaImagenes from '../components/CargaImagenes.jsx';
 
 // constante fuera del componente para que el selector no recargue las etiquetas en cada render
 const filtroTodasEtiquetas = {};
 
 const ID_FORMULARIO = 'form-registrar-objeto';
 
-function MiniaturaFoto({ archivo, onQuitar }) {
-  const imagen = useRef(null);
-  const [sinVistaPrevia, setSinVistaPrevia] = useState(false);
-
-  // la url temporal se crea y se libera junto con la miniatura
-  useEffect(() => {
-    if (!imagen.current) return;
-    const url = URL.createObjectURL(archivo);
-    imagen.current.src = url;
-    return () => URL.revokeObjectURL(url);
-  }, [archivo]);
-
-  return (
-    <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-xl border bg-muted">
-      {!sinVistaPrevia ? (
-        <img
-          ref={imagen}
-          alt={archivo.name}
-          className="h-full w-full object-cover"
-          onError={() => setSinVistaPrevia(true)}
-        />
-      ) : (
-        // p. ej. fotos HEIC en navegadores que no las pueden mostrar
-        <span className="line-clamp-3 break-all p-1 text-center text-xs text-muted-foreground">{archivo.name}</span>
-      )}
-      <Button
-        type="button"
-        variant="secondary"
-        size="icon-xs"
-        className="absolute right-1 top-1"
-        onClick={onQuitar}
-        aria-label={`Quitar foto ${archivo.name}`}
-      >
-        <XIcon />
-      </Button>
-    </div>
-  );
-}
-
 export default function RegistrarObjetoPage() {
   const navigate = useNavigate();
   const [apiError, setApiError] = useState(null);
   const [hayEtiquetaValiosa, setHayEtiquetaValiosa] = useState(false);
-  const inputFotos = useRef(null);
 
   const formulario = useForm({
     resolver: zodResolver(RegistrarObjetoSchema),
@@ -203,53 +164,9 @@ export default function RegistrarObjetoPage() {
               <Controller
                 name="fotos"
                 control={formulario.control}
-                render={({ field, fieldState }) => {
-                  const fotos = field.value;
-                  const agregarFotos = (evento) => {
-                    const nuevas = Array.from(evento.target.files ?? []);
-                    field.onChange([...fotos, ...nuevas]);
-                    // permite volver a elegir el mismo archivo después de quitarlo
-                    evento.target.value = '';
-                  };
-                  const quitarFoto = (indice) => field.onChange(fotos.filter((_, i) => i !== indice));
-                  return (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor="objeto-fotos">Fotos ({fotos.length} de {MAXIMO_FOTOS_OBJETO})</FieldLabel>
-                      <input
-                        ref={(elemento) => { inputFotos.current = elemento; field.ref(elemento); }}
-                        id="objeto-fotos"
-                        type="file"
-                        accept="image/*,.heic,.heif"
-                        multiple
-                        className="sr-only"
-                        onChange={agregarFotos}
-                        onBlur={field.onBlur}
-                      />
-                      <div className="flex flex-wrap gap-2">
-                        {fotos.map((foto, indice) => (
-                          <MiniaturaFoto
-                            key={`${foto.name}-${foto.lastModified}-${indice}`}
-                            archivo={foto}
-                            onQuitar={() => quitarFoto(indice)}
-                          />
-                        ))}
-                        {fotos.length < MAXIMO_FOTOS_OBJETO && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="h-24 w-24 flex-col"
-                            onClick={() => inputFotos.current?.click()}
-                          >
-                            <ImagePlusIcon className="size-6!" />
-                            Agregar
-                          </Button>
-                        )}
-                      </div>
-                      <FieldDescription>Al menos una foto. JPG, PNG, WEBP o HEIC, de hasta 5 MB cada una.</FieldDescription>
-                      {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    </Field>
-                  );
-                }}
+                render={({ field, fieldState }) => (
+                  <CargaImagenes field={field} fieldState={fieldState} max={MAXIMO_FOTOS_OBJETO} />
+                )}
               />
             </FieldGroup>
           </form>
