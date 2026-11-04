@@ -5,8 +5,10 @@ export async function listar(filtros={}){
     const where = {};
     if(filtros.idOficina)
         where.idOficina = filtros.idOficina;
-    if(filtros.esValioso)
-        where.esValioso = filtros.esValioso;
+    if(filtros.idEstado)
+        where.idEstado = filtros.idEstado;
+    if(filtros.valioso)
+        where.valioso = filtros.valioso;
     if(filtros.etiquetaObjeto)
         where.etiquetas = {
             some: {
@@ -28,6 +30,20 @@ export async function listar(filtros={}){
                 mode: 'insensitive'
             }
         }))
+    }
+    if(filtros.fechaIngreso) {
+        const fecha = new Date(filtros.fechaIngreso);
+
+        const finFecha = new Date(filtros.fechaIngreso);
+        finFecha.setHours(fecha.getHours(fecha)+23);
+        finFecha.setMinutes(fecha.getMinutes(fecha)+59);
+        finFecha.setSeconds(fecha.getSeconds(fecha)+59);
+        finFecha.setMilliseconds(fecha.getMilliseconds(fecha)+999);
+
+        where.fechaIngreso = {
+            gte: fecha,
+            lte: finFecha
+        }
     }
     const objetos = await prisma.objetoPerdido.findMany({
         where,
