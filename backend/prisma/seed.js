@@ -95,7 +95,7 @@ async function main() {
   if(esDesarrollo)
     await limpiarDatosPrueba();
 
-  const { estadosAlerta, etiquetasValiosas } = await crearCatalogos();
+  const { estadosAlerta, etiquetasValiosas, etiquetasNormales } = await crearCatalogos();
 
   if(!esDesarrollo)
     return;
@@ -111,8 +111,7 @@ async function main() {
     nombreFotos.map((nombre) =>
       prisma.foto.create({
         data: {
-          nombre,
-          valioso: false
+          url: nombre
         }
       })
     )
@@ -163,7 +162,7 @@ async function main() {
       let etiquetas;
       if(Math.random() < 0.5){
         valioso = true;
-        etiquetas = faker.helpers.arrayElements(etiquetasValiosos,{min:1,max:3})
+        etiquetas = faker.helpers.arrayElements(etiquetasValiosas,{min:1,max:3})
       } else {
         valioso = false
         etiquetas = faker.helpers.arrayElements(etiquetasNormales,{min:1,max:3})
@@ -174,7 +173,7 @@ async function main() {
           idEstado: estadosOjeto.sinEntrega.id,
           nombre: faker.lorem.sentence({min:1,max:4}),
           descripcion: faker.lorem.paragraphs({min:2,max:15}),
-          esValioso: valioso,
+          valioso: valioso,
           etiquetas: {createMany: {data: etiquetas.map((etiqueta)=> ({idEtiqueta: etiqueta.id}))}},
           fotos: {createMany: {data: faker.helpers.arrayElements(fotos,{min: 1, max: 3}).map((foto)=> ({idFoto: foto.id}))}}
         }
