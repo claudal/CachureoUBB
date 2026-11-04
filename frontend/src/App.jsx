@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AutenticacionContext';
 import MenuOficinaPage from './pages/MenuOficina';
 import ProtectedRoute from './pages/ProtectedRoute';
 import AtenderAlertasPage from './pages/AtenderAlertas';
+import RegistrarObjetoPage from './pages/RegistrarObjeto';
 
 function App() {
 
@@ -23,6 +24,10 @@ function App() {
             <Route
               index
               element={<InicioPage />}
+            />
+            <Route
+              path="registrarObjeto"
+              element={<RegistrarObjetoPage />}
             />
             <Route
               path="atenderAlertas"

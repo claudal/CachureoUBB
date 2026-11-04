@@ -6,13 +6,31 @@ import { ItemCargando } from "./ui/item-cargando";
 
 const listarEtiquetaObjeto = listar
 
-export default function SelectorEtiquetasObjeto({id,field,filtro}){
-    
+/**
+ * Selector múltiple de etiquetas de objeto para usar con un Controller de react-hook-form.
+ * El valor del campo es un arreglo de ids de etiqueta.
+ *
+ * @param {object} props
+ * @param {string} [props.id]
+ * @param {import("react-hook-form").ControllerRenderProps} props.field
+ * @param {{valioso?: boolean}} [props.filtro] debe ser una constante declarada fuera del componente,
+ *   si se crea en cada render useFetch vuelve a pedir las etiquetas sin parar
+ * @param {(etiquetas: {id: number, nombre: string, valioso: boolean}[]) => void} [props.onSeleccion]
+ *   recibe las etiquetas completas seleccionadas (no solo los ids)
+ * @param {boolean} [props.invalido]
+ */
+export default function SelectorEtiquetasObjeto({id,field,filtro,onSeleccion,invalido}){
+
     const {datos: etiquetasObjeto, cargando: etiquetasObjetoCargando} = useFetch(listarEtiquetaObjeto,filtro);
     const anchor = useComboboxAnchor();
     if(etiquetasObjetoCargando) return (
         <ItemCargando texto="Cargando etiquetas..." />
     )
+
+    function cambiarSeleccion(ids){
+        field.onChange(ids);
+        onSeleccion?.(etiquetasObjeto.filter((etiqueta) => ids.includes(etiqueta.id)));
+    }
 
     return (
         <Combobox
@@ -20,32 +38,33 @@ export default function SelectorEtiquetasObjeto({id,field,filtro}){
             multiple
             autoHighlight
             value={field.value || []}
-            onValueChange={field.onChange}
+            onValueChange={cambiarSeleccion}
             onBlur={field.onBlur}
             ref={field.ref}
             items={etiquetasObjeto}
             disabled={etiquetasObjetoCargando}
             itemToStringValue={(etiqueta)=> etiqueta.nombre}
         >
-            <ComboboxChips ref={anchor} className="w-full max-w-xs">
+            <ComboboxChips ref={anchor} className="w-full" aria-invalid={invalido}>
             <ComboboxValue>
                 {(values) => (
                 <Fragment>
                     {values?.map((value) => {
                     const etiqueta = etiquetasObjeto.find((item) => item.id === value)
+                    if(!etiqueta) return null
                     return (
                     <ComboboxChip key={etiqueta.id}>
                         {etiqueta.nombre}
                     </ComboboxChip>
                     )})}
-                    <ComboboxChipsInput />
+                    <ComboboxChipsInput placeholder={values?.length ? "" : "Buscar etiqueta..."} />
                 </Fragment>
                 )}
             </ComboboxValue>
             </ComboboxChips>
 
             <ComboboxContent anchor={anchor}>
-            <ComboboxEmpty>No items found.</ComboboxEmpty>
+            <ComboboxEmpty>No se encontraron etiquetas.</ComboboxEmpty>
             <ComboboxList>
                 {etiquetasObjeto?.map((etiqueta) => (
                 <ComboboxItem key={etiqueta.id} value={etiqueta.id}>
