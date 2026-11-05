@@ -7,39 +7,54 @@ import { useRef } from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import VisorImagen from "./ui/visor-imagen";
+import { urlFoto } from "../utils/foto.utils.js";
 
 function MiniaturaFoto({ archivo, onQuitar, onClick }) {
-  const imagen = useRef(null);
   const [sinVistaPrevia, setSinVistaPrevia] = useState(false);
+  const [srcPreview, setSrcPreview] = useState('');
 
-  // la url temporal se crea y se libera junto con la miniatura
+  const esArchivoLocal = archivo instanceof File;
+  // Soporta tanto 'name' (File) como propiedades de la API ('nombre' o fallback)
+  const nombreFoto = esArchivoLocal 
+    ? archivo.name 
+    : `Foto ${archivo?.id}`;
+
   useEffect(() => {
-    if (!imagen.current) return;
-    const url = URL.createObjectURL(archivo);
-    imagen.current.src = url;
-    return () => URL.revokeObjectURL(url);
-  }, [archivo]);
+    if (!archivo) return;
+
+    if (esArchivoLocal) {
+      // 1. Archivo subido localmente por el input
+      const urlTemporal = URL.createObjectURL(archivo);
+      setSrcPreview(urlTemporal);
+      return () => URL.revokeObjectURL(urlTemporal);
+    } else {
+      // 2. Foto proveniente del backend: aplicamos el helper de URL para completar el dominio/base
+      const urlCompleta = urlFoto(archivo.url);
+      setSrcPreview(urlCompleta);
+    }
+  }, [archivo, esArchivoLocal]);
 
   return (
     <Attachment orientation="vertical">
       <AttachmentMedia variant="image">
-        {!sinVistaPrevia ? (
+        {!sinVistaPrevia && srcPreview ? (
           <img
-            ref={imagen}
-            alt={archivo.name}
-            className="h-full w-full object-cover"
-            onError={() => setSinVistaPrevia(true)}
-            onClick={()=>onClick({url: imagen.current.src, nombre:archivo.name})}
+            src={srcPreview}
+            alt={nombreFoto}
+            className="h-full w-full object-cover cursor-pointer"
+            onError={() => setSinVistaPrevia(true)} // Si la URL falla (404/cors), pasa a mostrar solo el texto
+            onClick={() => onClick({ url: srcPreview, nombre: nombreFoto })}
           />
         ) : (
-          // p. ej. fotos HEIC en navegadores que no las pueden mostrar
-          <span className="line-clamp-3 break-all p-1 text-center text-xs text-muted-foreground">{archivo.name}</span>
+          <span className="line-clamp-3 break-all p-1 text-center text-xs text-muted-foreground">
+            {nombreFoto}
+          </span>
         )}
       </AttachmentMedia>
       <AttachmentActions>
         <AttachmentAction
           onClick={onQuitar}
-          aria-label={`Eliminar ${archivo.name}`}
+          aria-label={`Eliminar ${nombreFoto}`}
           className="rounded-full bg-muted p-1 text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
         >
           <XIcon />
@@ -86,7 +101,7 @@ export default function CargaImagenes({field, fieldState, max}){
           {field.value.map((foto, indice) => (
             <MiniaturaFoto
               onClick={setFotoAbierta}
-              key={`${foto.name}-${foto.lastModified}-${indice}`}
+              key={foto.id ? `api-${foto.id}` : `${foto.name}-${foto.lastModified}-${indice}`}
               archivo={foto}
               onQuitar={() => quitarFoto(indice)}
             />
