@@ -52,8 +52,18 @@ export function listarOficina(filtros){
     return api.get(`/objetoPerdido/oficina/?${query.toString()}`);
 }
 
-export function listarPublico(){
-    return api.get('/objetoPerdido');
+export function listarPublico(filtros){
+    if(!filtros)
+        filtros = {}
+    const query = new URLSearchParams();
+    if(Boolean(filtros.nombre)) query.set('nombre',filtros.nombre);
+    if(Boolean(filtros.palabrasClave)) query.set('palabrasClave',filtros.palabrasClave);
+    if(Boolean(filtros.idCampus)) query.set('idCampus',filtros.idCampus);
+    if(Boolean(filtros.salto)) query.set('salto',filtros.salto);
+    if(Boolean(filtros.cantidad)) query.set('cantidad',filtros.cantidad);
+    filtros.etiquetasObjeto?.map((id)=>query.append('etiquetaObjeto',id));
+    console.log(query.toString())
+    return api.get(`/objetoPerdido/publico/?${query.toString()}`);
 }
 
 export function buscarPorId(id){

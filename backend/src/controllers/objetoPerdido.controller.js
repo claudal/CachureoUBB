@@ -11,11 +11,9 @@ async function buscarEncargadoSesion(req, res) {
 
 export const getObjetosPerdidosPublico = async (req, res) => {
   try {
-    const encargado = await buscarEncargadoSesion(req, res);
-    if (!encargado) return;
-    res.json(await services.listarPorOficina(encargado.idOficina));
+    res.json(await services.listarPublico(req.vQuery));
   } catch (err) {
-    next(err);
+    console.error('Error fetching public objects:', err);
   }
 }
 

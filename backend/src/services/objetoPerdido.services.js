@@ -149,11 +149,9 @@ export async function eliminar(id) {
     });
 }
 
-export async function listar(filtros={}){
+export async function listar(filtros={}) {
     /**@type {import("@prisma/client").Prisma.ObjetoPerdidoWhereInput} */
     const where = {};
-    /**@type {import("@prisma/client").Prisma.ObjetoPerdidoWhereInput} */
-    const include = INCLUDE_DEFAULT;
 
     if(filtros.idOficina)
         where.idOficina = filtros.idOficina;
@@ -208,7 +206,55 @@ export async function listar(filtros={}){
 
     const objetos = await prisma.objetoPerdido.findMany({
         where,
-        include,
+        include: INCLUDE_DEFAULT,
+        orderBy: {fechaIngreso:'desc'}});
+    return objetos.map((objeto)=>formatear(objeto));
+}
+
+export async function listarPublico(filtros={}) {
+    /**@type {import("@prisma/client").Prisma.ObjetoPerdidoWhereInput} */
+    const where = {
+        idEstado: 1,
+        valioso: false,
+    };
+    
+    const skip = filtros.salto;
+    const take = filtros.cantidad;
+
+    if(filtros.idCampus) where.oficina = {
+        idCampus: filtros.idCampus
+    }
+    if(filtros.etiquetaObjeto)
+        where.etiquetas = {
+            some: {
+                idEtiqueta: {
+                    in: filtros.etiquetaObjeto
+                }
+            }
+        }
+    if(filtros.nombre)
+        where.nombre = {
+            mode: "insensitive",
+            contains: filtros.nombre
+        }
+    if(filtros.palabrasClave) {
+        const palabras = filtros.palabrasClave.trim().split(/\s+/);
+        where.OR = palabras.map((palabra)=>({
+            descripcion: {
+                contains: palabra,
+                mode: 'insensitive'
+            }
+        }))
+    }
+
+    const objetos = await prisma.objetoPerdido.findMany({
+        where,
+        include: {
+            fotos: {include:{foto:true}},
+            etiquetas: {include:{etiqueta:true}},
+        },
+        skip,
+        take,
         orderBy: {fechaIngreso:'desc'}});
     return objetos.map((objeto)=>formatear(objeto));
 }

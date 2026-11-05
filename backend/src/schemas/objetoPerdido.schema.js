@@ -53,6 +53,18 @@ export const filtroObjetoOficinaSchema = z.object({
   valioso: z.enum(['true','false'],{error: "El valor del parámetro debe ser booleano"}).transform((valor) => valor === 'true').optional()
 });
 
+export const filtroObjetoPublicoSchema = z.object({
+  etiquetaObjeto: z.preprocess((val) => {
+      return Array.isArray(val) ? val : [val];
+    }, z.array(z.string().regex(/^\d+$/).transform(Number)))
+    .optional(),
+  nombre: z.string().optional(),
+  palabrasClave: z.string().optional(),
+  idCampus: z.string().regex(/^\d+$/).transform(Number).optional(),
+  salto: z.string().regex(/^\d+$/).transform(Number).optional().default(0),
+  cantidad: z.string().regex(/^\d+$/).transform(Number).optional().default(15)
+});
+
 export const parametroObjetoPerdidoSchema = z.object({
   id: z.string().regex(/^\d+$/).transform(Number)
 })
