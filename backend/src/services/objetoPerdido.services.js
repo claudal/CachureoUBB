@@ -152,10 +152,28 @@ export async function eliminar(id) {
 export async function listar(filtros={}){
     /**@type {import("@prisma/client").Prisma.ObjetoPerdidoWhereInput} */
     const where = {};
+    /**@type {import("@prisma/client").Prisma.ObjetoPerdidoWhereInput} */
+    const include = INCLUDE_DEFAULT;
+
     if(filtros.idOficina)
         where.idOficina = filtros.idOficina;
-    if(filtros.idEstado)
+    if(filtros.idEstado) {
         where.idEstado = filtros.idEstado;
+        if(filtros.idEstado === 2) {
+            include.entregas = true;
+            if(filtros.fechaEntrega) {
+                const fechas = calcularRangoDia(filtros.fechaEntrega);
+                where.entregas = {
+                    some: {
+                        fechaEntrega: {
+                            gte: fechas.inicioFecha,
+                            lte: fechas.finFecha
+                        }
+                    }
+                }
+            }
+        }
+    }
     if(filtros.valioso)
         where.valioso = filtros.valioso;
     if(filtros.etiquetaObjeto)
@@ -187,9 +205,10 @@ export async function listar(filtros={}){
             lte: fechas.finFecha
         }
     }
+
     const objetos = await prisma.objetoPerdido.findMany({
         where,
-        include: INCLUDE_DEFAULT,
+        include,
         orderBy: {fechaIngreso:'desc'}});
     return objetos.map((objeto)=>formatear(objeto));
 }

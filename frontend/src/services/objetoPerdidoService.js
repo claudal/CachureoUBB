@@ -47,6 +47,7 @@ export function listarOficina(filtros){
     if(Boolean(filtros.idOficina)) query.set('idOficina',filtros.idOficina);
     if(Boolean(filtros.idEstado)) query.set('idEstado',filtros.idEstado);
     if(Boolean(filtros.fechaIngreso)) query.set('fechaIngreso',filtros.fechaIngreso.toISOString());
+    if(Boolean(filtros.fechaEntrega)) query.set('fechaEntrega',filtros.fechaEntrega.toISOString());
     filtros.etiquetasObjeto?.map((id)=>query.append('etiquetaObjeto',id));
     return api.get(`/objetoPerdido/oficina/?${query.toString()}`);
 }
