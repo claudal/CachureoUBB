@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getObjetosOficina, postObjetoPerdido, getObjetosPerdidosPublico, getObjetoPerdido, putObjetoPerdido } from '../controllers/objetoPerdido.controller.js';
+import { getObjetosOficina, postObjetoPerdido, getObjetosPerdidosPublico, getObjetoPerdido, putObjetoPerdido, deleteObjetoPerdido } from '../controllers/objetoPerdido.controller.js';
 import { autenticacion } from '../middlewares/auth.middleware.js';
 import { subirFotosObjeto } from '../middlewares/upload.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
@@ -15,5 +15,6 @@ router.get('/publico', getObjetosPerdidosPublico);
 router.get('/oficina', autenticacion, validate(filtroObjetoOficinaSchema,"query","vQuery"), getObjetosOficina);
 router.get('/:id', autenticacion, validate(parametroObjetoPerdidoSchema,"params"), getObjetoPerdido);
 router.put('/:id', autenticacion, validate(parametroObjetoPerdidoSchema,"params"), subirFotosObjeto, validate(actualizarObjetoPerdidoSchema), putObjetoPerdido);
+router.delete('/:id', autenticacion, validate(parametroObjetoPerdidoSchema,"params"), deleteObjetoPerdido);
 
 export default router;

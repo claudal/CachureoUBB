@@ -117,3 +117,23 @@ export const putObjetoPerdido = async (req, res) => {
   }
 };
 
+/**
+ * Lista los objetos de la oficina del encargado autenticado.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+export const deleteObjetoPerdido = async (req, res) => {
+  try {
+    const encargado = await buscarEncargadoSesion(req, res);
+    if(!encargado) return;
+    const objeto = await services.buscarPorId(req.params.id);
+    if(objeto.idOficina !== encargado.idOficina || objeto.idEstado !== 1)
+      return res.status(403).json({ error: 'No tiene permisos para eliminar este objeto' });
+    return res.json(await services.eliminar(req.params.id));
+  } catch (error) {
+    console.error('Error fetching object:', error);
+    res.status(500).json({ error: 'Error al obtener objetos perdidos' });
+  }
+};

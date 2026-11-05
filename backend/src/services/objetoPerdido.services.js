@@ -128,6 +128,26 @@ export async function actualizar(id, { nombre, descripcion, idsEtiquetas, urlsFo
     return formatear(objetoActualizado);
 }
 
+export async function eliminar(id) {
+    // 1. Obtener las fotos asociadas al objeto para eliminar los archivos físicos
+    const fotosAEliminar = await prisma.fotoObjeto.findMany({
+        where: { idObjeto: id },
+        include: { foto: true }
+    });
+    // 2. Eliminar los archivos físicos del servidor/disco de las fotos descartadas
+    for (const f of fotosAEliminar) {
+        await eliminarArchivoFisico(f.foto.url);
+    }
+    // 3. Eliminar las fotos de la base de datos
+    await prisma.fotoObjeto.deleteMany({
+        where: { idObjeto: id }
+    });
+    // 4. Eliminar el objeto de la base de datos
+    return await prisma.objetoPerdido.delete({
+        where: { id }
+    });
+}
+
 export async function listar(filtros={}){
     /**@type {import("@prisma/client").Prisma.ObjetoPerdidoWhereInput} */
     const where = {};

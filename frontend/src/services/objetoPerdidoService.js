@@ -58,3 +58,7 @@ export function listarPublico(){
 export function buscarPorId(id){
     return api.get(`/objetoPerdido/${id}`);
 }
+
+export function eliminarPorId(id){
+    return api.delete(`/objetoPerdido/${id}`);
+}
