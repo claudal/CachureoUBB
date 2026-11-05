@@ -1,4 +1,4 @@
-import { listarOficina } from '../services/objetoPerdidoService.js';
+import { eliminarPorId, listarOficina } from '../services/objetoPerdidoService.js';
 import { useFetch } from '../hooks/useFetch.js';
 import { useState } from 'react';
 import { Controller } from 'react-hook-form';
@@ -22,6 +22,7 @@ import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
 import { urlFoto } from '../utils/foto.utils.js';
 import { DatePicker } from '../components/ui/date-picker.jsx';
 import { useNavigate } from 'react-router-dom';
+import { BotonEliminar } from '../components/ui/dialogo-eliminar.jsx';
 
 const filtroEtiqueta = {}
 const filtroBase = {
@@ -39,6 +40,7 @@ export default function ObjetosOficinaPage() {
   const navigate = useNavigate()
   const [filtros, setFiltros] = useState(filtroBase);
   const objetos = useFetch(()=>listarOficina(filtros),[filtros],[]);
+  const [eliminando, setEliminando] = useState(false);
 
   const onSubmitFiltros = (data) => {
     const { idEstado, ...filtro } = data;
@@ -55,6 +57,18 @@ export default function ObjetosOficinaPage() {
 
   async function abrirObjeto(objeto){
     setObjetoAbierto(objeto);
+  }
+
+  async function eliminarObjeto(){
+    setEliminando(true);
+    try {
+      await eliminarPorId(objetoAbierto.id);
+    } catch (error) {
+      console.error("Error al eliminar el objeto:", error);
+    }
+    setObjetoAbierto(null);
+    objetos.recargar();
+    setEliminando(false);
   }
 
   async function cerrarObjeto(){
@@ -194,17 +208,19 @@ export default function ObjetosOficinaPage() {
             </div>
             {objetoAbierto?.idEstado === 1 ? (
               <DrawerFooter>
-                <Button variant="outline" onClick={()=>navigate(`editarObjeto/${objetoAbierto.id}`)}>
+                <Button variant="outline" onClick={()=>navigate(`editarObjeto/${objetoAbierto.id}`)} disabled={eliminando}>
                   Editar<PenIcon/>
                 </Button>
-                <Button variant="destructive" onClick={()=>navigate(`editarObjeto/${objetoAbierto.id}`)}>
-                  Eliminar<TrashIcon/>
-                </Button>
-                <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
+                <BotonEliminar textoBoton={eliminando ? "Eliminando..." : "Eliminar"} 
+                titulo="Eliminar objeto" 
+                descripcion="¿Está seguro de que desea eliminar este objeto?"
+                disabled={eliminando}
+                onClick={() => eliminarObjeto()} />
+                <DrawerClose disabled={eliminando} render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
               </DrawerFooter>
               ) : (
                 <DrawerFooter>
-                  <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
+                  <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>} disabled={eliminando}/>
                 </DrawerFooter>
               )}
         </DrawerContent>
