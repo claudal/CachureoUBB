@@ -1,6 +1,7 @@
 import { prisma } from "../config/prisma.js";
 import { ESTADO_OBJETO } from "../config/estados.js";
 import { eliminarArchivoFisico } from "./foto.services.js";
+import { calcularRangoDia } from "../utils/fecha.utils.js";
 
 /**@type {import("@prisma/client").Prisma.ObjetoPerdidoInclude}*/
 const INCLUDE_DEFAULT = {
@@ -180,17 +181,10 @@ export async function listar(filtros={}){
         }))
     }
     if(filtros.fechaIngreso) {
-        const fecha = new Date(filtros.fechaIngreso);
-
-        const finFecha = new Date(filtros.fechaIngreso);
-        finFecha.setHours(fecha.getHours(fecha)+23);
-        finFecha.setMinutes(fecha.getMinutes(fecha)+59);
-        finFecha.setSeconds(fecha.getSeconds(fecha)+59);
-        finFecha.setMilliseconds(fecha.getMilliseconds(fecha)+999);
-
+        const fechas = calcularRangoDia(filtros.fechaIngreso);
         where.fechaIngreso = {
-            gte: fecha,
-            lte: finFecha
+            gte: fechas.inicioFecha,
+            lte: fechas.finFecha
         }
     }
     const objetos = await prisma.objetoPerdido.findMany({
