@@ -3,24 +3,24 @@ import { useFetch } from '../hooks/useFetch.js';
 import { useState } from 'react';
 import { Controller } from 'react-hook-form';
 
-import { ArrowLeftIcon, ArrowRightCircleIcon, ArrowRightIcon, GemIcon, PlusIcon, SearchIcon } from 'lucide-react';
+import { ArrowRightCircleIcon, SearchIcon } from 'lucide-react';
 
 import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
 
 import { FieldGroup, Field, FieldLabel, FieldDescription } from "../components/ui/field.js"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
 import { Badge } from '../components/ui/badge.js'
 import { Button } from '../components/ui/button.js'
-import { ButtonGroup } from '../components/ui/button-group.js'
 import { Input } from '../components/ui/input.js';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { ItemSinDatos } from '../components/ui/item-sin-datos.jsx';
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../components/ui/drawer.js';
 import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
 import { urlFoto } from '../utils/foto.utils.js';
 import SelectorCampus from '../components/SelectorCampus.jsx';
 import { Paginacion } from '../components/ui/paginacion.jsx';
+import { Separator } from '../components/ui/separator';
 
 const filtroEtiqueta = {}
 const filtroBase = {
@@ -161,6 +161,59 @@ export default function BuscarObjetos() {
 
             </div>
             <DrawerFooter>
+              <Drawer swipeDirection='left' >
+                <DrawerTrigger render={<Button>Ver dónde está</Button>} />
+                <DrawerContent>
+                    <DrawerHeader className="p-4 border-b">
+                      <DrawerTitle className="font-semibold text-lg">Oficina {objetoAbierto?.oficina.nombre}</DrawerTitle>
+                    </DrawerHeader>
+                    <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2">
+                      <span className="font-semibold text-sm text-foreground">
+                        Fotos <span className='font-light text-muted-foreground'>(presione en una para expandirlo)</span>
+                      </span>
+                      <CarruselImagenes fotos={objetoAbierto?.oficina.fotos} swipeDirection={'left'} />
+
+                      <Separator />
+
+                      <div className="flex-1 overflow-y-auto space-y-4">
+                        {/* Sección Descripción */}
+                        <div>
+                          <span className="font-semibold text-sm text-foreground block mb-1">
+                            Descripción:
+                          </span>
+                          <p className="text-sm text-muted-foreground whitespace-pre-line">
+                            {objetoAbierto?.oficina.descripcion || "Sin descripción disponible."}
+                          </p>
+                        </div>
+
+                        <Separator />
+
+                        <div>
+                          <span className="font-semibold text-sm text-foreground block mb-0.5">
+                            Campus:
+                          </span>
+                          <p className="text-sm text-muted-foreground whitespace-pre-line">
+                            {objetoAbierto?.oficina.campus.nombre}
+                          </p>
+                        </div>
+
+                        {/* Sección Dirección */}
+                        <div>
+                          <span className="font-semibold text-sm text-foreground block mb-0.5">
+                            Dirección campus:
+                          </span>
+                          <p className="text-sm text-muted-foreground whitespace-pre-line">
+                            {objetoAbierto?.oficina.campus.direccion}
+                          </p>
+                        </div>
+                      </div>
+
+                    </div>
+                    <DrawerFooter>
+                      <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
+                    </DrawerFooter>
+                </DrawerContent>
+              </Drawer>
               <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
             </DrawerFooter>
         </DrawerContent>
