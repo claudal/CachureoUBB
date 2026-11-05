@@ -137,7 +137,8 @@ async function main() {
         data:{
           nombre: faker.book.title(),
           descripcion: faker.lorem.sentence(),
-          idCampus: campu.id
+          idCampus: campu.id,
+          fotos: {createMany: {data: faker.helpers.arrayElements(fotos,{min: 1, max: 3}).map((foto)=> ({idFoto: foto.id}))}}
         }
       }))
     }
