@@ -19,7 +19,7 @@ import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { ItemSinDatos } from '../components/ui/item-sin-datos.jsx';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
 import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
-import { urlFoto } from '../utils/urlFoto.js';
+import { urlFoto } from '../utils/foto.utils.js';
 import { DatePicker } from '../components/ui/date-picker.jsx';
 import { useNavigate } from 'react-router-dom';
 

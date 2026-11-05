@@ -1,5 +1,5 @@
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../components/ui/carousel.js';
-import { urlFoto } from '../utils/urlFoto.js';
+import { urlFoto } from '../utils/foto.utils.js';
 import { useState } from 'react';
 import VisorImagen from './ui/visor-imagen.jsx';
 
