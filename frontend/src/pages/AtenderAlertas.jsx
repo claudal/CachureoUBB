@@ -9,7 +9,6 @@ import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
 
 import { FieldError, FieldGroup, Field, FieldLabel, FieldDescription } from "../components/ui/field.js"
-import { ScrollArea } from "../components/ui/scroll-area.js"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
 import { Badge } from '../components/ui/badge.js'
 import { Toggle } from '../components/ui/toggle.js'
@@ -17,7 +16,7 @@ import { Button } from '../components/ui/button.js'
 import { Input } from '../components/ui/input.js';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { ItemSinDatos } from '../components/ui/item-sin-datos.jsx';
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerDescription, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
 import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
 
 const filtroEtiqueta = {valioso:true}
@@ -32,11 +31,9 @@ const VALOR_DEFECTO_FILTRO = {
 
 const LARGO_MAXIMO_DESCRIPCION_ALERTA = 100;
 
-const listarAlertas = alertaBusquedaService.listar
-
 export default function AtenderAlertasPage() {
   const [filtros, setFiltros] = useState(filtroAlerta);
-  const alertas = useFetch(listarAlertas,filtros);
+  const alertas = useFetch(()=>alertaBusquedaService.listar(filtros),[filtros],[]);
 
   const onSubmitFiltros = (data) => {
     data.marcado = filtros.marcado;
@@ -65,7 +62,7 @@ export default function AtenderAlertasPage() {
     setAlertaAbierta({
       ...alertaAbierta,
       marcada: valor
-    })
+    });
   }
 
   async function cerrarAlerta(){
@@ -74,6 +71,7 @@ export default function AtenderAlertasPage() {
         await alertaBusquedaService.agregarMarcador(alertaAbierta.id);
       else 
         await alertaBusquedaService.quitarMarcador(alertaAbierta.id);
+      alertas.recargar();
     }
     setAlertaAbierta(null);
     setAlertaOriginal(null);

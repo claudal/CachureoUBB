@@ -21,7 +21,7 @@ const listarEtiquetaObjeto = listar
  */
 export default function SelectorEtiquetasObjeto({id,field,filtro,onSeleccion,invalido}){
 
-    const {datos: etiquetasObjeto, cargando: etiquetasObjetoCargando} = useFetch(listarEtiquetaObjeto,filtro);
+    const {datos: etiquetasObjeto, cargando: etiquetasObjetoCargando} = useFetch(listarEtiquetaObjeto,[filtro],[]);
     const anchor = useComboboxAnchor();
     if(etiquetasObjetoCargando) return (
         <ItemCargando texto="Cargando etiquetas..." />
