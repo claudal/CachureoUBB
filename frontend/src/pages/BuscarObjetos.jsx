@@ -224,7 +224,7 @@ export default function BuscarObjetos() {
             <h1 className="text-2xl font-bold tracking-tight">Objetos perdidos</h1>
             <p className="text-sm text-muted-foreground">Objetos perdidos en el campus.</p>
           </div>
-          <SelectorCampus onSelect={onSelectCampus} />
+          <SelectorCampus onSelect={onSelectCampus} value={filtros.idCampus}/>
           <Button onClick={()=>controladorPanelFiltro.setAbierto(true)} variant="outline" disabled={objetos.cargando}>
               <SearchIcon />Abrir filtros
           </Button>
