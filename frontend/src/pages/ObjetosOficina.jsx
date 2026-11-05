@@ -38,7 +38,7 @@ const VALOR_DEFECTO_FILTRO = {
 export default function ObjetosOficinaPage() {
   const navigate = useNavigate()
   const [filtros, setFiltros] = useState(filtroBase);
-  const objetos = useFetch(listarOficina,filtros);
+  const objetos = useFetch(()=>listarOficina(filtros),[filtros],[]);
 
   const onSubmitFiltros = (data) => {
     const { idEstado, ...filtro } = data;
