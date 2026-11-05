@@ -1,11 +1,12 @@
 import { prisma } from "../config/prisma.js";
 import { ESTADO_OBJETO } from "../config/estados.js";
+import { eliminarArchivoFisico } from "./foto.services.js";
 
 /**@type {import("@prisma/client").Prisma.ObjetoPerdidoInclude}*/
-const include = {
+const INCLUDE_DEFAULT = {
     estado: true,
     etiquetas: { include: { etiqueta: true } },
-    fotos: { include: { foto: true } }
+    fotos: { include: { foto: true }, orderBy: { foto: { id: 'asc' } } }
 };
 
 // deja etiquetas y fotos como listas simples, igual que en las alertas
@@ -46,9 +47,85 @@ export async function crear({ nombre, descripcion, idsEtiquetas, valioso, urlsFo
                 create: urlsFotos.map((url) => ({ foto: { create: { url } } }))
             }
         },
-        include
+        include: INCLUDE_DEFAULT
     });
     return formatear(objeto);
+}
+
+
+/**
+ * Actualiza un objeto perdido.
+ * Elimina las fotos removidas de la BD y del servidor, y agrega las nuevas.
+ *
+ * @param {number} id
+ * @param {{
+ *   nombre: string, 
+ *   descripcion: string, 
+ *   idsEtiquetas: number[], 
+ *   urlsFotosNuevas: string[], 
+ *   idsFotosAConservar: number[] 
+ * }} datos
+ */
+export async function actualizar(id, { nombre, descripcion, idsEtiquetas, urlsFotosNuevas = [], idsFotosAConservar = [] }) {
+    // 1. Validar existencia de las etiquetas
+    const etiquetas = await prisma.etiquetaObjeto.findMany({ 
+        where: { id: { in: idsEtiquetas } } 
+    });
+    if (etiquetas.length !== idsEtiquetas.length) {
+        const err = new Error("Una o más etiquetas seleccionadas no existen");
+        err.statusCode = 400;
+        throw err;
+    }
+
+    // 2. Obtener la relación actual de fotos del objeto en la BD
+    const fotosAEliminar = await prisma.fotoObjeto.findMany({
+        where: { 
+            idObjeto: id,
+            idFoto: { notIn: idsFotosAConservar }
+        },
+        include: { foto: true }
+    });
+
+    // 3. Eliminar los archivos físicos del servidor/disco de las fotos descartadas
+    for (const f of fotosAEliminar) {
+        await eliminarArchivoFisico(f.foto.url);
+    }
+
+    const idsFotosBorrar = fotosAEliminar.map((f) => f.idFoto);
+
+    // 4. Actualización en la Base de Datos dentro de una Transacción
+    const objetoActualizado = await prisma.$transaction(async (tx) => {
+        // A. Reemplazar relación de Etiquetas (Eliminar viejas y asociar nuevas)
+        await tx.objetoTieneEtiqueta.deleteMany({
+            where: { idObjeto: id }
+        });
+
+        if (idsFotosBorrar.length > 0) {
+            await tx.foto.deleteMany({
+                where: { id: { in: idsFotosBorrar } }
+            });
+        }
+
+        // C. Actualizar objeto y crear las referencias a las fotos nuevas
+        return await tx.objetoPerdido.update({
+            where: { id },
+            data: {
+                nombre,
+                descripcion,
+                etiquetas: {
+                    create: idsEtiquetas.map((idEtiqueta) => ({ idEtiqueta }))
+                },
+                fotos: {
+                    create: urlsFotosNuevas.map((url) => ({
+                        foto: { create: { url } }
+                    }))
+                }
+            },
+            include: INCLUDE_DEFAULT
+        });
+    });
+
+    return formatear(objetoActualizado);
 }
 
 export async function listar(filtros={}){
@@ -98,20 +175,9 @@ export async function listar(filtros={}){
     }
     const objetos = await prisma.objetoPerdido.findMany({
         where,
-        include: {
-            fotos: {include:{foto:true}},
-            etiquetas: {include:{etiqueta:true}},
-            estado: true
-        },
+        include: INCLUDE_DEFAULT,
         orderBy: {fechaIngreso:'desc'}});
-    return objetos.map((objeto)=>{
-        const { etiquetas, fotos, ...restoObjeto} = objeto;
-        return {
-            ...restoObjeto,
-            etiquetas: etiquetas.map((e)=> e.etiqueta),
-            fotos: fotos.map((e)=> e.foto)
-        }
-    });
+    return objetos.map((objeto)=>formatear(objeto));
 }
 
 export async function buscarPorId(id){
@@ -119,10 +185,7 @@ export async function buscarPorId(id){
         where: {
             id: id
         },
-        include:{
-            fotos: {include:{foto:true}},
-            etiquetas: {include:{etiqueta:true}}
-        }
+        include: INCLUDE_DEFAULT
     });
     return formatear(objeto);
 }

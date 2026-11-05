@@ -18,6 +18,25 @@ export function crear({ nombre, descripcion, etiquetas, valioso, fotos }){
     fotos.forEach((foto) => formData.append('fotos', conTipoHeic(foto)));
     return api.postForm('/objetoPerdido', formData);
 }
+
+/**
+ * Registra un objeto perdido en la oficina del encargado autenticado.
+ * @param {{nombre: string, descripcion: string, etiquetas: number[], valioso: boolean, fotos: File[]}} datos
+ */
+export function actualizar(id,{ nombre, descripcion, etiquetas, fotos }){
+    const formData = new FormData();
+    formData.append('nombre', nombre);
+    formData.append('descripcion', descripcion);
+    etiquetas.forEach((id) => formData.append('etiquetas', String(id)));
+    fotos.forEach((foto) => {
+        if(foto instanceof File)
+            formData.append('fotos', conTipoHeic(foto));
+        else
+            formData.append('fotosOriginales', foto.id);
+    });
+    return api.putForm(`/objetoPerdido/${id}`, formData);
+}
+
 export function listarOficina(filtros){
     if(!filtros)
         filtros = {}
