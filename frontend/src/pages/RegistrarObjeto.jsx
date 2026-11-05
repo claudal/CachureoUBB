@@ -16,6 +16,7 @@ import { RegistrarObjetoSchema, MAXIMO_FOTOS_OBJETO } from '../schemas/objetoPer
 import * as objetoPerdidoService from '../services/objetoPerdidoService.js';
 import CargaImagenes from '../components/CargaImagenes.jsx';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
+import { useNotify } from '../hooks/useNotify.js';
 
 // constante fuera del componente para que el selector no recargue las etiquetas en cada render
 const filtroTodasEtiquetas = {};
@@ -34,6 +35,7 @@ const defaultValues = {
 
 export default function RegistrarObjetoPage() {
   const { id } = useParams();
+  const notification = useNotify();
   const esEdicion = Boolean(id);
   const [apiError, setApiError] = useState(null);
   const [cargando, setCargando] = useState(esEdicion);
@@ -78,19 +80,25 @@ export default function RegistrarObjetoPage() {
   async function onSubmit(datos) {
     setApiError(null);
     try {
-      const objeto = esEdicion ?
-        await objetoPerdidoService.actualizar(id,datos) :
+      if(esEdicion) {
+        await objetoPerdidoService.actualizar(id,datos)
+        notification.exito(`Objeto editado correctamente`);
+      } else {
         await objetoPerdidoService.crear(datos);
-      navigate('/menuOficina', { state: { mensaje: `El objeto "${objeto.nombre}" fue ${esEdicion ? 'editado' : 'registrado'}.` } });
+        notification.exito(`Objeto registrado correctamente`);
+      }
+      navigate('/menuOficina');
     } catch (err) {
       // los errores de validación del backend se muestran en su campo
       err.detalles?.forEach(({ campo, mensaje }) => {
         if (campo in formulario.getValues())
           formulario.setError(campo, { message: mensaje });
       });
+      notification.error(`Error al ${esEdicion ? 'editar' : 'registrar'} el objeto`);
       setApiError(err.message);
     }
   }
+
 
   return (
     <div className="mx-auto w-full max-w-2xl p-4 pb-28">

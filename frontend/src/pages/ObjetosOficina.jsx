@@ -23,6 +23,7 @@ import { urlFoto } from '../utils/foto.utils.js';
 import { DatePicker } from '../components/ui/date-picker.jsx';
 import { useNavigate } from 'react-router-dom';
 import { BotonEliminar } from '../components/ui/dialogo-eliminar.jsx';
+import { useNotify } from '../hooks/useNotify.js';
 
 const filtroEtiqueta = {}
 const filtroBase = {
@@ -37,7 +38,8 @@ const VALOR_DEFECTO_FILTRO = {
 }
 
 export default function ObjetosOficinaPage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const notificacion = useNotify();
   const [filtros, setFiltros] = useState(filtroBase);
   const objetos = useFetch(()=>listarOficina(filtros),[filtros],[]);
   const [eliminando, setEliminando] = useState(false);
@@ -63,8 +65,10 @@ export default function ObjetosOficinaPage() {
     setEliminando(true);
     try {
       await eliminarPorId(objetoAbierto.id);
+      notificacion.exito("Objeto eliminado correctamente");
     } catch (error) {
       console.error("Error al eliminar el objeto:", error);
+      notificacion.error("Hubo un error al eliminar el objeto");
     }
     setObjetoAbierto(null);
     objetos.recargar();
