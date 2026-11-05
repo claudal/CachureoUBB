@@ -1,5 +1,5 @@
 import { Dialog, DialogContent } from "./dialog"
-import { urlFoto } from '../../utils/urlFoto.js';
+import { urlFoto } from '../../utils/foto.utils.js';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter } from './drawer.js';
 import { Button } from './button.js';
 import { ArrowRightCircleIcon } from 'lucide-react';
