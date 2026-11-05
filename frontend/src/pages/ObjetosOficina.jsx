@@ -3,7 +3,7 @@ import { useFetch } from '../hooks/useFetch.js';
 import { useState } from 'react';
 import { Controller } from 'react-hook-form';
 
-import { ArrowRightCircleIcon, CircleCheckIcon, GemIcon, GhostIcon, PackageSearchIcon, PlusIcon, SearchIcon, StarIcon } from 'lucide-react';
+import { ArrowRightCircleIcon, CircleCheckIcon, GemIcon, GhostIcon, PackageSearchIcon, PenIcon, PlusIcon, SearchIcon, StarIcon, TrashIcon } from 'lucide-react';
 
 import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
@@ -192,9 +192,21 @@ export default function ObjetosOficinaPage() {
               </div>
 
             </div>
-            <DrawerFooter > 
-              <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
-            </DrawerFooter>
+            {objetoAbierto?.idEstado === 1 ? (
+              <DrawerFooter>
+                <Button variant="outline" onClick={()=>navigate(`editarObjeto/${objetoAbierto.id}`)}>
+                  Editar<PenIcon/>
+                </Button>
+                <Button variant="destructive" onClick={()=>navigate(`editarObjeto/${objetoAbierto.id}`)}>
+                  Eliminar<TrashIcon/>
+                </Button>
+                <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
+              </DrawerFooter>
+              ) : (
+                <DrawerFooter>
+                  <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
+                </DrawerFooter>
+              )}
         </DrawerContent>
       </Drawer>
       <div>

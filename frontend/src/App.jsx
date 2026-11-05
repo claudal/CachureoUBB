@@ -30,6 +30,10 @@ function App() {
               element={<RegistrarObjetoPage />}
             />
             <Route
+              path="editarObjeto/:id"
+              element={<RegistrarObjetoPage />}
+            />
+            <Route
               path="atenderAlertas"
               element={<AtenderAlertasPage />}
             />
