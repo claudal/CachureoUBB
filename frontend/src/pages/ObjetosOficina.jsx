@@ -34,15 +34,16 @@ const VALOR_DEFECTO_FILTRO = {
   "nombre": "",
   "palabrasClave": "",
   "etiquetasObjeto": [],
+  "fechaEntrega": undefined,
   "fechaIngreso": undefined
 }
 
 export default function ObjetosOficinaPage() {
   const navigate = useNavigate();
   const notificacion = useNotify();
+
   const [filtros, setFiltros] = useState(filtroBase);
-  const objetos = useFetch(()=>listarOficina(filtros),[filtros],[]);
-  const [eliminando, setEliminando] = useState(false);
+  const [filtroEstado, setFiltroEstado] = useState("1");
 
   const onSubmitFiltros = (data) => {
     const { idEstado, ...filtro } = data;
@@ -52,10 +53,12 @@ export default function ObjetosOficinaPage() {
     });
     controladorPanelFiltro.formulario.resetField("fechaIngreso")
   }
-
   const controladorPanelFiltro = usePanelFiltro(VALOR_DEFECTO_FILTRO,onSubmitFiltros);
   
+  const objetos = useFetch(()=>listarOficina(filtros),[filtros],[]);
+  
   const [objetoAbierto, setObjetoAbierto] = useState(null);
+  const [eliminando, setEliminando] = useState(false);
 
   async function abrirObjeto(objeto){
     setObjetoAbierto(objeto);
@@ -95,7 +98,11 @@ export default function ObjetosOficinaPage() {
                     <ToggleGroup
                       type="single"
                       value={field.value}
-                      onValueChange={(val)=> {if(val) field.onChange(val);}}
+                      onValueChange={(val)=> {
+                        if(!val) return;
+                        setFiltroEstado(val[0]);
+                        field.onChange(val);
+                      }}
                       size="sm"
                       variant="outline"
                       spacing={1}
@@ -178,6 +185,24 @@ export default function ObjetosOficinaPage() {
                   />
                 </Field>
             )}/>
+
+            {filtroEstado === "2" && (
+              <Controller name="fechaEntrega"
+                control={controladorPanelFiltro.control}
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel htmlFor={controladorPanelFiltro.idForm}>
+                        Fecha de entrega
+                    </FieldLabel>
+                    <DatePicker
+                        id={controladorPanelFiltro.idForm}
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) => date > new Date()}
+                    />
+                  </Field>
+              )}/>
+            )}
         </FieldGroup>
       </PanelFiltro>
       <Drawer open={Boolean(objetoAbierto)} onOpenChange={cerrarObjeto} swipeDirection='left' >
