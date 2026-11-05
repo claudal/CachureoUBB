@@ -62,7 +62,6 @@ export function listarPublico(filtros){
     if(Boolean(filtros.salto)) query.set('salto',filtros.salto);
     if(Boolean(filtros.cantidad)) query.set('cantidad',filtros.cantidad);
     filtros.etiquetasObjeto?.map((id)=>query.append('etiquetaObjeto',id));
-    console.log(query.toString())
     return api.get(`/objetoPerdido/publico/?${query.toString()}`);
 }
 
