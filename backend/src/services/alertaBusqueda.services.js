@@ -70,6 +70,37 @@ export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
 }
 
 /**
+ * Crea una alerta de búsqueda en el campus ingresado, con estado "Sin entrega".
+ * Queda como valioso si el encargado lo marcó o si alguna etiqueta es valiosa.
+ *
+ * @param {{nombre: string, descripcion: string, idsEtiquetas: number[], urlsFotos: string[], idCampus: number}} datos
+ */
+export async function crear({ nombre, descripcion, idsEtiquetas, urlsFotos, idCampus }) {
+    const etiquetas = idsEtiquetas ? await prisma.etiquetaObjeto.findMany({ where: { id: { in: idsEtiquetas } } }) : [];
+    if (etiquetas.length !== idsEtiquetas.length) {
+        const err = new Error("Una o más etiquetas seleccionadas no existen");
+        err.statusCode = 400;
+        throw err;
+    }
+
+    const alerta = await prisma.alertaBusqueda.create({
+        data: {
+            nombre,
+            descripcion,
+            idEstado: 1,
+            idCampus,
+            etiquetas: etiquetas && {
+                create: idsEtiquetas.map((idEtiqueta) => ({ idEtiqueta }))
+            },
+            fotos: urlsFotos && {
+                create: urlsFotos.map((url) => ({ foto: { create: { url } } }))
+            }
+        }
+    });
+    return {idAlerta: alerta.id};
+}
+
+/**
  * 
  * @param {import("@prisma/client").AlertaBusqueda.idAlerta} idAlerta
  * @returns 

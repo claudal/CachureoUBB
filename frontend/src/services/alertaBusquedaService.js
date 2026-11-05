@@ -1,3 +1,4 @@
+import { conTipoHeic } from "../utils/foto.utils.js";
 import { api } from "./api.js";
 
 export function listar(filtros){
@@ -25,4 +26,19 @@ export function agregarMarcador(idAlerta){
 
 export function registrarLectura(idAlerta){
     return api.post(`/alertasBusqueda/${idAlerta}/lecturas`);
+}
+
+/**
+ * Crea una alerta de búsqueda
+ * @param {{nombre: string, descripcion: string, etiquetas: number[], fotos: File[]}} datos
+ */
+export function crear({ nombre, descripcion, etiquetas, fotos, idCampus }){
+    console.log("a")
+    const formData = new FormData();
+    formData.append('nombre', nombre);
+    formData.append('descripcion', descripcion);
+    formData.append('idCampus', idCampus);
+    etiquetas.forEach((id) => formData.append('etiquetas', String(id)));
+    fotos.forEach((foto) => formData.append('fotos', conTipoHeic(foto)));
+    return api.postForm('/alertasBusqueda', formData);
 }
