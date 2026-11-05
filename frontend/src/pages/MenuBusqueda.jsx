@@ -11,7 +11,7 @@ export default function MenuBusquedaPage(){
         },
         {
             texto: "Administrar alerta de búsqueda",
-            nombre:"administrarAlerta",
+            nombre:"alertaBusqueda",
             icono: BellIcon
         }
     ])
