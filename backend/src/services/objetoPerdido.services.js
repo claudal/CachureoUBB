@@ -252,11 +252,27 @@ export async function listarPublico(filtros={}) {
         include: {
             fotos: {include:{foto:true}},
             etiquetas: {include:{etiqueta:true}},
+            oficina: {
+                include: {
+                    campus: true,
+                    fotos: {include: {foto:true}}
+                },
+            }
         },
         skip,
         take,
         orderBy: {fechaIngreso:'desc'}});
-    return objetos.map((objeto)=>formatear(objeto));
+    return objetos.map((objeto)=>{
+        const {oficina, ...o} = formatear(objeto);
+        const {fotos, ...restoOficina} = oficina;
+        return {
+            ...o,
+            oficina: {
+                ...restoOficina,
+                fotos: fotos.map((f)=>f.foto)
+            } 
+        };
+    });
 }
 
 export async function buscarPorId(id){
