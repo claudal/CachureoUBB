@@ -62,7 +62,7 @@ export default function AtenderAlertasPage() {
     setAlertaAbierta({
       ...alertaAbierta,
       marcada: valor
-    })
+    });
   }
 
   async function cerrarAlerta(){
@@ -71,6 +71,7 @@ export default function AtenderAlertasPage() {
         await alertaBusquedaService.agregarMarcador(alertaAbierta.id);
       else 
         await alertaBusquedaService.quitarMarcador(alertaAbierta.id);
+      alertas.recargar();
     }
     setAlertaAbierta(null);
     setAlertaOriginal(null);
