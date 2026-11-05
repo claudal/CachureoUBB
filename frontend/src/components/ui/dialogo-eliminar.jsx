@@ -14,11 +14,13 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 
-export function BotonEliminar({onClick, textoBoton, titulo, descripcion}) {
+export function BotonEliminar({onClick, textoBoton, titulo, descripcion, disabled=false}) {
   return (
     <AlertDialog >
       <AlertDialogTrigger
-        render={<Button variant="destructive">{textoBoton}</Button>}
+        render={<Button variant="destructive" disabled={disabled}>
+          {textoBoton}
+        </Button>} 
       />
       <AlertDialogContent size="sm">
         <AlertDialogHeader>
