@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { Badge } from "./ui/badge";
+import { Toaster } from "./ui/toast";
 
 export default function PantallaUsuario({ menuItems, onClick }) {
   return (
@@ -7,6 +8,7 @@ export default function PantallaUsuario({ menuItems, onClick }) {
       <main className="h-full overflow-y-auto pb-16">
         <Outlet />
       </main>
+      <Toaster />
 
       <nav className="
         fixed
