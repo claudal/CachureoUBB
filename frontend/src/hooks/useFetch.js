@@ -1,16 +1,35 @@
 import { useEffect, useState, useCallback } from 'react'
 
-export function useFetch(fn,filtros) {
-  const [datos, setDatos] = useState([])
+export function useFetch(fn,deps=[],defaultData=null) {
+  const [datos, setDatos] = useState(defaultData)
   const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState('');
+  const [error, setError] = useState('')
 
   const recargar = useCallback(() => {
+    let cancelado = false
     setCargando(true)
-    fn(filtros).then(setDatos).catch(e => setError(e.message)).finally(() => setCargando(false))
-  }, [fn,filtros])
+    setError('')
 
-  useEffect(() => { recargar() }, [recargar])
+    fn()
+      .then((respuesta) => {
+        if (!cancelado) setDatos(respuesta)
+      })
+      .catch((e) => {
+        if (!cancelado) setError(e.message || 'Error al cargar los datos')
+      })
+      .finally(() => {
+        if (!cancelado) setCargando(false)
+      })
 
-  return { datos, cargando, error, recargar }
+    return () => {
+      cancelado = true
+    }
+  }, deps) // Se vuelve a ejecutar solo cuando los elementos dentro de 'deps' cambian
+
+  useEffect(() => {
+    const cleanup = recargar()
+    return cleanup
+  }, [recargar])
+
+  return { datos, cargando, error, recargar, setDatos }
 }

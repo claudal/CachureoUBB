@@ -12,25 +12,31 @@ export function PanelFiltro({controlador,children}){
         <Drawer
             open={controlador.abierto}
             onOpenChange={controlador.setAbierto}
-            swipeDirection='right'
+            swipeDirection="right"
         >
-        <DrawerContent>
-            <DrawerHeader className="p-4 border-b">
-                <DrawerTitle className="font-semibold text-lg">Filtros</DrawerTitle>
-            </DrawerHeader>
-            <form
-                id={ID_FILTRO}
-                onSubmit={controlador.onSubmit}
-            >
-                {children}
-            </form>
-            <DrawerFooter>
-            <Button type="submit" form={ID_FILTRO} disabled={controlador.formulario.formState.isSubmitting}>
-                Aplicar filtros
-            </Button>
-            <DrawerClose render={<Button variant="outline"><XIcon/>Cancelar</Button>}/>
-            </DrawerFooter>
-        </DrawerContent>
+            <DrawerContent>
+                <DrawerHeader className="p-4 shrink-0">
+                    <DrawerTitle className="font-semibold text-lg">Filtros</DrawerTitle>
+                </DrawerHeader>
+                <form
+                    id={ID_FILTRO}
+                    onSubmit={controlador.onSubmit}
+                    className='flex-1 overflow-y-auto p-4'
+                >
+                    {children}
+                </form>
+                <DrawerFooter className="shrink-0 border-t p-4">
+                    <Button
+                        type="submit"
+                        form={ID_FILTRO}
+                        disabled={controlador.formulario.formState.isSubmitting}
+                    >
+                        Aplicar filtros
+                    </Button>
+                    <DrawerClose render={<Button variant="outline"><XIcon />Cancelar</Button>} />
+                </DrawerFooter>
+
+            </DrawerContent>
         </Drawer>
     )
 }

@@ -5,7 +5,7 @@ import {
   UPLOAD_DIR,
   TIPOS_IMAGEN_PERMITIDOS,
   TAMANO_MAXIMO_FOTO_MB,
-  MAXIMO_FOTOS_OBJETO
+  MAXIMO_FOTOS
 } from "../config/upload.js";
 
 const storage = multer.diskStorage({
@@ -91,4 +91,4 @@ export function subirImagenes(campo, maximo) {
   ];
 }
 
-export const subirFotosObjeto = subirImagenes("fotos", MAXIMO_FOTOS_OBJETO);
+export const subirFotos = subirImagenes("fotos", MAXIMO_FOTOS);

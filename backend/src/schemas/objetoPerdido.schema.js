@@ -11,7 +11,7 @@ export const crearObjetoPerdidoSchema = z.object({
     .string({ error: "La descripción es obligatoria" })
     .trim()
     .min(5, { error: "La descripción debe tener al menos 5 carácteres" })
-    .max(2000, { error: "La descripción debe tener a lo más 2000 carácteres" }),
+    .max(500, { error: "La descripción debe tener a lo más 500 carácteres" }),
   // un solo valor llega como string y varios como arreglo
   etiquetas: z.preprocess(
     (val) => (val === undefined || Array.isArray(val) ? val : [val]),
@@ -27,3 +27,44 @@ export const crearObjetoPerdidoSchema = z.object({
     .optional()
     .transform((valor) => valor === 'true')
 });
+
+export const actualizarObjetoPerdidoSchema = crearObjetoPerdidoSchema
+  .omit({ valioso: true })
+  .extend({
+    // IDs numéricos de las fotos ya existentes en la BD que el usuario decidió conservar
+    fotosOriginales: z
+      .preprocess((val) => {
+          return Array.isArray(val) ? val : [val];
+        }, z.array(z.string().regex(/^\d+$/).transform(Number)))
+      .optional()
+      .default([])
+  });
+
+export const filtroObjetoOficinaSchema = z.object({
+  idEstado: z.string().regex(/^\d+$/).transform(Number).optional(),
+  etiquetaObjeto: z.preprocess((val) => {
+      return Array.isArray(val) ? val : [val];
+    }, z.array(z.string().regex(/^\d+$/).transform(Number)))
+    .optional(),
+  nombre: z.string().optional(),
+  fechaIngreso: z.iso.datetime({error:"La fecha de ingreso debe ser válida" }).optional(),
+  fechaEntrega: z.iso.datetime({error:"La fecha de entrega debe ser válida" }).optional(),
+  palabrasClave: z.string().optional(),
+  valioso: z.enum(['true','false'],{error: "El valor del parámetro debe ser booleano"}).transform((valor) => valor === 'true').optional()
+});
+
+export const filtroObjetoPublicoSchema = z.object({
+  etiquetaObjeto: z.preprocess((val) => {
+      return Array.isArray(val) ? val : [val];
+    }, z.array(z.string().regex(/^\d+$/).transform(Number)))
+    .optional(),
+  nombre: z.string().optional(),
+  palabrasClave: z.string().optional(),
+  idCampus: z.string().regex(/^\d+$/).transform(Number).optional(),
+  salto: z.string().regex(/^\d+$/).transform(Number).optional().default(0),
+  cantidad: z.string().regex(/^\d+$/).transform(Number).optional().default(15)
+});
+
+export const parametroObjetoPerdidoSchema = z.object({
+  id: z.string().regex(/^\d+$/).transform(Number)
+})

@@ -9,7 +9,6 @@ import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
 
 import { FieldError, FieldGroup, Field, FieldLabel, FieldDescription } from "../components/ui/field.js"
-import { ScrollArea } from "../components/ui/scroll-area.js"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
 import { Badge } from '../components/ui/badge.js'
 import { Toggle } from '../components/ui/toggle.js'
@@ -17,7 +16,7 @@ import { Button } from '../components/ui/button.js'
 import { Input } from '../components/ui/input.js';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { ItemSinDatos } from '../components/ui/item-sin-datos.jsx';
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerDescription, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
 import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
 
 const filtroEtiqueta = {valioso:true}
@@ -32,11 +31,9 @@ const VALOR_DEFECTO_FILTRO = {
 
 const LARGO_MAXIMO_DESCRIPCION_ALERTA = 100;
 
-const listarAlertas = alertaBusquedaService.listar
-
 export default function AtenderAlertasPage() {
   const [filtros, setFiltros] = useState(filtroAlerta);
-  const alertas = useFetch(listarAlertas,filtros);
+  const alertas = useFetch(()=>alertaBusquedaService.listar(filtros),[filtros],[]);
 
   const onSubmitFiltros = (data) => {
     data.marcado = filtros.marcado;
@@ -65,7 +62,7 @@ export default function AtenderAlertasPage() {
     setAlertaAbierta({
       ...alertaAbierta,
       marcada: valor
-    })
+    });
   }
 
   async function cerrarAlerta(){
@@ -74,10 +71,10 @@ export default function AtenderAlertasPage() {
         await alertaBusquedaService.agregarMarcador(alertaAbierta.id);
       else 
         await alertaBusquedaService.quitarMarcador(alertaAbierta.id);
+      alertas.recargar();
     }
     setAlertaAbierta(null);
     setAlertaOriginal(null);
-    alertas.recargar();
   }
 
   return (
@@ -146,8 +143,8 @@ export default function AtenderAlertasPage() {
         </FieldGroup>
       </PanelFiltro>
       <Drawer open={Boolean(alertaAbierta)} onOpenChange={cerrarAlerta} swipeDirection='left' >
-        <DrawerContent className="flex flex-col h-full max-h-[100dvh] w-full sm:max-w-md ml-auto">
-            <DrawerHeader className="p-4 border-b">
+        <DrawerContent>
+            <DrawerHeader className="p-4">
               <DrawerTitle className="font-semibold text-lg">{alertaAbierta?.nombre}</DrawerTitle>
               <div className="flex flex-wrap gap-1">
                 {alertaAbierta?.etiquetas?.map((etiqueta)=>(
@@ -158,15 +155,25 @@ export default function AtenderAlertasPage() {
                 <BookmarkIcon className="group-aria-pressed/toggle:fill-foreground"/>Marcar
               </Toggle>
             </DrawerHeader>
-            <div className="flex-1 min-h-0 flex flex-col p-4 gap-2 overflow-hidden">
-              <CarruselImagenes fotos={alertaAbierta?.fotos} swipeDirection={'left'}/>
-              <div className="flex-1 min-h-0 flex flex-col">
-                <ScrollArea className="h-full w-full rounded-md border p-3">
-                  <DrawerDescription className="text-sm text-foreground/90 whitespace-pre-wrap">
+            <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2">
+              
+              <span className="font-semibold text-sm text-foreground">
+                Fotos <span className='font-light text-muted-foreground'>(presione en una para expandirlo)</span>
+              </span>
+              <CarruselImagenes fotos={alertaAbierta?.fotos} swipeDirection={'left'} />
+
+              <div className="flex-1 min-h-0 flex flex-col gap-1.5">
+                <span className="font-semibold text-sm text-foreground">
+                  Descripción:
+                </span>
+                
+                <div className="flex-1 overflow-y-auto p-4 border rounded-2xl">
+                  <p className="text-sm text-muted-foreground whitespace-pre-line">
                     {alertaAbierta?.descripcion}
-                  </DrawerDescription>
-                </ScrollArea>
+                  </p>
+                </div>
               </div>
+
             </div>
             <DrawerFooter>
               <Button variant="secondary">

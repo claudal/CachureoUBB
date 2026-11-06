@@ -21,6 +21,32 @@ export async function getAlertasBusqueda(req, res, next) {
 }
 
 /**
+ * Registra una alerta de búsqueda.
+ * Espera multipart/form-data con nombre, descripcion, etiquetas[], idCampus y fotos[].
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+export async function postAlertaBusqueda(req, res, next) {
+  try {
+
+    const idAlerta = await services.crear({
+      nombre: req.body.nombre,
+      descripcion: req.body.descripcion,
+      idsEtiquetas: req.body.etiquetas,
+      urlsFotos: req.files?.map((archivo) => archivo.filename) || [],
+      idCampus: req.body.idCampus
+    });
+    res.status(201).json(idAlerta);
+  } catch (err) {
+    if (err.statusCode)
+      return res.status(err.statusCode).json({ error: err.message });
+    next(err);
+  }
+}
+
+/**
  * 
  * @param {import("express").Request} req 
  * @param {import("express").Response} res 
@@ -28,12 +54,7 @@ export async function getAlertasBusqueda(req, res, next) {
  */
 export async function getAlertaBusqueda(req, res, next) {
     try {
-        if(req.user.rol == 2)
-            return res.json(await services.buscarPorIdEncargado(req.params.id));
-        const alerta = await services.buscarPorId(req.params.id);
-        if(alerta.rut_autor !== req.user.rut)
-            return res.status(403).json({"error": "La persona autenticada no puede acceder a la"})
-        return alerta;
+        return res.status(200).json(await services.buscarPorId(req.params.id));
     } catch (err) {
         next(err);
     }
