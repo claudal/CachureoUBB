@@ -271,14 +271,14 @@ export default function BuscarObjetos() {
             )
           )
         }
-        <footer className='align-middle justify-items-center py-6 pb-24'>
+        <div className='align-middle justify-items-center py-6 pb-24'>
           <Paginacion 
             disabledBack={objetos.cargando || filtros.salto === 0}
             onBack={onSaltoRetroceder}
             disabledFoward={objetos.cargando || objetos.datos.length === 0}
             onFoward={onSaltoAvanzar}
           />
-        </footer>
+        </div>
       </div>
     </div>
   )
