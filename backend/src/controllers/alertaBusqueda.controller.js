@@ -21,6 +21,28 @@ export async function getAlertasBusqueda(req, res, next) {
 }
 
 /**
+ * 
+ * @param {import("express").Request} req 
+ * @param {import("express").Response} res 
+ * @param {import("express").NextFunction} next 
+ */
+export async function postSolicitudDetalles(req, res, next) {
+    try {
+        const encargado = await buscarPorRut(req.user.rut, {oficina: true});
+        if(!encargado)
+            return res.status(401).json({"error": "El usuario de la sesión ya no existe"});
+        const alerta = await prisma.alertaBusqueda.findUniqueOrThrow({where:{id: req.params.id}});
+        if(alerta.idCampus !== encargado.oficina.idCampus){
+            return res.status(403).json({"error": "No tiene permisos para enviar una solicitud a esta alerta"})
+        } 
+        return res.json(await services.crearSolicitud(req.params.id, encargado.rut, req.body));
+    } catch (err) {
+        next(err);
+    }
+}
+
+
+/**
  * Registra una alerta de búsqueda.
  * Espera multipart/form-data con nombre, descripcion, etiquetas[], idCampus y fotos[].
  *

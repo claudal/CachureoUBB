@@ -44,3 +44,11 @@ export function crear({ nombre, descripcion, etiquetas, fotos, idCampus }){
     fotos.forEach((foto) => formData.append('fotos', conTipoHeic(foto)));
     return api.postForm('/alertasBusqueda', formData);
 }
+
+/**
+ * Crea una alerta de búsqueda
+ * @param {{nombre: string, descripcion: string, etiquetas: number[], fotos: File[]}} datos
+ */
+export function crearSolicitud(idAlerta,data){
+    return api.post(`/alertasBusqueda/${idAlerta}/solicitudesDetalles`, data);
+}
