@@ -159,3 +159,12 @@ export function crearSolicitud(idAlerta,rutEncargado,datos){
         }
     })
 }
+
+export async function buscarNovedad(idAlerta){
+    const solicitudes = await prisma.solicitudDetalles.count(
+        {
+            where: {idAlerta}
+        }
+    )
+    return solicitudes > 0;
+}

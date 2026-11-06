@@ -82,3 +82,17 @@ export async function getAlertaBusqueda(req, res, next) {
         next(err);
     }
 }
+
+/**
+ * 
+ * @param {import("express").Request} req 
+ * @param {import("express").Response} res 
+ * @param {import("express").NextFunction} next 
+ */
+export async function getAlertaBusquedaNovedad(req, res, next) {
+    try {
+        return res.status(200).json({novedad: await services.buscarNovedad(req.params.id)});
+    } catch (err) {
+        next(err);
+    }
+}

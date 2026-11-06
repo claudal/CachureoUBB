@@ -52,3 +52,9 @@ export function crear({ nombre, descripcion, etiquetas, fotos, idCampus }){
 export function crearSolicitud(idAlerta,data){
     return api.post(`/alertasBusqueda/${idAlerta}/solicitudesDetalles`, data);
 }
+
+export async function buscarNovedad(idAlerta){
+    if(!idAlerta)
+        return;
+    return api.get(`/alertasBusqueda/${idAlerta}/solicitudesDetalles/novedad`);
+}
