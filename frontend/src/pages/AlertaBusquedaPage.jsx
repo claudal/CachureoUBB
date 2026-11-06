@@ -13,12 +13,19 @@ import CarruselImagenes from '../components/CarruselImagenes.jsx';
 import { CalendarIcon, MapPinIcon, PencilIcon, Trash2Icon } from "lucide-react"
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../components/ui/drawer.js';
 import { Separator } from '../components/ui/separator.js';
+import { useEffect } from 'react';
 
 export default function AlertaBusquedaPage() {
   const alertaLocal = useAlertaLocal();
-  const { datos: alerta, cargando } = useFetch(()=>buscarPorId(alertaLocal.id),[alertaLocal.id]);
+  const { datos: alerta, cargando, error } = useFetch(()=>buscarPorId(alertaLocal.id),[alertaLocal.id]);
+  
+  useEffect(()=>{
+    if(!error) return;
+    if(error.codigo === 404)
+      alertaLocal.clearIdAlerta();
+  },[error]);
+
   const navigate = useNavigate();
-  console.log(alerta)
 
   return (
     <div>
