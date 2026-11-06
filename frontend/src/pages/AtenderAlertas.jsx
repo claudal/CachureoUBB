@@ -1,9 +1,9 @@
 import * as alertaBusquedaService from '../services/alertaBusquedaService.js';
 import { useFetch } from '../hooks/useFetch.js';
 import { useState } from 'react';
-import { Controller } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
-import { AlertCircle, ArrowRightCircleIcon, BookmarkIcon, EyeIcon, SearchIcon } from 'lucide-react';
+import { AlertCircle, AlertCircleIcon, ArrowRightCircleIcon, BookmarkIcon, EyeIcon, SearchIcon, SendHorizontalIcon } from 'lucide-react';
 
 import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
@@ -16,8 +16,14 @@ import { Button } from '../components/ui/button.js'
 import { Input } from '../components/ui/input.js';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { ItemSinDatos } from '../components/ui/item-sin-datos.jsx';
-import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle } from '../components/ui/drawer.js';
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../components/ui/drawer.js';
 import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
+import { Textarea } from '../components/ui/textarea';
+import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert.js';
+import { useAuth } from '../context/AutenticacionContext.jsx';
+import { useNotify } from '../hooks/useNotify.js';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CrearSolicitudDetallesSchema } from '../schemas/alertaBusqueda.schema.js';
 
 const filtroEtiqueta = {valioso:true}
 const filtroAlerta = {
@@ -30,6 +36,106 @@ const VALOR_DEFECTO_FILTRO = {
 }
 
 const LARGO_MAXIMO_DESCRIPCION_ALERTA = 100;
+
+function FormularioSolicitud({alerta,onSend}){
+  const notificacion = useNotify();
+  const [apiError, setApiError] = useState('');
+  const formulario = useForm({
+    resolver: zodResolver(CrearSolicitudDetallesSchema),
+    defaultValues: {
+      indicaciones: ""
+    }
+  });
+
+  async function onSubmit(data){
+    setApiError(null);
+    try {
+      await alertaBusquedaService.crearSolicitud(alerta.id, data);
+      notificacion.exito(`Solicitud de información enviada correctamente`);
+      onSend();
+    } catch (err) {
+      // los errores de validación del backend se muestran en su campo
+      err.detalles?.forEach(({ campo, mensaje }) => {
+        if (campo in formulario.getValues())
+          formulario.setError(campo, { message: mensaje });
+      });
+      setApiError(err.message);
+    }
+  }
+
+  return (
+    <Drawer swipeDirection='left' >
+      <DrawerTrigger render={<Button variant="outline">Solicitar más información</Button>} />
+      <DrawerContent className="max-w-lg mx-auto">
+        <DrawerHeader className="p-4 sm:p-6 border-b text-left">
+          <DrawerTitle className="text-xl">Solicitar más información</DrawerTitle>
+          <DrawerDescription className="text-sm text-muted-foreground mt-1">
+            Alerta: <span className="font-semibold text-foreground">{alerta.nombre}</span>
+          </DrawerDescription>
+        </DrawerHeader>
+
+        {/* Contenedor scrolleable del cuerpo del Drawer */}
+        <div className="p-4 sm:p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+          {apiError && (
+            <Alert variant="destructive">
+              <AlertCircleIcon className="h-4 w-4" />
+              <AlertTitle>No se pudo enviar la solicitud</AlertTitle>
+              <AlertDescription>{apiError}</AlertDescription>
+            </Alert>
+          )}
+
+          <form id="form-solicitud" onSubmit={formulario.handleSubmit(onSubmit)} noValidate>
+            <FieldGroup>
+              <Controller
+                name="indicaciones"
+                control={formulario.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid} className="space-y-2">
+                    <FieldLabel
+                      htmlFor="solicitud-indicaciones"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      ¿Qué información va a solicitar?
+                    </FieldLabel>
+
+                    <Textarea
+                      {...field}
+                      id="solicitud-indicaciones"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Ej: Modelo exacto del objeto, color del protector, o fotos que evidencien su autoría..."
+                      className="min-h-32 resize-none text-sm leading-relaxed"
+                    />
+
+                    <FieldDescription className="text-xs text-muted-foreground leading-normal">
+                      Indique los detalles necesarios si no está seguro de que el objeto en su oficina coincide con la alerta, o si requiere mayor evidencia.
+                    </FieldDescription>
+
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} className="text-xs text-destructive font-medium" />
+                    )}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+          </form>
+        </div>
+
+        <DrawerFooter className="p-4 sm:p-6 border-t flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+          <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
+          <Button
+            type="submit"
+            form="form-solicitud"
+            size="lg"
+            className="w-full sm:w-auto"
+            disabled={formulario.formState.isSubmitting}
+          >
+            {formulario.formState.isSubmitting ? 'Enviando solicitud...' : 'Enviar solicitud'}<SendHorizontalIcon />
+          </Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  )
+}
 
 export default function AtenderAlertasPage() {
   const [filtros, setFiltros] = useState(filtroAlerta);
@@ -75,6 +181,14 @@ export default function AtenderAlertasPage() {
     }
     setAlertaAbierta(null);
     setAlertaOriginal(null);
+  }
+
+  async function onSendSolicitud() {
+    if(!alertaOriginal.marcada)
+      await alertaBusquedaService.agregarMarcador(alertaAbierta.id);
+    setAlertaAbierta(null);
+    setAlertaOriginal(null);
+    alertas.recargar();
   }
 
   return (
@@ -157,10 +271,14 @@ export default function AtenderAlertasPage() {
             </DrawerHeader>
             <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2">
               
-              <span className="font-semibold text-sm text-foreground">
-                Fotos <span className='font-light text-muted-foreground'>(presione en una para expandirlo)</span>
-              </span>
-              <CarruselImagenes fotos={alertaAbierta?.fotos} swipeDirection={'left'} />
+              {alertaAbierta?.fotos.lenght > 0 && (
+                <div>
+                  <span className="font-semibold text-sm text-foreground">
+                    Fotos <span className='font-light text-muted-foreground'>(presione en una para expandirlo)</span>
+                  </span>
+                  <CarruselImagenes fotos={alertaAbierta?.fotos} swipeDirection={'left'} />
+                </div>
+              )}
 
               <div className="flex-1 min-h-0 flex flex-col gap-1.5">
                 <span className="font-semibold text-sm text-foreground">
@@ -176,9 +294,9 @@ export default function AtenderAlertasPage() {
 
             </div>
             <DrawerFooter>
-              <Button variant="secondary">
-                  Solicitar más información
-              </Button>
+              {alertaAbierta && (
+                <FormularioSolicitud alerta={alertaAbierta} onSend={onSendSolicitud}/>
+              )}
               <Button>
                   Revelar oficina
               </Button>
