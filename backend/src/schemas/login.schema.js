@@ -12,3 +12,12 @@ export const loginEncargadoOficinaSchema = z.object({
     .min(6,{error: "La contraseña debe tener al menos 6 carácteres"})
     .max(72, {error: "La contraseña debe tener a lo más 72 carácteres"})
 });
+
+export const loginAdministradorSchema = z.object({
+  // acepta formato de correo
+  correo: z.email({error: "El correo debe ser válido"}),
+  clave: z
+    .string({error: "La contraseña no debe estar vacía"})
+    .min(6,{error: "La contraseña debe tener al menos 6 carácteres"})
+    .max(72, {error: "La contraseña debe tener a lo más 72 carácteres"})
+});
