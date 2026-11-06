@@ -218,6 +218,7 @@ export default function BuscarObjetos() {
             </DrawerFooter>
         </DrawerContent>
       </Drawer>
+      
       <div>
         <header className="flex flex-col gap-4 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -264,13 +265,13 @@ export default function BuscarObjetos() {
                   })}
                 </div>
             ) : (
-              <div className='align-middle justify-items-center'>
+              <div className='flex justify-center items-center p-8'>
                 <ItemSinDatos className="max-w-100"/>
               </div>
             )
           )
         }
-        <footer className='align-middle justify-items-center'>
+        <footer className='align-middle justify-items-center py-6 pb-24'>
           <Paginacion 
             disabledBack={objetos.cargando || filtros.salto === 0}
             onBack={onSaltoRetroceder}
