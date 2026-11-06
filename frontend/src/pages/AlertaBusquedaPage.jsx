@@ -3,10 +3,11 @@ import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../components/ui/empty';
 import { useFetch } from '../hooks/useFetch.js';
 import { buscarPorId } from '../services/alertaBusquedaService.js';
-import { BellOffIcon, BellPlusIcon } from 'lucide-react';
+import { BellOffIcon, BellPlusIcon, InfoIcon } from 'lucide-react';
 import { Button } from '../components/ui/button.js';
 import { useAlertaLocal } from '../hooks/useAlertaLocal.js';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion.js';
 import { Badge } from '../components/ui/badge.js';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
 import { CalendarIcon, MapPinIcon, PencilIcon, Trash2Icon } from "lucide-react"
@@ -14,7 +15,6 @@ import { CalendarIcon, MapPinIcon, PencilIcon, Trash2Icon } from "lucide-react"
 export default function AlertaBusquedaPage() {
   const alertaLocal = useAlertaLocal();
   const { datos: alerta, cargando } = useFetch(()=>buscarPorId(alertaLocal.id),[alertaLocal.id]);
-
   const navigate = useNavigate();
 
   return (
@@ -65,8 +65,35 @@ export default function AlertaBusquedaPage() {
                 )}
               </div>
             </CardHeader>
-
+              
             <CardContent className="space-y-4">
+              <Accordion defaultValue={[]}>
+                {alerta.solicitudesDetalles.length > 0 && (
+                  <AccordionItem key='solicitudesDetalles' value='solicitudesDetalles'>
+                    <AccordionTrigger><InfoIcon/>Solicitudes de detalles</AccordionTrigger>
+                    <AccordionContent>
+                      Uno o varios encargados de oficina creen tener tu objeto, pero requieren más información.
+                      Revisa las solicitudes y edita tu alerta para ingresar la información adicional.
+                      <Accordion defaultValue={[]}>
+                        {alerta.solicitudesDetalles.map((solicitud)=>(
+                          <AccordionItem
+                            key={`solicitudDetalle-${solicitud.fechaCreacion}`}
+                            value={`solicitudDetalle-${solicitud.fechaCreacion}`}
+                          >
+                            <AccordionTrigger  className="text-sm">Fecha: {new Date(solicitud.fechaCreacion).toLocaleString()}</AccordionTrigger>
+                            <AccordionContent>
+                              {solicitud.indicaciones}
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+              </Accordion>
+              <span className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
+                Descripción:
+              </span>
               <div className="rounded-lg bg-muted/40 p-3 text-sm text-foreground/90 whitespace-pre-line leading-relaxed">
                 {alerta.descripcion || "Sin descripción proporcionada."}
               </div>
