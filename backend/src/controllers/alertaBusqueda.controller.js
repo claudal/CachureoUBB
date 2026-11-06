@@ -41,6 +41,27 @@ export async function postSolicitudDetalles(req, res, next) {
     }
 }
 
+/**
+ * 
+ * @param {import("express").Request} req 
+ * @param {import("express").Response} res 
+ * @param {import("express").NextFunction} next 
+ */
+export async function postReunion(req, res, next) {
+    try {
+        const encargado = await buscarPorRut(req.user.rut, {oficina: true});
+        if(!encargado)
+            return res.status(401).json({"error": "El usuario de la sesión ya no existe"});
+        const alerta = await services.buscarPorId(req.params.id);
+        if(alerta.idCampus !== encargado.oficina.idCampus){
+            return res.status(403).json({"error": "No tiene permisos para llamar una reunion a esta alerta"})
+        } 
+        return res.json(await services.crearReunion(req.params.id, encargado.rut, encargado.idOficina, req.body));
+    } catch (err) {
+        next(err);
+    }
+}
+
 
 /**
  * Registra una alerta de búsqueda.

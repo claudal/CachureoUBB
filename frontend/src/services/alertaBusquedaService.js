@@ -53,6 +53,14 @@ export function crearSolicitud(idAlerta,data){
     return api.post(`/alertasBusqueda/${idAlerta}/solicitudesDetalles`, data);
 }
 
+/**
+ * Crea una alerta de búsqueda
+ * @param {{nombre: string, descripcion: string, etiquetas: number[], fotos: File[]}} datos
+ */
+export function crearReunion(idAlerta,data){
+    return api.post(`/alertasBusqueda/${idAlerta}/reuniones`, data);
+}
+
 export async function buscarNovedad(idAlerta){
     if(!idAlerta)
         return;

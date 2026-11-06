@@ -128,7 +128,7 @@ export async function buscarPorIdEncargado(id_alerta,rut_encargado){
  * @returns 
  */
 export async function buscarPorId(id_alerta){
-    const {fotos,etiquetas,...alerta} = await prisma.alertaBusqueda.findUniqueOrThrow({
+    const {fotos,etiquetas,reuniones,...alerta} = await prisma.alertaBusqueda.findUniqueOrThrow({
         where:{id: id_alerta},
         include: {
             solicitudesDetalles: {
@@ -137,7 +137,7 @@ export async function buscarPorId(id_alerta){
                     indicaciones:true
                 }
             },
-            reuniones: {select:{fechaCreacion:true,indicaciones:true,oficina:true}},
+            reuniones: {select:{fechaCreacion:true,indicaciones:true,oficina:{include:{fotos:{include:{foto:true}}}}}},
             etiquetas: {select:{etiqueta: true}},
             campus: true,
             fotos:{select: {foto:true}}
@@ -146,7 +146,17 @@ export async function buscarPorId(id_alerta){
     return {
         ...alerta,
         fotos: fotos.map((f)=>f.foto),
-        etiquetas: etiquetas.map((e)=>e.etiqueta)
+        etiquetas: etiquetas.map((e)=>e.etiqueta),
+        reuniones: reuniones.map(({oficina,...r})=>{
+            const {fotos,...o} = oficina;
+            return {
+                ...r,
+                oficina: {
+                    ...o,
+                    fotos: fotos.map((f)=>f.foto)
+                }
+            }
+        })
     };
 }
 
@@ -160,11 +170,27 @@ export function crearSolicitud(idAlerta,rutEncargado,datos){
     })
 }
 
+export function crearReunion(idAlerta,rutEncargado,idOficina,datos){
+    return prisma.reunion.create({
+        data: {
+            idAlerta,
+            rutEncargado,
+            idOficina,
+            indicaciones: datos.indicaciones
+        }
+    })
+}
+
 export async function buscarNovedad(idAlerta){
     const solicitudes = await prisma.solicitudDetalles.count(
         {
             where: {idAlerta}
         }
     )
-    return solicitudes > 0;
+    const reuniones = await prisma.reunion.count(
+        {
+            where: {idAlerta}
+        }
+    )
+    return solicitudes > 0 || reuniones > 0;
 }
