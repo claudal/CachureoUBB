@@ -4,7 +4,6 @@ import { router } from './src/routes/index.routes.js';
 import { prisma } from './src/config/prisma.js';
 
 import cors from 'cors';
-import path from 'path';
 
 const PORT = process.env.PORT;
 const app = express();

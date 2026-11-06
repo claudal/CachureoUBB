@@ -1,4 +1,3 @@
-import { prisma } from "../config/prisma.js";
 import * as services from "../services/alertaBusqueda.services.js";
 import { buscarPorRut } from "../services/encargadoOficina.services.js";
 
