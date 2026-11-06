@@ -18,8 +18,8 @@ export default function AlertaBusquedaPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-6 p-4 sm:p-6">
-      <header className="flex flex-col gap-4 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <header className="flex flex-col gap-4 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Alerta de búsqueda</h1>
           <p className="text-sm text-muted-foreground">
@@ -27,11 +27,11 @@ export default function AlertaBusquedaPage() {
           </p>
         </div>
       </header>
-      <div className='align-middle justify-items-center'>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pt-4">
         {cargando ? (
           <ItemCargando texto="Cargando alerta..." />
         ) : alerta ? (
-          <Card className=" border shadow-sm">
+          <Card className="border shadow-smx w-full" >
             <CardHeader className="space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
                 <div>
