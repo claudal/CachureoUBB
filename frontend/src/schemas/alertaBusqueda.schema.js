@@ -41,3 +41,13 @@ export const CrearAlertaBusquedaSchema = z.object({
       error: `Cada foto debe pesar como máximo ${TAMANO_MAXIMO_FOTO_MB} MB`
     }).optional()
 });
+
+
+
+export const CrearSolicitudDetallesSchema = z.object({
+  indicaciones: z
+  .string({ error: "La indicación es obligatoria" })
+  .trim()
+  .min(10, { error: "La indicación debe tener al menos 10 carácteres" })
+  .max(500, { error: "La descripción debe tener a lo más 500 carácteres" }),
+});
