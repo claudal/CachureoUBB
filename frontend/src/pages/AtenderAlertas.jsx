@@ -428,7 +428,7 @@ export default function AtenderAlertasPage() {
               <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
                 {alertas.datos.map((alerta)=>{
                   return (
-                      <Card key={alerta.id} size="default" onClick={()=>abrirAlerta(alerta)}>
+                      <Card key={alerta.id} size="default" className='cursor-pointer hover:shadow-md transition-shadow' onClick={()=>abrirAlerta(alerta)}>
                         <CardHeader>
                           <CardTitle>
                             {alerta.nombre}

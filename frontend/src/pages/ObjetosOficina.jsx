@@ -282,7 +282,7 @@ export default function ObjetosOficinaPage() {
               <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
                 {objetos.datos.map((objeto)=>{
                   return (
-                    <Card key={objeto.id} className="overflow-hidden pt-0" onClick={()=>abrirObjeto(objeto)}>
+                    <Card key={objeto.id} className="overflow-hidden pt-0 cursor-pointer hover:shadow-md transition-shadow" onClick={()=>abrirObjeto(objeto)}>
                       {objeto.fotos[0] && (
                         <img
                           src={urlFoto(objeto.fotos[0].url)}
