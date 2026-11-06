@@ -131,7 +131,12 @@ export async function buscarPorId(id_alerta){
     const {fotos,etiquetas,...alerta} = await prisma.alertaBusqueda.findUniqueOrThrow({
         where:{id: id_alerta},
         include: {
-            solicitudesDetalles: {select:{fechaCreacion:true,indicaciones:true}},
+            solicitudesDetalles: {
+                select:{
+                    fechaCreacion:true,
+                    indicaciones:true
+                }
+            },
             reuniones: {select:{fechaCreacion:true,indicaciones:true,oficina:true}},
             etiquetas: {select:{etiqueta: true}},
             campus: true,
@@ -141,11 +146,11 @@ export async function buscarPorId(id_alerta){
     return {
         ...alerta,
         fotos: fotos.map((f)=>f.foto),
-        etiquetas: etiquetas.map((e)=>e.etiqueta),
+        etiquetas: etiquetas.map((e)=>e.etiqueta)
     };
 }
 
-export async function crearSolicitud(idAlerta,rutEncargado,datos){
+export function crearSolicitud(idAlerta,rutEncargado,datos){
     return prisma.solicitudDetalles.create({
         data: {
             idAlerta,

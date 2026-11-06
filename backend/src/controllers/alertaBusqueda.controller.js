@@ -1,3 +1,4 @@
+import { prisma } from "../config/prisma.js";
 import * as services from "../services/alertaBusqueda.services.js";
 import { buscarPorRut } from "../services/encargadoOficina.services.js";
 
@@ -31,7 +32,7 @@ export async function postSolicitudDetalles(req, res, next) {
         const encargado = await buscarPorRut(req.user.rut, {oficina: true});
         if(!encargado)
             return res.status(401).json({"error": "El usuario de la sesión ya no existe"});
-        const alerta = await prisma.alertaBusqueda.findUniqueOrThrow({where:{id: req.params.id}});
+        const alerta = await services.buscarPorId(req.params.id);
         if(alerta.idCampus !== encargado.oficina.idCampus){
             return res.status(403).json({"error": "No tiene permisos para enviar una solicitud a esta alerta"})
         } 

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAlertaBusqueda, getAlertasBusqueda, postAlertaBusqueda } from "../controllers/alertaBusqueda.controller.js";
+import { getAlertaBusqueda, getAlertasBusqueda, postAlertaBusqueda, postSolicitudDetalles } from "../controllers/alertaBusqueda.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { filtroAlertaBusquedaSchema, parametroAlertaBusquedaSchema, crearAlertaBusquedaSchema, crearSolicitudDetallesSchema } from "../schemas/alertaBusqueda.schema.js";
 import { autenticacion } from "../middlewares/auth.middleware.js";
@@ -23,6 +23,6 @@ router.post('/:id/solicitudesDetalles/',
     autenticacion,
     validate(parametroAlertaBusquedaSchema,'params'),
     validate(crearSolicitudDetallesSchema),
-    postLecturaAlerta);
+    postSolicitudDetalles);
 
 export default router;
