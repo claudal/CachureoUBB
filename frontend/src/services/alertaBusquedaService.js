@@ -1,3 +1,4 @@
+import { useAlertaLocal } from "../hooks/useAlertaLocal.js";
 import { conTipoHeic } from "../utils/foto.utils.js";
 import { api } from "./api.js";
 
@@ -12,7 +13,9 @@ export function listar(filtros){
     return api.get(`/alertasBusqueda/?${query.toString()}`);
 }
 
-export function buscarPorId(id){
+export async function buscarPorId(id){
+    if(!Boolean(id))
+        return;
     return api.get(`/alertasBusqueda/${id}/`);
 }
 
@@ -33,7 +36,6 @@ export function registrarLectura(idAlerta){
  * @param {{nombre: string, descripcion: string, etiquetas: number[], fotos: File[]}} datos
  */
 export function crear({ nombre, descripcion, etiquetas, fotos, idCampus }){
-    console.log("a")
     const formData = new FormData();
     formData.append('nombre', nombre);
     formData.append('descripcion', descripcion);
