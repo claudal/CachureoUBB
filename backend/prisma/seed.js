@@ -77,6 +77,7 @@ async function crearCatalogos() {
 async function limpiarDatosPrueba() {
   // el orden importa: primero lo que depende de otras tablas
   try {
+    await prisma.administrador.deleteMany();
     await prisma.objetoPerdido.deleteMany();
     await prisma.foto.deleteMany();
     await prisma.alertaBusqueda.deleteMany();
@@ -92,13 +93,21 @@ async function limpiarDatosPrueba() {
 async function main() {
   const esDesarrollo = process.env.NODE_ENV === 'development';
 
+  if(!esDesarrollo)
+    return;
+
   if(esDesarrollo)
     await limpiarDatosPrueba();
 
   const { estadosAlerta, etiquetasValiosas, etiquetasNormales } = await crearCatalogos();
 
-  if(!esDesarrollo)
-    return;
+  console.log('=> Creando administrador')
+  const administrador = await prisma.administrador.create({
+    data: {
+      correo: "cachureoubb@gmail.com",
+      clave: hashSync("123456",BCRYPT_SALT_ROUNDS)
+    }
+  });
 
   console.log('=> Creando fotos');
   const nombreFotos = [
