@@ -22,8 +22,7 @@ export default function MenuOficinaPage(){
         {
             texto: "Perfil",
             nombre:"perfil",
-            icono: User,
-            notificacion: true
+            icono: User
         }
     ])
     
