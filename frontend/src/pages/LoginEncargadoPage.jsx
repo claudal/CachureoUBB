@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/card"
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -24,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert"
 
-export default function EncargadoLoginPage() {
+export default function LoginEncargadoPage() {
     const [apiError, setApiError] = useState(null);
     const { loginEncargadoOficina } = useAuth();
     const navigate = useNavigate();

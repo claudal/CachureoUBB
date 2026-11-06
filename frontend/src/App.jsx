@@ -1,6 +1,5 @@
 import { Route, Routes, BrowserRouter, Navigate } from 'react-router-dom';
 import TestAuditPage from './pages/TestAuditPage';
-import EncargadoLoginPage from './pages/LoginPage';
 import { AuthProvider } from './context/AutenticacionContext';
 import MenuOficinaPage from './pages/MenuOficina';
 import ProtectedRoute from './pages/ProtectedRoute';
@@ -13,6 +12,7 @@ import CrearAlertaPage from './pages/CrearAlerta';
 import AlertaBusquedaPage from './pages/AlertaBusquedaPage';
 import MenuAdministradorPage from './pages/MenuAdministrador';
 import LoginAdministradorPage from './pages/LoginAdministradorPage';
+import LoginEncargadoPage from './pages/LoginEncargadoPage';
 
 function App() {
 
@@ -20,8 +20,10 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/login" element={<EncargadoLoginPage />} />
-          <Route path="/login/administrador" element={<LoginAdministradorPage />} />
+          <Route path="/login">
+            <Route index element={<LoginEncargadoPage />} />
+            <Route path="administrador" element={<LoginAdministradorPage />} />
+          </Route>
           <Route path="/menuBusqueda" element={<MenuBusquedaPage />}>
             <Route
               index
