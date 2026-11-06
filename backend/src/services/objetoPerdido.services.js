@@ -2,22 +2,28 @@ import { prisma } from "../config/prisma.js";
 import { ESTADO_OBJETO } from "../config/estados.js";
 import { eliminarArchivoFisico } from "./foto.services.js";
 import { calcularRangoDia } from "../utils/fecha.utils.js";
+import { INCLUDE_ENTREGA } from "./entrega.services.js";
 
 /**@type {import("@prisma/client").Prisma.ObjetoPerdidoInclude}*/
 const INCLUDE_DEFAULT = {
     estado: true,
     etiquetas: { include: { etiqueta: true } },
-    fotos: { include: { foto: true }, orderBy: { foto: { id: 'asc' } } }
+    fotos: { include: { foto: true }, orderBy: { foto: { id: 'asc' } } },
+    entregas: { include: INCLUDE_ENTREGA, orderBy: { fechaEntrega: 'desc' } }
 };
 
-// deja etiquetas y fotos como listas simples, igual que en las alertas
+// deja etiquetas y fotos como listas simples, igual que en las alertas,
+// y la entrega más reciente como "entrega" (null si no se ha entregado)
 function formatear(objeto) {
-    const { etiquetas, fotos, ...restoObjeto } = objeto;
-    return {
+    const { etiquetas, fotos, entregas, ...restoObjeto } = objeto;
+    const formateado = {
         ...restoObjeto,
         etiquetas: etiquetas.map((e) => e.etiqueta),
         fotos: fotos.map((e) => e.foto)
     };
+    if (entregas)
+        formateado.entrega = entregas[0] ?? null;
+    return formateado;
 }
 
 /**
@@ -157,8 +163,7 @@ export async function listar(filtros={}) {
         where.idOficina = filtros.idOficina;
     if(filtros.idEstado) {
         where.idEstado = filtros.idEstado;
-        if(filtros.idEstado === 2) {
-            include.entregas = true;
+        if(filtros.idEstado === ESTADO_OBJETO.ENTREGADO) {
             if(filtros.fechaEntrega) {
                 const fechas = calcularRangoDia(filtros.fechaEntrega);
                 where.entregas = {
