@@ -56,6 +56,14 @@ export const crearSolicitudDetallesSchema = z.object({
   .max(500, { error: "La descripción debe tener a lo más 500 carácteres" }),
 });
 
+export const crearReunionSchema = z.object({
+  indicaciones: z
+  .string({ error: "La indicación es obligatoria" })
+  .trim()
+  .min(10, { error: "La indicación debe tener al menos 10 carácteres" })
+  .max(500, { error: "La descripción debe tener a lo más 500 carácteres" }),
+});
+
 export const parametroAlertaBusquedaSchema = z.object({
   id: z.uuid({error: "El identificador debe tener formato UUID"})
 })
