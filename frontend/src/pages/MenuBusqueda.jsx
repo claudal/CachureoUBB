@@ -23,7 +23,7 @@ export default function MenuBusquedaPage(){
     ]);
     
     useEffect(() => {
-        if(!novedades.datos)
+        if(!novedades.datos?.novedad)
             return;
         setSecciones(([
             {
