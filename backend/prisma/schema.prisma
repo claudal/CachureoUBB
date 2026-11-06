@@ -308,7 +308,7 @@ model SolicitudDetalles {
   alerta    AlertaBusqueda   @relation(fields: [idAlerta], references: [id], onDelete: Cascade)
   encargado EncargadoOficina @relation(fields: [rutEncargado], references: [rut], onDelete: Cascade)
 
-  @@id([idAlerta, rutEncargado])
+  @@id([idAlerta, rutEncargado,fechaCreacion])
   @@map("solicitud_detalles")
 }
 
