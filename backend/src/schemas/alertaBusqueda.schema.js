@@ -39,13 +39,21 @@ export const crearAlertaBusquedaSchema = z.object({
 
 export const filtroAlertaBusquedaSchema = z.object({
   idEstado: z.string().regex(/^\d+$/).transform(Number).optional(),
-  etiquetaObjeto: z.preprocess((val) => {
+  etiquetaObjeto: z.preprocess((val) => { 
       return Array.isArray(val) ? val : [val];
     }, z.array(z.string().regex(/^\d+$/).transform(Number)))
     .optional(),
   nombre: z.string().optional(),
   palabrasClave: z.string().optional(),
   marcado: z.enum(['true','false'],{error: "El valor del parámetro debe ser booleano"}).transform((valor) => valor === 'true').optional()
+});
+
+export const crearSolicitudDetallesSchema = z.object({
+  indicaciones: z
+  .string({ error: "La indicación es obligatoria" })
+  .trim()
+  .min(10, { error: "La indicación debe tener al menos 10 carácteres" })
+  .max(500, { error: "La descripción debe tener a lo más 500 carácteres" }),
 });
 
 export const parametroAlertaBusquedaSchema = z.object({
