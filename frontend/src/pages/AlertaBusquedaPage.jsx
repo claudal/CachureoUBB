@@ -3,7 +3,7 @@ import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../components/ui/empty';
 import { useFetch } from '../hooks/useFetch.js';
 import { buscarPorId } from '../services/alertaBusquedaService.js';
-import { BellOffIcon, BellPlusIcon, InfoIcon } from 'lucide-react';
+import { ArrowRightCircleIcon, BellOffIcon, BellPlusIcon, InfoIcon, UserSearchIcon } from 'lucide-react';
 import { Button } from '../components/ui/button.js';
 import { useAlertaLocal } from '../hooks/useAlertaLocal.js';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
@@ -11,11 +11,14 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { Badge } from '../components/ui/badge.js';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
 import { CalendarIcon, MapPinIcon, PencilIcon, Trash2Icon } from "lucide-react"
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../components/ui/drawer.js';
+import { Separator } from '../components/ui/separator.js';
 
 export default function AlertaBusquedaPage() {
   const alertaLocal = useAlertaLocal();
   const { datos: alerta, cargando } = useFetch(()=>buscarPorId(alertaLocal.id),[alertaLocal.id]);
   const navigate = useNavigate();
+  console.log(alerta)
 
   return (
     <div>
@@ -83,6 +86,59 @@ export default function AlertaBusquedaPage() {
                             <AccordionTrigger  className="text-sm">Fecha: {new Date(solicitud.fechaCreacion).toLocaleString()}</AccordionTrigger>
                             <AccordionContent>
                               {solicitud.indicaciones}
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+                {alerta.reuniones.length > 0 && (
+                  <AccordionItem key='reuniones' value='reuniones'>
+                    <AccordionTrigger><UserSearchIcon/>Reuniones</AccordionTrigger>
+                    <AccordionContent>
+                      Uno o varios encargados de oficina creen tener tu objeto y enviaron la ubicación de su oficina
+                      para que puedas reclamar el objeto.
+                      <Accordion defaultValue={[]}>
+                        {alerta.reuniones.map((reunion)=>(
+                          <AccordionItem
+                            key={`reunion-${reunion.fechaCreacion}`}
+                            value={`reunion-${reunion.fechaCreacion}`}
+                          >
+                            <AccordionTrigger  className="text-sm">Fecha: {new Date(reunion.fechaCreacion).toLocaleString()}</AccordionTrigger>
+                            <AccordionContent>
+                              <Drawer swipeDirection='left' >
+                                <DrawerContent>
+                                    <DrawerHeader className="p-4 border-b">
+                                      <DrawerTitle className="font-semibold text-lg">Oficina {reunion.oficina.nombre}</DrawerTitle>
+                                    </DrawerHeader>
+                                    <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2">
+                                      <span className="font-semibold text-sm text-foreground">
+                                        Fotos <span className='font-light text-muted-foreground'>(presione en una para expandirlo)</span>
+                                      </span>
+                                      <CarruselImagenes fotos={reunion.oficina.fotos} swipeDirection={'left'} />
+
+                                      <Separator />
+
+                                      <div className="flex-1 overflow-y-auto space-y-4">
+                                        {/* Sección Descripción */}
+                                        <div>
+                                          <span className="font-semibold text-sm text-foreground block mb-1">
+                                            Descripción:
+                                          </span>
+                                          <p className="text-sm text-muted-foreground whitespace-pre-line">
+                                            {reunion.oficina.descripcion || "Sin descripción disponible."}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <DrawerFooter>
+                                      <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
+                                    </DrawerFooter>
+                                </DrawerContent>
+                                Indicaciones: {reunion.indicaciones}
+                                <DrawerTrigger render={<Button variant="link">Ver ubicación oficina</Button>} />
+                              </Drawer>
                             </AccordionContent>
                           </AccordionItem>
                         ))}
