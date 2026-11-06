@@ -46,6 +46,13 @@ export function AuthProvider({ children }) {
     return data.usuario;
   };
 
+  const loginAdministrador = async (credenciales) => {
+    const data = await services.loginAdministrador(credenciales);
+    localStorage.setItem('token', data.token);
+    setUsuario(data.usuario);
+    return data.usuario;
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setUsuario(null);
@@ -56,6 +63,7 @@ export function AuthProvider({ children }) {
     cargando,
     sesionIniciada: Boolean(usuario),
     loginEncargadoOficina,
+    loginAdministrador,
     logout,
   };
 

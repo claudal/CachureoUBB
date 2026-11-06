@@ -11,6 +11,8 @@ import MenuBusquedaPage from './pages/MenuBusqueda';
 import BuscarObjetos from './pages/BuscarObjetos';
 import CrearAlertaPage from './pages/CrearAlerta';
 import AlertaBusquedaPage from './pages/AlertaBusquedaPage';
+import MenuAdministradorPage from './pages/MenuAdministrador';
+import LoginAdministradorPage from './pages/LoginAdministradorPage';
 
 function App() {
 
@@ -19,6 +21,7 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<EncargadoLoginPage />} />
+          <Route path="/login/administrador" element={<LoginAdministradorPage />} />
           <Route path="/menuBusqueda" element={<MenuBusquedaPage />}>
             <Route
               index
@@ -62,6 +65,32 @@ function App() {
             />
             <Route
               path="entregas"
+              element={<ObjetosOficinaPage />}
+            />
+          </Route>
+          <Route path='/menuAdministrador' element={
+            <ProtectedRoute type="administrador">
+              <MenuAdministradorPage/>
+            </ProtectedRoute>
+          }>
+            <Route
+              index
+              element={<ObjetosOficinaPage />}
+            />
+            <Route
+              path="oficinas"
+              element={<RegistrarObjetoPage />}
+            />
+            <Route
+              path="editarObjeto/:id"
+              element={<RegistrarObjetoPage />}
+            />
+            <Route
+              path="campus"
+              element={<AtenderAlertasPage />}
+            />
+            <Route
+              path="perfil"
               element={<ObjetosOficinaPage />}
             />
           </Route>
