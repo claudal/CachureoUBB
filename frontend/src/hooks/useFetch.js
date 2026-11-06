@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react'
 export function useFetch(fn,deps=[],defaultData=null) {
   const [datos, setDatos] = useState(defaultData)
   const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState('')
+  const [error, setError] = useState(null)
 
   const recargar = useCallback(() => {
     let cancelado = false
@@ -15,7 +15,7 @@ export function useFetch(fn,deps=[],defaultData=null) {
         if (!cancelado) setDatos(respuesta)
       })
       .catch((e) => {
-        if (!cancelado) setError(e.message || 'Error al cargar los datos')
+        if (!cancelado) setError({codigo: e.status, mensaje: e.message || 'Error al cargar los datos'})
       })
       .finally(() => {
         if (!cancelado) setCargando(false)
