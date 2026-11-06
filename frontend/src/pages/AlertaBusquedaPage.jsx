@@ -77,83 +77,87 @@ export default function AlertaBusquedaPage() {
             </CardHeader>
               
             <CardContent className="space-y-4">
-              <Accordion defaultValue={[]}>
-                {alerta.solicitudesDetalles.length > 0 && (
-                  <AccordionItem key='solicitudesDetalles' value='solicitudesDetalles'>
-                    <AccordionTrigger><InfoIcon/>Solicitudes de detalles</AccordionTrigger>
-                    <AccordionContent>
-                      Uno o varios encargados de oficina creen tener tu objeto, pero requieren más información.
-                      Revisa las solicitudes y edita tu alerta para ingresar la información adicional.
-                      <Accordion defaultValue={[]}>
-                        {alerta.solicitudesDetalles.map((solicitud)=>(
-                          <AccordionItem
-                            key={`solicitudDetalle-${solicitud.fechaCreacion}`}
-                            value={`solicitudDetalle-${solicitud.fechaCreacion}`}
-                          >
-                            <AccordionTrigger  className="text-sm">Fecha: {new Date(solicitud.fechaCreacion).toLocaleString()}</AccordionTrigger>
-                            <AccordionContent>
-                              {solicitud.indicaciones}
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    </AccordionContent>
-                  </AccordionItem>
-                )}
-                {alerta.reuniones.length > 0 && (
-                  <AccordionItem key='reuniones' value='reuniones'>
-                    <AccordionTrigger><UserSearchIcon/>Reuniones</AccordionTrigger>
-                    <AccordionContent>
-                      Uno o varios encargados de oficina creen tener tu objeto y enviaron la ubicación de su oficina
-                      para que puedas reclamar el objeto.
-                      <Accordion defaultValue={[]}>
-                        {alerta.reuniones.map((reunion)=>(
-                          <AccordionItem
-                            key={`reunion-${reunion.fechaCreacion}`}
-                            value={`reunion-${reunion.fechaCreacion}`}
-                          >
-                            <AccordionTrigger  className="text-sm">Fecha: {new Date(reunion.fechaCreacion).toLocaleString()}</AccordionTrigger>
-                            <AccordionContent>
-                              <Drawer swipeDirection='left' >
-                                <DrawerContent>
-                                    <DrawerHeader className="p-4 border-b">
-                                      <DrawerTitle className="font-semibold text-lg">Oficina {reunion.oficina.nombre}</DrawerTitle>
-                                    </DrawerHeader>
-                                    <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2">
-                                      <span className="font-semibold text-sm text-foreground">
-                                        Fotos <span className='font-light text-muted-foreground'>(presione en una para expandirlo)</span>
-                                      </span>
-                                      <CarruselImagenes fotos={reunion.oficina.fotos} swipeDirection={'left'} />
 
-                                      <Separator />
+              {/* Desplegable de mensajes (solicitudes de detalle y reuniones) */}
+              {(alerta.solicitudesDetalles.length > 0 || alerta.reuniones.length > 0) && (
+                <Accordion defaultValue={[]}>
+                  {alerta.solicitudesDetalles.length > 0 && (
+                    <AccordionItem key='solicitudesDetalles' value='solicitudesDetalles'>
+                      <AccordionTrigger><InfoIcon/>Solicitudes de detalles</AccordionTrigger>
+                      <AccordionContent>
+                        Uno o varios encargados de oficina creen tener tu objeto, pero requieren más información.
+                        Revisa las solicitudes y edita tu alerta para ingresar la información adicional.
+                        <Accordion defaultValue={[]}>
+                          {alerta.solicitudesDetalles.map((solicitud)=>(
+                            <AccordionItem
+                              key={`solicitudDetalle-${solicitud.fechaCreacion}`}
+                              value={`solicitudDetalle-${solicitud.fechaCreacion}`}
+                            >
+                              <AccordionTrigger  className="text-sm">Fecha: {new Date(solicitud.fechaCreacion).toLocaleString()}</AccordionTrigger>
+                              <AccordionContent>
+                                {solicitud.indicaciones}
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
+                  {alerta.reuniones.length > 0 && (
+                    <AccordionItem key='reuniones' value='reuniones'>
+                      <AccordionTrigger><UserSearchIcon/>Reuniones</AccordionTrigger>
+                      <AccordionContent>
+                        Uno o varios encargados de oficina creen tener tu objeto y enviaron la ubicación de su oficina
+                        para que puedas reclamar el objeto.
+                        <Accordion defaultValue={[]}>
+                          {alerta.reuniones.map((reunion)=>(
+                            <AccordionItem
+                              key={`reunion-${reunion.fechaCreacion}`}
+                              value={`reunion-${reunion.fechaCreacion}`}
+                            >
+                              <AccordionTrigger  className="text-sm">Fecha: {new Date(reunion.fechaCreacion).toLocaleString()}</AccordionTrigger>
+                              <AccordionContent>
+                                <Drawer swipeDirection='left' >
+                                  <DrawerContent>
+                                      <DrawerHeader className="p-4 border-b">
+                                        <DrawerTitle className="font-semibold text-lg">Oficina {reunion.oficina.nombre}</DrawerTitle>
+                                      </DrawerHeader>
+                                      <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2">
+                                        <span className="font-semibold text-sm text-foreground">
+                                          Fotos <span className='font-light text-muted-foreground'>(presione en una para expandirlo)</span>
+                                        </span>
+                                        <CarruselImagenes fotos={reunion.oficina.fotos} swipeDirection={'left'} />
 
-                                      <div className="flex-1 overflow-y-auto space-y-4">
-                                        {/* Sección Descripción */}
-                                        <div>
-                                          <span className="font-semibold text-sm text-foreground block mb-1">
-                                            Descripción:
-                                          </span>
-                                          <p className="text-sm text-muted-foreground whitespace-pre-line">
-                                            {reunion.oficina.descripcion || "Sin descripción disponible."}
-                                          </p>
+                                        <Separator />
+
+                                        <div className="flex-1 overflow-y-auto space-y-4">
+                                          {/* Sección Descripción */}
+                                          <div>
+                                            <span className="font-semibold text-sm text-foreground block mb-1">
+                                              Descripción:
+                                            </span>
+                                            <p className="text-sm text-muted-foreground whitespace-pre-line">
+                                              {reunion.oficina.descripcion || "Sin descripción disponible."}
+                                            </p>
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
-                                    <DrawerFooter>
-                                      <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
-                                    </DrawerFooter>
-                                </DrawerContent>
-                                Indicaciones: {reunion.indicaciones}
-                                <DrawerTrigger render={<Button variant="link">Ver ubicación oficina</Button>} />
-                              </Drawer>
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    </AccordionContent>
-                  </AccordionItem>
-                )}
-              </Accordion>
+                                      <DrawerFooter>
+                                        <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
+                                      </DrawerFooter>
+                                  </DrawerContent>
+                                  Indicaciones: {reunion.indicaciones}
+                                  <DrawerTrigger render={<Button variant="link">Ver ubicación oficina</Button>} />
+                                </Drawer>
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
+                </Accordion>
+              )}
               <span className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
                 Descripción:
               </span>
