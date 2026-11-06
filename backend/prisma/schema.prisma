@@ -302,7 +302,7 @@ model CierreAlerta {
 }
 
 model SolicitudDetalles {
-  idAlerta          String      @map("id_alerta")
+  idAlerta          String   @map("id_alerta")
   rutEncargado      String   @map("rut_encargado") @db.VarChar(12)
   fechaCreacion     DateTime @default(now()) @map("fecha_creacion")
   indicaciones      String   @db.VarChar(500)
@@ -319,7 +319,7 @@ model Reunion {
   idAlerta          String   @map("id_alerta")
   rutEncargado      String   @map("rut_encargado") @db.VarChar(12)
   fechaCreacion     DateTime @default(now())  @map("fecha_creacion")
-  indicaciones      String   @db.Text
+  indicaciones      String   @db.VarChar(500)
   idOficina         Int      @map("id_oficina")
 
   // Relaciones con @relation explícito
