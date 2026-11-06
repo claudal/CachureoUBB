@@ -301,8 +301,8 @@ model CierreAlerta {
 model SolicitudDetalles {
   idAlerta          String      @map("id_alerta")
   rutEncargado      String   @map("rut_encargado") @db.VarChar(12)
-  fechaModificacion DateTime @default(now()) @updatedAt @map("fecha_modificacion")
-  indicaciones      String   @db.Text
+  fechaCreacion     DateTime @default(now()) @map("fecha_creacion")
+  indicaciones      String   @db.VarChar(500)
 
   // Relaciones con @relation explícito
   alerta    AlertaBusqueda   @relation(fields: [idAlerta], references: [id], onDelete: Cascade)
@@ -313,9 +313,9 @@ model SolicitudDetalles {
 }
 
 model Reunion {
-  idAlerta          String      @map("id_alerta")
+  idAlerta          String   @map("id_alerta")
   rutEncargado      String   @map("rut_encargado") @db.VarChar(12)
-  fechaModificacion DateTime @default(now()) @updatedAt @map("fecha_modificacion")
+  fechaCreacion     DateTime @default(now())  @map("fecha_creacion")
   indicaciones      String   @db.Text
   idOficina         Int      @map("id_oficina")
 
