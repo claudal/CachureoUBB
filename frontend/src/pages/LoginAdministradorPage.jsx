@@ -22,6 +22,7 @@ import {
 } from "../components/ui/field"
 import { Input } from "../components/ui/input"
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert"
+import { UserIcon } from 'lucide-react';
 
 export default function LoginAdministradorPage() {
     const [apiError, setApiError] = useState(null);
@@ -47,7 +48,7 @@ export default function LoginAdministradorPage() {
         <div className="flex min-h-screen items-center justify-center p-4">
             <Card className="w-full sm:max-w-md">
                 <CardHeader>
-                    <CardTitle>Iniciar sesión</CardTitle>
+                    <CardTitle>Iniciar sesión como Administrador</CardTitle>
                     <CardDescription>
                     Ingrese sus credenciales.
                     </CardDescription>
@@ -108,12 +109,39 @@ export default function LoginAdministradorPage() {
                     </FieldGroup>
                     </form>
                 </CardContent>
-                <CardFooter>
-                    <Field orientation="horizontal">
-                    <Button type="submit" form="form-rhf" disabled={formulario.formState.isSubmitting}>
-                        {formulario.formState.isSubmitting ? "Ingresando..." : "Ingresar"}
+                <CardFooter className="flex flex-col gap-4">
+                    {/* Botón principal de login */}
+                    <Button
+                    type="submit"
+                    form="form-rhf"
+                    className="w-full"
+                    disabled={formulario.formState.isSubmitting}
+                    >
+                    {formulario.formState.isSubmitting ? "Ingresando..." : "Ingresar"}
                     </Button>
-                    </Field>
+
+                    {/* Divisor con texto */}
+                    <div className="relative w-full my-1">
+                        <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-card px-2 text-muted-foreground">
+                            ¿Otro tipo de usuario?
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Acceso para Administrador */}
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full gap-2 text-xs"
+                        onClick={() => navigate("../")}
+                    >
+                    <UserIcon className="h-4 w-4" />
+                        Iniciar sesión como Encargado de Oficina
+                    </Button>
                 </CardFooter>
             </Card>
         </div>
