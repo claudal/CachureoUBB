@@ -371,7 +371,7 @@ export default function AtenderAlertasPage() {
             </DrawerHeader>
             <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2">
               
-              {alertaAbierta?.fotos.lenght > 0 && (
+              {alertaAbierta?.fotos.length > 0 && (
                 <div>
                   <span className="font-semibold text-sm text-foreground">
                     Fotos <span className='font-light text-muted-foreground'>(presione en una para expandirlo)</span>
