@@ -182,16 +182,19 @@ model Entrega {
   id            Int      @id @default(autoincrement())
   fechaEntrega  DateTime @default(now()) @map("fecha_entrega")
   comentarios   String?  @db.Text
-  rutReclamante String   @map("rut_reclamante") @db.VarChar(12)
-  rutEncargado  String   @map("rut_encargado") @db.VarChar(12)
+  // dato que solo el dueño conoceria: se exige (o una foto) si el objeto es valioso
+  caracteristicaVerificacion String? @map("caracteristica_verificacion") @db.Text
+  rutReclamante String   @map("rut_reclamante") @db.VarChar(9)
+  rutEncargado  String   @map("rut_encargado") @db.VarChar(9)
   idObjeto      Int      @map("id_objeto")
-  idFoto        Int      @map("id_foto") @unique
+  // foto opcional de verificacion
+  idFoto        Int?     @map("id_foto") @unique
 
   // Relaciones con @relation explícito
   reclamante Reclamante       @relation(fields: [rutReclamante], references: [rut], onDelete: Restrict)
   encargado  EncargadoOficina @relation(fields: [rutEncargado], references: [rut], onDelete: Restrict)
   objeto     ObjetoPerdido    @relation(fields: [idObjeto], references: [id], onDelete: Restrict)
-  foto       Foto             @relation(fields: [idFoto], references: [id], onDelete: Restrict)
+  foto       Foto?            @relation(fields: [idFoto], references: [id], onDelete: Restrict)
 
   cierre CierreAlerta?
 
