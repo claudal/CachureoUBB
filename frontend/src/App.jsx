@@ -36,7 +36,7 @@ function App() {
             </Route>
           </Route>
           <Route path='/menuOficina' element={
-            <ProtectedRoute>
+            <ProtectedRoute type="encargado">
               <MenuOficinaPage/>
             </ProtectedRoute>
           }>

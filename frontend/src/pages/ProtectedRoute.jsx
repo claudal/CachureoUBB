@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AutenticacionContext';
 
-export function ProtectedRoute({ children }) {
+export function ProtectedRoute({ children, type }) {
   const autenticacion = useAuth();
 
   if (autenticacion.cargando) {
@@ -16,6 +16,13 @@ export function ProtectedRoute({ children }) {
 
   if (!autenticacion.sesionIniciada)
     return <Navigate to="/login" replace />;
+
+  if(type === "administrador" && !autenticacion.usuario.correo)
+    return <Navigate to="/menuOficina" replace />;
+
+  if(type === "encargado" && !autenticacion.usuario.rut)
+    return <Navigate to="/menuAdministrador" replace />;
+
 
   return children;
 }
