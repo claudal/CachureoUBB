@@ -29,10 +29,14 @@ export const errorHandler = (err, req, res, next) => {
     }
   }
 
-  // Errores con código de estado HTTP explícito (ej: 401 Credenciales inválidas)
-  if (err.status) {
-    return res.status(err.status).json({
-      error: err.message
+  // Errores con codigo de estado HTTP explicito (ej: 401 Credenciales invalidas).
+  // Los servicios usan err.statusCode. Express y sus librerias usan err.status.
+  const status = err.statusCode ?? err.status;
+  if (status) {
+    return res.status(status).json({
+      error: err.message,
+      // detalles por campo (mismo formato que validate.middleware), si el servicio los envia
+      ...(err.detalles && { detalles: err.detalles })
     });
   }
 

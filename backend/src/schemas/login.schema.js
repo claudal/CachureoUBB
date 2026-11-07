@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { limpiar, validar } from '../utils/rut.utils';
+import { limpiar, validar } from '../utils/rut.utils.js';
 
 
 export const loginEncargadoOficinaSchema = z.object({
