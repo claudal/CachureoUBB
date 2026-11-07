@@ -10,9 +10,7 @@ export const crearEncargadoOficinaSchema = z.object({
     .trim()
     .min(2, { error: "El nombre debe tener al menos 2 carácteres" })
     .max(150, { error: "El nombre debe tener a lo más 150 carácteres" }),
-  correoContacto: z.email({ message: "El correo debe ser válido" })
-    .optional()
-    .default(""),
+  correoContacto: z.email({ message: "El correo debe ser válido" }),
   idOficina: z
     .number({ error: "Debe seleccionar una oficina"}).int()
 });
