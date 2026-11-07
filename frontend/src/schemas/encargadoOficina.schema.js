@@ -1,10 +1,10 @@
 import {z} from 'zod';
-import rutjs from 'rut.js';
+import { limpiar, validar } from '../utils/rut.utils';
 
 export const CrearEncargadoOficinaSchema = z.object({
   rut: z.string({error: "El rut no debe estar vacío"})
-      .refine((rut) => rutjs.validate(rut),{error: "El rut de autenticación debe ser válido"})
-      .transform((rut) => rutjs.clean(rut)),
+      .refine(validar,{error: "El rut de autenticación debe ser válido"})
+      .transform(limpiar),
   nombre: z
     .string({ error: "El nombre es obligatorio" })
     .trim()
