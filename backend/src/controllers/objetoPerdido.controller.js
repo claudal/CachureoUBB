@@ -46,8 +46,6 @@ export async function postObjetoPerdido(req, res, next) {
     });
     res.status(201).json(objeto);
   } catch (err) {
-    if (err.statusCode)
-      return res.status(err.statusCode).json({ error: err.message });
     next(err);
   }
 }

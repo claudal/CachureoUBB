@@ -83,8 +83,6 @@ export async function postAlertaBusqueda(req, res, next) {
     });
     res.status(201).json(idAlerta);
   } catch (err) {
-    if (err.statusCode)
-      return res.status(err.statusCode).json({ error: err.message });
     next(err);
   }
 }
