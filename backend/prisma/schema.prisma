@@ -31,6 +31,15 @@ model EstadoObjeto {
   @@map("estado_objeto")
 }
 
+model EstadoEncargado {
+  id     Int    @id
+  nombre String @db.VarChar(50)
+
+  encargados EncargadoOficina[]
+
+  @@map("estado_encargado")
+}
+
 model EstadoAlerta {
   id     Int    @id @default(autoincrement())
   nombre String @db.VarChar(50)
@@ -99,16 +108,17 @@ model Oficina {
 }
 
 model EncargadoOficina {
-  rut            String   @id @db.VarChar(9)
-  nombre         String   @db.VarChar(150)
-  correoContacto String   @map("correo_contacto") @db.VarChar(255)
-  clave          String   @db.VarChar(255)
-  habilitado     Boolean  @default(true)
-  reinicioClave  Boolean  @default(false) @map("reinicio_clave")
-  idOficina      Int      @map("id_oficina")
+  rut                 String   @id @db.VarChar(9)
+  nombre              String   @db.VarChar(150)
+  correoContacto      String   @map("correo_contacto") @db.VarChar(255)
+  fechaCambioClave    DateTime @default(now()) @map("fecha_cambio_clave")
+  clave               String   @db.VarChar(255)
+  idOficina           Int      @map("id_oficina")
+  idEstado            Int      @map("id_estado") @default(2) //pendiente
 
   // Relaciones con @relation explícito
   oficina Oficina @relation(fields: [idOficina], references: [id], onDelete: Restrict)
+  estado  EstadoEncargado @relation(fields: [idEstado], references: [id], onDelete: Restrict)
 
   marcadores            MarcadorEncargado[]
   alertasLeidas         AlertaLeida[]
