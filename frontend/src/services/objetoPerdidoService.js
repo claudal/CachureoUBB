@@ -72,3 +72,19 @@ export function buscarPorId(id){
 export function eliminarPorId(id){
     return api.delete(`/objetoPerdido/${id}`);
 }
+
+/**
+ * Registra la entrega de un objeto "Sin entrega" a quien lo reclama.
+ * Los campos opcionales vacios no se envian. La foto de verificacion va en el campo "foto".
+ * @param {number} id
+ * @param {{rutReclamante: string, nombreReclamante: string, caracteristicaVerificacion?: string, comentarios?: string, fotos?: File[]}} datos
+ */
+export function registrarEntrega(id, { rutReclamante, nombreReclamante, caracteristicaVerificacion, comentarios, fotos = [] }){
+    const formData = new FormData();
+    formData.append('rutReclamante', rutReclamante);
+    formData.append('nombreReclamante', nombreReclamante);
+    if (caracteristicaVerificacion) formData.append('caracteristicaVerificacion', caracteristicaVerificacion);
+    if (comentarios) formData.append('comentarios', comentarios);
+    if (fotos[0]) formData.append('foto', conTipoHeic(fotos[0]));
+    return api.postForm(`/objetoPerdido/${id}/entrega`, formData);
+}

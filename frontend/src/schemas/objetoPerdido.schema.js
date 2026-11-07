@@ -7,11 +7,11 @@ export const TIPOS_IMAGEN_PERMITIDOS = ["image/jpeg", "image/png", "image/webp",
 
 // algunos navegadores (Windows/Android) no reconocen HEIC y dejan el tipo vacío
 const EXTENSIONES_HEIC = /\.(heic|heif)$/i;
-const esImagenPermitida = (archivo) =>
+export const esImagenPermitida = (archivo) =>
   archivo instanceof File ?
   TIPOS_IMAGEN_PERMITIDOS.includes(archivo.type) || EXTENSIONES_HEIC.test(archivo.name) :
   true // foto existente;
-const esTamanoFotoValido = (archivo) =>
+export const esTamanoFotoValido = (archivo) =>
   archivo instanceof File ?
   archivo.size <= TAMANO_MAXIMO_FOTO_MB * 1024 * 1024 :
   true // foto existente;
