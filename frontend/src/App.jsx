@@ -13,6 +13,7 @@ import MenuAdministradorPage from './pages/MenuAdministrador';
 import LoginAdministradorPage from './pages/LoginAdministradorPage';
 import LoginEncargadoPage from './pages/LoginEncargadoPage';
 import AdministrarEncargadosPage from './pages/AdministrarEncargadosPage';
+import CrearEncargadoPage from './pages/CrearEncargadoPage';
 
 function App() {
 
@@ -78,6 +79,10 @@ function App() {
             <Route
               index
               element={<AdministrarEncargadosPage />}
+            />
+            <Route
+              path="crearEncargado"
+              element={<CrearEncargadoPage />}
             />
             <Route
               path="oficinas"
