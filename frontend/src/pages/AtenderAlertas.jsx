@@ -24,6 +24,7 @@ import { useNotify } from '../hooks/useNotify.js';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CrearSolicitudDetallesSchema } from '../schemas/alertaBusqueda.schema.js';
 import { crearReunionSchema } from '../../../backend/src/schemas/alertaBusqueda.schema.js';
+import { ResponsiveModal } from '../components/ui/responsive-modal.jsx';
 
 const filtroEtiqueta = {valioso:true}
 const filtroAlerta = {
@@ -64,76 +65,71 @@ function FormularioSolicitud({alerta,onSend}){
   }
 
   return (
-    <Drawer swipeDirection='left' >
-      <DrawerTrigger render={<Button variant="outline">Solicitar más información</Button>} />
-      <DrawerContent className="max-w-lg mx-auto">
-        <DrawerHeader className="p-4 sm:p-6 border-b text-left">
-          <DrawerTitle className="text-xl">Solicitar más información</DrawerTitle>
-          <DrawerDescription className="text-sm text-muted-foreground mt-1">
-            Alerta: <span className="font-semibold text-foreground">{alerta.nombre}</span>
-          </DrawerDescription>
-        </DrawerHeader>
-
-        {/* Contenedor scrolleable del cuerpo del Drawer */}
-        <div className="p-4 sm:p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-          {apiError && (
-            <Alert variant="destructive">
-              <AlertCircleIcon className="h-4 w-4" />
-              <AlertTitle>No se pudo enviar la solicitud</AlertTitle>
-              <AlertDescription>{apiError}</AlertDescription>
-            </Alert>
-          )}
-
-          <form id="form-solicitud" onSubmit={formulario.handleSubmit(onSubmit)} noValidate>
-            <FieldGroup>
-              <Controller
-                name="indicaciones"
-                control={formulario.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className="space-y-2">
-                    <FieldLabel
-                      htmlFor="solicitud-indicaciones"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      ¿Qué información va a solicitar?
-                    </FieldLabel>
-
-                    <Textarea
-                      {...field}
-                      id="solicitud-indicaciones"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Ej: Modelo exacto del objeto, color del protector, o fotos que evidencien su autoría..."
-                      className="min-h-32 resize-none text-sm leading-relaxed"
-                    />
-
-                    <FieldDescription className="text-xs text-muted-foreground leading-normal">
-                      Indique los detalles necesarios si no está seguro de que el objeto en su oficina coincide con la alerta, o si requiere mayor evidencia.
-                    </FieldDescription>
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} className="text-xs text-destructive font-medium" />
-                    )}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-          </form>
-        </div>
-
-        <DrawerFooter className="p-4 sm:p-6 border-t flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
-          <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
-          <Button
+    <ResponsiveModal
+      drawerProps={{swipeDirection: 'left'}}
+      trigger={<Button variant="outline">Solicitar más información</Button>}
+      title="Solicitar más información"
+      description={
+        <span>
+          Alerta: <span className="font-semibold text-foreground">{alerta.nombre}</span>
+        </span>
+      }
+      footer={<Button
             type="submit"
             form="form-solicitud"
             size="lg"
             className="w-full sm:w-auto"
             disabled={formulario.formState.isSubmitting}
           >
-            {formulario.formState.isSubmitting ? 'Enviando solicitud...' : 'Enviar solicitud'}<SendHorizontalIcon />
-          </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+            {formulario.formState.isSubmitting ? 'Enviando reunión...' : 'Enviar reunion'}<SendHorizontalIcon />
+          </Button>}
+      closeButton={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}
+    >
+      <div className="p-4 sm:p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+        {apiError && (
+          <Alert variant="destructive">
+            <AlertCircleIcon className="h-4 w-4" />
+            <AlertTitle>No se pudo enviar la solicitud</AlertTitle>
+            <AlertDescription>{apiError}</AlertDescription>
+          </Alert>
+        )}
+
+        <form id="form-solicitud" onSubmit={formulario.handleSubmit(onSubmit)} noValidate>
+          <FieldGroup>
+            <Controller
+              name="indicaciones"
+              control={formulario.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid} className="space-y-2">
+                  <FieldLabel
+                    htmlFor="solicitud-indicaciones"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    ¿Qué información va a solicitar?
+                  </FieldLabel>
+
+                  <Textarea
+                    {...field}
+                    id="solicitud-indicaciones"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Ej: Modelo exacto del objeto, color del protector, o fotos que evidencien su autoría..."
+                    className="min-h-32 resize-none text-sm leading-relaxed"
+                  />
+
+                  <FieldDescription className="text-xs text-muted-foreground leading-normal">
+                    Indique los detalles necesarios si no está seguro de que el objeto en su oficina coincide con la alerta, o si requiere mayor evidencia.
+                  </FieldDescription>
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} className="text-xs text-destructive font-medium" />
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+        </form>
+      </div>
+    </ResponsiveModal>
   )
 }
 function FormularioReunion({alerta,onSend}){
@@ -163,66 +159,16 @@ function FormularioReunion({alerta,onSend}){
   }
 
   return (
-    <Drawer swipeDirection='left' >
-      <DrawerTrigger render={<Button variant="default">Revelar oficina</Button>} />
-      <DrawerContent className="max-w-lg mx-auto">
-        <DrawerHeader className="p-4 sm:p-6 border-b text-left">
-          <DrawerTitle className="text-xl">Llamar a reunión</DrawerTitle>
-          <DrawerDescription className="text-sm text-muted-foreground mt-1">
-            Alerta: <span className="font-semibold text-foreground">{alerta.nombre}</span>
-          </DrawerDescription>
-        </DrawerHeader>
-
-        {/* Contenedor scrolleable del cuerpo del Drawer */}
-        <div className="p-4 sm:p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-          {apiError && (
-            <Alert variant="destructive">
-              <AlertCircleIcon className="h-4 w-4" />
-              <AlertTitle>No se pudo enviar el llamado a reunión</AlertTitle>
-              <AlertDescription>{apiError}</AlertDescription>
-            </Alert>
-          )}
-
-          <form id="form-reunion" onSubmit={formulario.handleSubmit(onSubmit)} noValidate>
-            <FieldGroup>
-              <Controller
-                name="indicaciones"
-                control={formulario.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid} className="space-y-2">
-                    <FieldLabel
-                      htmlFor="solicitud-indicaciones"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      ¿Cuáles son las indicaciones para la reunión?
-                    </FieldLabel>
-
-                    <Textarea
-                      {...field}
-                      id="solicitud-indicaciones"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Ej: Horario de disponibilidad, condiciones, excepciones."
-                      className="min-h-32 resize-none text-sm leading-relaxed"
-                    />
-
-                    <FieldDescription className="text-xs text-muted-foreground leading-normal">
-                      Indique los detalles necesarios para reunirse con el autor de la alerta y realizar la entrega del objeto.
-                      El autor podrá ver la ubicación de su oficina junto a las indicaciones que le dé.
-                    </FieldDescription>
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} className="text-xs text-destructive font-medium" />
-                    )}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-          </form>
-        </div>
-
-        <DrawerFooter className="p-4 sm:p-6 border-t flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
-          <DrawerClose render={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}/>
-          <Button
+    <ResponsiveModal
+      drawerProps={{swipeDirection: 'left'}}
+      trigger={<Button variant="default">Revelar oficina</Button>}
+      title="Llamar a reunión"
+      description={
+        <span>
+          Alerta: <span className="font-semibold text-foreground">{alerta.nombre}</span>
+        </span>
+      }
+      footer={<Button
             type="submit"
             form="form-reunion"
             size="lg"
@@ -230,10 +176,55 @@ function FormularioReunion({alerta,onSend}){
             disabled={formulario.formState.isSubmitting}
           >
             {formulario.formState.isSubmitting ? 'Enviando reunión...' : 'Enviar reunion'}<SendHorizontalIcon />
-          </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+          </Button>}
+      closeButton={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}
+    >
+      <div className="p-4 sm:p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+        {apiError && (
+          <Alert variant="destructive">
+            <AlertCircleIcon className="h-4 w-4" />
+            <AlertTitle>No se pudo enviar el llamado a reunión</AlertTitle>
+            <AlertDescription>{apiError}</AlertDescription>
+          </Alert>
+        )}
+
+        <form id="form-reunion" onSubmit={formulario.handleSubmit(onSubmit)} noValidate>
+          <FieldGroup>
+            <Controller
+              name="indicaciones"
+              control={formulario.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid} className="space-y-2">
+                  <FieldLabel
+                    htmlFor="solicitud-indicaciones"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    ¿Cuáles son las indicaciones para la reunión?
+                  </FieldLabel>
+
+                  <Textarea
+                    {...field}
+                    id="solicitud-indicaciones"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Ej: Horario de disponibilidad, condiciones, excepciones."
+                    className="min-h-32 resize-none text-sm leading-relaxed"
+                  />
+
+                  <FieldDescription className="text-xs text-muted-foreground leading-normal">
+                    Indique los detalles necesarios para reunirse con el autor de la alerta y realizar la entrega del objeto.
+                    El autor podrá ver la ubicación de su oficina junto a las indicaciones que le dé.
+                  </FieldDescription>
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} className="text-xs text-destructive font-medium" />
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+        </form>
+      </div>
+    </ResponsiveModal>
   )
 }
 

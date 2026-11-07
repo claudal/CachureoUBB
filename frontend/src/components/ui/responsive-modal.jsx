@@ -1,10 +1,11 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription, DialogClose } from './dialog.js';
-import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter, DrawerDescription } from './drawer.js';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription, DialogClose, DialogTrigger } from './dialog.js';
+import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter, DrawerDescription, DrawerTrigger } from './drawer.js';
 import { useIsMobile } from '../../hooks/use-mobile.js';
 
 export function ResponsiveModal({ 
   open, 
-  onOpenChange, 
+  onOpenChange,
+  trigger,
   header,
   title, 
   description,
@@ -19,7 +20,8 @@ export function ResponsiveModal({
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange} {...drawerProps}>
-        <DrawerContent className="max-h-[92vh] flex flex-col">
+        {trigger && <DrawerTrigger render={trigger}/>}
+        <DrawerContent className="flex flex-col">
           {(title || description || header) && (
             <DrawerHeader className="p-4 border-b shrink-0 text-left">
               {title && <DrawerTitle>{title}</DrawerTitle>}
@@ -41,11 +43,12 @@ export function ResponsiveModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
+      {trigger && <DialogTrigger render={trigger}/>}
       {/* 
         Usamos dialogClassName para definir el tamaño. 
         Si no se pasa dialogClassName personalizado, aplica 'sm:max-w-lg' por defecto.
       */}
-      <DialogContent className={`flex flex-col p-6 overflow-hidden ${dialogClassName || "sm:max-w-lg"}`}>
+      <DialogContent className={dialogClassName}>
         {(header || title || description) && (
           <DialogHeader className="shrink-0 border-b pb-3 text-left">
             {title && <DialogTitle>{title}</DialogTitle>}
