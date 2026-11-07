@@ -29,8 +29,6 @@ export async function postEntrega(req, res, next) {
     });
     res.status(201).json(entrega);
   } catch (err) {
-    if (err.statusCode)
-      return res.status(err.statusCode).json({ error: err.message, detalles: err.detalles });
     next(err);
   }
 }
