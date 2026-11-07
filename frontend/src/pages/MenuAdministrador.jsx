@@ -26,11 +26,17 @@ export default function MenuAdministradorPage(){
         }
     ])
     
+    const [campusSeleccionado, setCampusSeleccionado] = useState(null);
     function onClick(nombre) {
         setSecciones(secciones.map((item)=>(item.nombre === nombre ? {...item,notificacion: false} : item)))
     }
 
+    const contextoCompartido = {
+        campusSeleccionado,
+        setCampusSeleccionado,
+    };
+
     return (
-        <PantallaUsuario menuItems={secciones} onClick={onClick} />
+        <PantallaUsuario menuItems={secciones} onClick={onClick} contextData={contextoCompartido} />
     )
 }

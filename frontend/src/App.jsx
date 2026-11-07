@@ -1,5 +1,4 @@
 import { Route, Routes, BrowserRouter, Navigate } from 'react-router-dom';
-import TestAuditPage from './pages/TestAuditPage';
 import { AuthProvider } from './context/AutenticacionContext';
 import MenuOficinaPage from './pages/MenuOficina';
 import ProtectedRoute from './pages/ProtectedRoute';
@@ -13,6 +12,7 @@ import AlertaBusquedaPage from './pages/AlertaBusquedaPage';
 import MenuAdministradorPage from './pages/MenuAdministrador';
 import LoginAdministradorPage from './pages/LoginAdministradorPage';
 import LoginEncargadoPage from './pages/LoginEncargadoPage';
+import AdministrarEncargadosPage from './pages/AdministrarEncargadosPage';
 
 function App() {
 
@@ -77,7 +77,7 @@ function App() {
           }>
             <Route
               index
-              element={<ObjetosOficinaPage />}
+              element={<AdministrarEncargadosPage />}
             />
             <Route
               path="oficinas"
