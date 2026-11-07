@@ -2,7 +2,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { Badge } from "./ui/badge";
 import { Toaster } from "./ui/toast";
 
-export default function PantallaUsuario({ menuItems, onClick }) {
+export default function PantallaUsuario({ menuItems, onClick, contextData=null }) {
   return (
     <div className="h-screen flex flex-col">
       {/* 
@@ -10,7 +10,7 @@ export default function PantallaUsuario({ menuItems, onClick }) {
         y evitar que tape el contenido en scroll 
       */}
       <main className="flex-1 overflow-y-auto pb-20">
-        <Outlet />
+        <Outlet context={contextData}/>
       </main>
       
       <Toaster />
