@@ -18,9 +18,10 @@ import { ItemSinDatos } from '../components/ui/item-sin-datos.jsx';
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../components/ui/drawer.js';
 import { PanelFiltro, usePanelFiltro } from '../components/PanelFiltros.jsx';
 import { urlFoto } from '../utils/foto.utils.js';
-import SelectorCampus from '../components/SelectorCampus.jsx';
 import { Paginacion } from '../components/ui/paginacion.jsx';
 import { Separator } from '../components/ui/separator';
+import Selector from '../components/Selector.jsx';
+import { listar } from '../services/campusService.js';
 
 const filtroEtiqueta = {}
 const filtroBase = {
@@ -225,7 +226,14 @@ export default function BuscarObjetos() {
             <h1 className="text-2xl font-bold tracking-tight">Objetos perdidos</h1>
             <p className="text-sm text-muted-foreground">Objetos perdidos en el campus.</p>
           </div>
-          <SelectorCampus onSelect={onSelectCampus} value={filtros.idCampus}/>
+          <Selector 
+            onSelect={onSelectCampus}
+            value={filtros.idCampus}
+            fn={listar}
+            textoCargando="Cargando campus..."
+            textoNoDatos="No se pudo cargar los campus"
+            textoVacio="Seleccione un campus"
+          />
           <Button onClick={()=>controladorPanelFiltro.setAbierto(true)} variant="outline" disabled={objetos.cargando}>
               <SearchIcon />Abrir filtros
           </Button>

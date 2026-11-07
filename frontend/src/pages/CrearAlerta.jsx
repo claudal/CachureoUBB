@@ -15,10 +15,11 @@ import CargaImagenes from '../components/CargaImagenes.jsx';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { useNotify } from '../hooks/useNotify.js';
 import { CrearAlertaBusquedaSchema, MAXIMO_FOTOS_OBJETO } from '../schemas/alertaBusqueda.schema.js';
-import SelectorCampus from '../components/SelectorCampus.jsx';
 
 import * as alertaBusquedaService from '../services/alertaBusquedaService.js';
 import { useAlertaLocal } from '../hooks/useAlertaLocal.js';
+import Selector from '../components/Selector.jsx';
+import { listar } from '../services/campusService.js';
 
 
 // constante fuera del componente para que el selector no recargue las etiquetas en cada render
@@ -167,13 +168,16 @@ export default function CrearAlertaPage() {
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor="objeto-etiquetas">Campus dónde buscar</FieldLabel>
-                      <SelectorCampus
-                        {...field}
+                      <Selector 
                         onBlur={field.onBlur}
                         onSelect={field.onChange}
                         value={field.value}
                         invalid={fieldState.invalid}
                         id={"selector-campus"}
+                        fn={listar}
+                        textoCargando="Cargando campus..."
+                        textoNoDatos="No se pudo cargar los campus"
+                        textoVacio="Seleccione un campus"
                       />
                       <FieldDescription>Seleccione el campus donde se le haya perdido el objeto.</FieldDescription>
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
