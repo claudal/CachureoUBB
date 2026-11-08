@@ -21,3 +21,11 @@ export const loginAdministradorSchema = z.object({
     .min(6,{error: "La contraseña debe tener al menos 6 carácteres"})
     .max(72, {error: "La contraseña debe tener a lo más 72 carácteres"})
 });
+
+export const restablecerClaveSchema = z.object({
+  claveNueva: z
+    .string({error: "La contraseña no debe estar vacía"})
+    .min(6,{error: "La contraseña debe tener al menos 6 carácteres"})
+    .max(72, {error: "La contraseña debe tener a lo más 72 carácteres"}),
+  token: z.jwt({error: "El token debe ser válido"})
+})

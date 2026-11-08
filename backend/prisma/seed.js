@@ -19,6 +19,12 @@ const ESTADOS_ALERTA = [
   { id: 3, nombre: "Rectificado" }
 ];
 
+const ESTADOS_ENCARGADO = [
+  { id: 1, nombre: "Habilitado" },
+  { id: 2, nombre: "Pendiente" },
+  { id: 3, nombre: "Deshabilitado" }
+];
+
 const NOMBRE_ETIQUETAS_NORMALES = [
   "Mochila vacía",
   "Ropa",
@@ -44,6 +50,13 @@ const NOMBRE_ETIQUETAS_VALIOSAS = [
  * Se ejecuta en cualquier entorno y se puede correr varias veces sin duplicar datos.
  */
 async function crearCatalogos() {
+  console.log('=> Creando estados de encargado');
+  const estadosEncargado = await Promise.all(
+    ESTADOS_ENCARGADO.map(({ id, nombre }) =>
+      prisma.estadoEncargado.upsert({ where: { id }, update: { nombre }, create: { id, nombre } })
+    )
+  );
+
   console.log('=> Creando estados de objeto');
   const estadosObjeto = await Promise.all(
     ESTADOS_OBJETO.map(({ id, nombre }) =>
@@ -71,7 +84,7 @@ async function crearCatalogos() {
     NOMBRE_ETIQUETAS_VALIOSAS.map((nombre) => crearEtiqueta(nombre, true))
   );
 
-  return { estadosObjeto, estadosAlerta, etiquetasNormales, etiquetasValiosas };
+  return { estadosObjeto, estadosAlerta, etiquetasNormales, etiquetasValiosas, estadosEncargado };
 }
 
 async function limpiarDatosPrueba() {
@@ -203,7 +216,8 @@ async function main() {
           correoContacto: faker.internet.email(),
           nombre: faker.person.fullName(),
           clave: hashSync(clave,BCRYPT_SALT_ROUNDS),
-          idOficina: faker.helpers.arrayElement(oficinas).id
+          idOficina: faker.helpers.arrayElement(oficinas).id,
+          idEstado: 1
         }
       })
     )

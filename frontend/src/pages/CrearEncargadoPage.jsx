@@ -77,8 +77,10 @@ export default function CrearEncargadoPage() {
         notification.exito(`Alerta editada correctamente`);
         
       } else {
-        await encargadoOficinaService.crear(datos);
+        const resultado = await encargadoOficinaService.crear(datos);
         notification.exito(`Encargado de oficina creado correctamente`);
+        if(!resultado.correoEnviado)
+          notification.error(`Hubo un error al enviar el correo de creación. Vuelva a reenviarle el correo más tarde.`);
       }
       navigate("/menuAdministrador")
     } catch (err) {

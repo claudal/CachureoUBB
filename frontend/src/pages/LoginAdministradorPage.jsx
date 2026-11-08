@@ -1,6 +1,6 @@
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LoginAdministradorSchema } from '../schemas/auth.schema';
+import { LoginAdministradorSchema } from '../schemas/autenticacion.schema.js';
 import { useState } from 'react';
 import { useAuth } from '../context/AutenticacionContext';
 import { useNavigate } from 'react-router-dom';

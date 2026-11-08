@@ -14,6 +14,7 @@ import LoginAdministradorPage from './pages/LoginAdministradorPage';
 import LoginEncargadoPage from './pages/LoginEncargadoPage';
 import AdministrarEncargadosPage from './pages/AdministrarEncargadosPage';
 import CrearEncargadoPage from './pages/CrearEncargadoPage';
+import RestablecerClavePage from './pages/ReestablecerClavePage';
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
             <Route index element={<LoginEncargadoPage />} />
             <Route path="administrador" element={<LoginAdministradorPage />} />
           </Route>
+          <Route path="/restablecerClave" element={<RestablecerClavePage />}/>
           <Route path="/menuBusqueda" element={<MenuBusquedaPage />}>
             <Route
               index
