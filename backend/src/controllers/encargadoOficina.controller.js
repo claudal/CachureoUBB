@@ -1,5 +1,5 @@
-import { crearTokenCreacionClaveEncargado } from '../services/autenticacion.services.js';
-import { enviarCorreoCreacionEncargado } from '../services/email.services.js';
+import { crearTokenCreacionClaveEncargado, crearTokenRestablecimientoClaveEncargado } from '../services/autenticacion.services.js';
+import { enviarCorreoCreacionEncargado, enviarCorreoRestablecimiento } from '../services/email.services.js';
 import { buscarPorRut, crear, listar } from '../services/encargadoOficina.services.js';
 
 export const getEncargados = async (req, res, next) => {
@@ -36,6 +36,22 @@ export const postReenviarCorreoCreacionEncargado = async (req, res, next) => {
       crearTokenCreacionClaveEncargado(encargado.rut)
     )
     res.status(200).json({"mensaje": "Correo reenviado con éxito"});
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const postEnviarCorreoReestablecimientoEncargado = async (req, res, next) => {
+  try {
+    const encargado = await buscarPorRut(req.params.rut);
+    if(encargado?.idEstado === 1) {
+      enviarCorreoRestablecimiento(
+        encargado.correoContacto,
+        encargado.nombre,
+        crearTokenRestablecimientoClaveEncargado(encargado.rut)
+      )
+    }
+    return res.status(200).json({"mensaje": "Solicitud de reestablecimiento de clave enviada con éxito"});
   } catch (error) {
     next(error);
   }

@@ -16,3 +16,7 @@ export function crear(data){
 export function reenviarCorreoCreacion(rut){
     return api.post(`/encargadoOficina/${rut}/reenviarCorreoCreacion`);
 }
+
+export function enviarCorreoRestablecimientoClave(rut){
+    return api.post(`/encargadoOficina/${rut}/enviarCorreoRestablecimientoClave`);
+}
