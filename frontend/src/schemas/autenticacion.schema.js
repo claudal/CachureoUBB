@@ -1,6 +1,7 @@
 import {z} from 'zod';
 import { limpiar, validar } from '../utils/rut.utils.js';
 
+
 export const LoginEncargadoSchema = z.object({
     rut: z.string({error: "El rut no debe estar vacío"})
     .refine(validar,{error: "El rut de autenticación debe ser válido"})
@@ -32,4 +33,11 @@ export const RestablecerClaveSchema = z
   .refine((data) => data.claveNueva === data.claveRepetida, {
     message: "Las contraseñas no coinciden",
     path: ["claveRepetida"],
+  });
+
+export const RutRestablecimientoSchema = z
+  .object({
+    rut: z.string({error: "El rut no debe estar vacío"})
+    .refine(validar,{error: "El rut de autenticación debe ser válido"})
+    .transform(limpiar),
   });
