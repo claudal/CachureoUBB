@@ -1,17 +1,13 @@
-import { prisma } from '../config/prisma.js';
 import { crearTokenCreacionClaveEncargado } from '../services/autenticacion.services.js';
 import { enviarCorreoCreacionEncargado } from '../services/email.services.js';
-import { buscarPorRut, crear } from '../services/encargadoOficina.services.js';
+import { buscarPorRut, crear, listar } from '../services/encargadoOficina.services.js';
 
 export const getEncargados = async (req, res, next) => {
   try {
-    const encargados = await prisma.encargadoOficina.findMany();
-    // Removemos la contraseña de la respuesta por seguridad
-    const safeEncargados = encargados.map(p => {
-      const { clave, ...rest } = p;
-      return rest;
-    });
-    res.json(safeEncargados);
+    if(!req.user.correo)
+      return res.status(403).json({error: "No tiene permisos para listar encargados"});
+    console.log(req.vQuery)
+    res.json(await listar(req.vQuery));
   } catch (error) {
     next(error);
   }

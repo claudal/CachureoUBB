@@ -20,3 +20,14 @@ export const parametroEncargadoOficinaSchema = z.object({
     .refine(validar,{error: "El rut debe ser válido"})
     .transform(limpiar)
 })
+
+export const filtroEncargadoOficinaSchema = z.object({
+  nombre: z.string().optional(),
+  rut: z.string({error: "El rut no debe estar vacío"})
+      .refine(validar,{error: "El rut de autenticación debe ser válido"})
+      .transform(limpiar).optional(),
+  idCampus: z.string().regex(/^\d+$/).transform(Number).optional(),
+  idEstado: z.string().regex(/^\d+$/).transform(Number).optional(),
+  salto: z.string().regex(/^\d+$/).transform(Number).optional().default(0),
+  cantidad: z.string().regex(/^\d+$/).transform(Number).optional().default(15)
+});

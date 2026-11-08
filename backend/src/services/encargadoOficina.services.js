@@ -3,6 +3,22 @@ import { encriptarClave } from "../utils/autenticacion.utils.js";
 import { crearTokenCreacionClaveEncargado } from "./autenticacion.services.js";
 import { enviarCorreoCreacionEncargado } from "./email.services.js";
 
+export function listar(filtros={}){
+    return prisma.encargadoOficina.findMany({
+        omit: {
+            clave: true,
+            fechaCambioClave: true,
+        },
+        include: {
+            oficina: true,
+            estado: true
+        },
+        skip: filtros.salto,
+        take: filtros.cantidad,
+        orderBy:{nombre:'asc'}
+    })
+}
+
 /**
  * 
  * @param {string} rut
