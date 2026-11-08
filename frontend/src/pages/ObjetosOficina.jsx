@@ -3,7 +3,7 @@ import { useFetch } from '../hooks/useFetch.js';
 import { useState } from 'react';
 import { Controller } from 'react-hook-form';
 
-import { ArrowRightCircleIcon, CircleCheckIcon, GemIcon, GhostIcon, PackageSearchIcon, PenIcon, PlusIcon, SearchIcon, StarIcon, TrashIcon } from 'lucide-react';
+import { ArrowRightCircleIcon, CircleCheckIcon, GemIcon, GhostIcon, PackageSearchIcon, PenIcon, PlusIcon, SearchIcon } from 'lucide-react';
 
 import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';

@@ -1,17 +1,5 @@
 import { z } from 'zod';
 
-/*TODO
-export const createAnimalSchema = z.object({
-  nombre: z.string().min(2, 'El nombre es obligatorio').max(100),
-  edad: z.number().int().nonnegative('La edad no puede ser negativa'),
-  peso: z.number().positive().optional(),
-  disponible: z.boolean().default(true),
-  especieId: z.number().int().positive('Debe indicar una especie válida'),
-  recintoId: z.number().int().positive('Debe indicar un recinto válido'),
-});
-
-export const updateAnimalSchema = createAnimalSchema.partial();*/
-
 // Los campos llegan como texto porque el formulario se envía como multipart/form-data (por las fotos).
 export const crearAlertaBusquedaSchema = z.object({
   nombre: z

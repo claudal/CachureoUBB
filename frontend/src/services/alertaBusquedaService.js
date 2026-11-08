@@ -1,4 +1,3 @@
-import { useAlertaLocal } from "../hooks/useAlertaLocal.js";
 import { conTipoHeic } from "../utils/foto.utils.js";
 import { api } from "./api.js";
 
