@@ -6,9 +6,9 @@ import { crearEncargadoOficinaSchema, filtroEncargadoOficinaSchema, parametroEnc
 
 const router = Router();
 
-router.get('/',autenticacion,validate(filtroEncargadoOficinaSchema,"query","vQuery"), getEncargados);
-router.post('/', autenticacion, validate(crearEncargadoOficinaSchema), postEncargado);
-router.post('/:rut/reenviarCorreoCreacion', autenticacion, validate(parametroEncargadoOficinaSchema,"params"), postReenviarCorreoCreacionEncargado);
+router.get('/',autenticacion("administrador"),validate(filtroEncargadoOficinaSchema,"query","vQuery"), getEncargados);
+router.post('/', autenticacion("administrador"), validate(crearEncargadoOficinaSchema), postEncargado);
+router.post('/:rut/reenviarCorreoCreacion', autenticacion("administrador"), validate(parametroEncargadoOficinaSchema,"params"), postReenviarCorreoCreacionEncargado);
 router.post('/:rut/enviarCorreoRestablecimientoClave', validate(parametroEncargadoOficinaSchema,"params"), postEnviarCorreoReestablecimientoEncargado);
 
 export default router;

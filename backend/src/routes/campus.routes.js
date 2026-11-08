@@ -8,6 +8,6 @@ const router = Router();
 
 router.get('/', getCampuses);
 
-router.get('/:id/oficinas/',autenticacion,validate(parametroCampusSchema,"params"),getOficinasCampus)
+router.get('/:id/oficinas/',autenticacion("administrador"),validate(parametroCampusSchema,"params"),getOficinasCampus)
 
 export default router;

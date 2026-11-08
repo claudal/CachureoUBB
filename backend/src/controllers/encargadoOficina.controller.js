@@ -4,8 +4,6 @@ import { buscarPorRut, crear, listar } from '../services/encargadoOficina.servic
 
 export const getEncargados = async (req, res, next) => {
   try {
-    if(!req.user.correo)
-      return res.status(403).json({error: "No tiene permisos para listar encargados"});
     console.log(req.vQuery)
     res.json(await listar(req.vQuery));
   } catch (error) {
@@ -15,8 +13,6 @@ export const getEncargados = async (req, res, next) => {
 
 export const postEncargado = async (req, res, next) => {
   try {
-    if(!req.user.correo)
-      return res.status(403).json({error: "No tiene permisos para crear el encargado"});
     res.status(201).json(await crear(req.body));
   } catch (error) {
     next(error);
@@ -25,8 +21,6 @@ export const postEncargado = async (req, res, next) => {
 
 export const postReenviarCorreoCreacionEncargado = async (req, res, next) => {
   try {
-    if(!req.user.correo)
-      return res.status(403).json({error: "No tiene permisos para enviar el correo de creación"});
     const encargado = await buscarPorRut(req.params.rut);
     if(encargado.idEstado !== 2)
       return res.status(403).json({error: "No tiene permisos para enviar el correo de creación"});

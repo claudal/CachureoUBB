@@ -10,15 +10,15 @@ import { postEntrega } from '../controllers/entrega.controller.js';
 const router = Router();
 
 // multer va antes de validate porque es multer el que llena req.body con los campos del formulario
-router.post('/', autenticacion, subirFotos, validate(crearObjetoPerdidoSchema), postObjetoPerdido);
+router.post('/', autenticacion("encargado"), subirFotos, validate(crearObjetoPerdidoSchema), postObjetoPerdido);
 
 router.get('/publico', validate(filtroObjetoPublicoSchema, "query", "vQuery"), getObjetosPerdidosPublico);
 
-router.get('/oficina', autenticacion, validate(filtroObjetoOficinaSchema,"query","vQuery"), getObjetosOficina);
-router.get('/:id', autenticacion, validate(parametroObjetoPerdidoSchema,"params"), getObjetoPerdido);
-router.put('/:id', autenticacion, validate(parametroObjetoPerdidoSchema,"params"), subirFotos, validate(actualizarObjetoPerdidoSchema), putObjetoPerdido);
-router.delete('/:id', autenticacion, validate(parametroObjetoPerdidoSchema,"params"), deleteObjetoPerdido);
+router.get('/oficina', autenticacion("encargado"), validate(filtroObjetoOficinaSchema,"query","vQuery"), getObjetosOficina);
+router.get('/:id', autenticacion("encargado"), validate(parametroObjetoPerdidoSchema,"params"), getObjetoPerdido);
+router.put('/:id', autenticacion("encargado"), validate(parametroObjetoPerdidoSchema,"params"), subirFotos, validate(actualizarObjetoPerdidoSchema), putObjetoPerdido);
+router.delete('/:id', autenticacion("encargado"), validate(parametroObjetoPerdidoSchema,"params"), deleteObjetoPerdido);
 
-router.post('/:id/entrega', autenticacion, validate(parametroObjetoPerdidoSchema,"params"), subirFotoEntrega, validate(registrarEntregaSchema), postEntrega);
+router.post('/:id/entrega', autenticacion("encargado"), validate(parametroObjetoPerdidoSchema,"params"), subirFotoEntrega, validate(registrarEntregaSchema), postEntrega);
 
 export default router;

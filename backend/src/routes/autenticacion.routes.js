@@ -13,6 +13,6 @@ router.post('/restablecerClave',
     validate(restablecerClaveSchema, 'body'),
     postRestablecerClave);
 
-router.get('/perfil/',autenticacion,getPerfil)
+router.get('/perfil/',autenticacion("todos"),getPerfil)
 
 export default router;

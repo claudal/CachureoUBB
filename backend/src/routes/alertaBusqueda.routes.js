@@ -11,22 +11,22 @@ const router = Router();
 
 router.post('/', subirFotos, validate(crearAlertaBusquedaSchema), postAlertaBusqueda);
 
-router.get('/',autenticacion,validate(filtroAlertaBusquedaSchema, 'query', 'vQuery'), getAlertasBusqueda);
+router.get('/',autenticacion("encargado"),validate(filtroAlertaBusquedaSchema, 'query', 'vQuery'), getAlertasBusqueda);
 router.get('/:id/',validate(parametroAlertaBusquedaSchema, 'params'), getAlertaBusqueda);
 
 
-router.post('/:id/marcadores/',autenticacion,validate(parametroAlertaBusquedaSchema,'params'),postMarcadorAlerta);
-router.delete('/:id/marcadores/',autenticacion,validate(parametroAlertaBusquedaSchema,'params'),deleteMarcadorAlerta);
+router.post('/:id/marcadores/',autenticacion("encargado"),validate(parametroAlertaBusquedaSchema,'params'),postMarcadorAlerta);
+router.delete('/:id/marcadores/',autenticacion("encargado"),validate(parametroAlertaBusquedaSchema,'params'),deleteMarcadorAlerta);
 
-router.post('/:id/lecturas/',autenticacion,validate(parametroAlertaBusquedaSchema,'params'),postLecturaAlerta);
+router.post('/:id/lecturas/',autenticacion("encargado"),validate(parametroAlertaBusquedaSchema,'params'),postLecturaAlerta);
 
 router.post('/:id/solicitudesDetalles/',
-    autenticacion,
+    autenticacion("encargado"),
     validate(parametroAlertaBusquedaSchema,'params'),
     validate(crearSolicitudDetallesSchema),
     postSolicitudDetalles);
 router.post('/:id/reuniones/',
-    autenticacion,
+    autenticacion("todos"),
     validate(parametroAlertaBusquedaSchema,'params'),
     validate(crearReunionSchema),
     postReunion);
