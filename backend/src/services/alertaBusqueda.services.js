@@ -36,6 +36,11 @@ export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
             rutEncargado
         }
     }
+    include.reuniones = {
+        where: {
+            rutEncargado
+        }
+    }
     if(filtros.etiquetaObjeto) where.etiquetas = {
         some: {
             idEtiqueta: {

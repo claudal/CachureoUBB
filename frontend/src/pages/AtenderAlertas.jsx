@@ -161,7 +161,10 @@ function FormularioReunion({alerta,onSend}){
   return (
     <ResponsiveModal
       drawerProps={{swipeDirection: 'left'}}
-      trigger={<Button variant="default">Revelar oficina</Button>}
+      trigger={alerta.reuniones.length === 0 ?
+        <Button variant="default">Revelar oficina</Button> :
+        <Button disabled={true} variant="default">Oficina relevada</Button>
+      }
       title="Llamar a reunión"
       description={
         <span>
@@ -231,6 +234,8 @@ function FormularioReunion({alerta,onSend}){
 export default function AtenderAlertasPage() {
   const [filtros, setFiltros] = useState(filtroAlerta);
   const alertas = useFetch(()=>alertaBusquedaService.listar(filtros),[filtros],[]);
+
+  console.log(alertas)
 
   const onSubmitFiltros = (data) => {
     data.marcado = filtros.marcado;
