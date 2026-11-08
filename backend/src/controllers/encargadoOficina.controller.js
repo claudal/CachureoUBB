@@ -1,5 +1,5 @@
 import { crearTokenCreacionClaveEncargado, crearTokenRestablecimientoClaveEncargado } from '../services/autenticacion.services.js';
-import { enviarCorreoCreacionEncargado, enviarCorreoRestablecimiento } from '../services/email.services.js';
+import { enviarCorreoCreacionEncargado, enviarCorreoRestablecimientoEncargado } from '../services/email.services.js';
 import { buscarPorRut, crear, listar } from '../services/encargadoOficina.services.js';
 
 export const getEncargados = async (req, res, next) => {
@@ -45,7 +45,7 @@ export const postEnviarCorreoReestablecimientoEncargado = async (req, res, next)
   try {
     const encargado = await buscarPorRut(req.params.rut);
     if(encargado?.idEstado === 1) {
-      enviarCorreoRestablecimiento(
+      enviarCorreoRestablecimientoEncargado(
         encargado.correoContacto,
         encargado.nombre,
         crearTokenRestablecimientoClaveEncargado(encargado.rut)
