@@ -16,3 +16,20 @@ export const LoginAdministradorSchema = z.object({
     .min(6,{error: "La contraseña debe tener al menos 6 carácteres"})
     .max(72, {error: "La contraseña debe tener a lo más 72 carácteres"})
 });
+
+export const RestablecerClaveSchema = z
+  .object({
+    claveNueva: z
+      .string({error: "La contraseña no debe estar vacía"})
+      .min(6,{error: "La contraseña debe tener al menos 6 carácteres"})
+      .max(72, {error: "La contraseña debe tener a lo más 72 carácteres"}),
+    claveRepetida: z
+      .string({error: "La contraseña no debe estar vacía"})
+      .min(6,{error: "La contraseña debe tener al menos 6 carácteres"})
+      .max(72, {error: "La contraseña debe tener a lo más 72 carácteres"}),
+    token: z.jwt({error: "El token debe ser válido"})
+  })
+  .refine((data) => data.claveNueva === data.claveRepetida, {
+    message: "Las contraseñas no coinciden",
+    path: ["claveRepetida"],
+  });
