@@ -87,3 +87,18 @@ export async function getPerfilAdministrador(email) {
     }
     return administrador;
 }
+
+function generarTokenEncargado(rut, tipo, expiresIn) {
+  return jwt.sign(
+    {
+      rut,
+      tipo,     // 'creacion' | 'restablecimiento'
+    },
+    process.env.JWT_SECRET,
+    { expiresIn }
+  );
+}
+
+export function crearTokenCreacionClaveEncargado(rut) {
+  return generarTokenEncargado(rut, 'creacion', PASSWORD_SET_TIME);
+}
