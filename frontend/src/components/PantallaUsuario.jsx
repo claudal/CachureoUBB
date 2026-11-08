@@ -38,6 +38,7 @@ export default function PantallaUsuario({ menuItems, onClick, contextData=null }
                 flex-col
                 justify-center
                 items-center
+                text-center
                 gap-1
                 h-full
                 ${isActive ? "text-primary bg-primary-foreground" : "text-muted-foreground"}
