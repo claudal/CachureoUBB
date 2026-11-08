@@ -7,3 +7,7 @@ export function listar(){
 export function crear(data){
     return api.post(`/encargadoOficina`,data);
 }
+
+export function reenviarCorreoCreacion(rut){
+    return api.post(`/encargadoOficina/${rut}/reenviarCorreoCreacion`);
+}

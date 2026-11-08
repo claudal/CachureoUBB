@@ -14,3 +14,9 @@ export const crearEncargadoOficinaSchema = z.object({
   idOficina: z
     .number({ error: "Debe seleccionar una oficina"}).int()
 });
+
+export const parametroEncargadoOficinaSchema = z.object({
+  rut: z.string({error: "El rut no debe estar vacío"})
+    .refine(validar,{error: "El rut debe ser válido"})
+    .transform(limpiar)
+})
