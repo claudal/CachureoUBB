@@ -85,13 +85,13 @@ export default function CargaImagenes({field, fieldState, max}){
   return (
     <Field data-invalid={fieldState.invalid}>
       <VisorImagen url={fotoAbierta?.url} nombre={fotoAbierta?.name} absolute={true} onOpenChange={()=>setFotoAbierta(null)}/>
-      <FieldLabel htmlFor="objeto-fotos">Fotos ({field.value.length} de {max})</FieldLabel>
+      <FieldLabel htmlFor={id}>{etiqueta} ({field.value.length} de {max})</FieldLabel>
       <Input
         ref={(elemento) => { inputFotos.current = elemento; field.ref(elemento); }}
-        id="objeto-fotos"
+        id={id}
         type="file"
         accept="image/*,.heic,.heif"
-        multiple
+        multiple={max > 1}
         className="sr-only"
         onChange={agregarFotos}
         onBlur={field.onBlur}
@@ -119,7 +119,7 @@ export default function CargaImagenes({field, fieldState, max}){
           )}
         </AttachmentGroup>
       </div>
-      <FieldDescription>Al menos una foto. JPG, PNG, WEBP o HEIC, de hasta {max} MB cada una.</FieldDescription>
+      <FieldDescription>{descripcion ?? `Al menos una foto. JPG, PNG, WEBP o HEIC, de hasta ${max} MB cada una.`}</FieldDescription>
       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
     </Field>
   );
