@@ -119,9 +119,10 @@ export async function verificarTokenCambioClaveEncargado(token){
     const encargado = await buscarPorRut(data.rut);
     if(!encargado)
         return false;
-    const fechaEmision = data.iat*1000;
+    const fechaEmisionToken = data.iat*1000;
+    const fechaCambioClave = Math.floor(encargado.fechaCambioClave.getTime() / 1000);
     if(
-        encargado.fechaCambioClave.getTime() >= fechaEmision ||
+        fechaCambioClave > fechaEmisionToken ||
         (encargado.idEstado === 2 && data.tipo !== "creacion") ||
         (encargado.idEstado === 1 && data.tipo !== "restablecimiento") ||
         encargado.idEstado === 3

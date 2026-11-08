@@ -35,10 +35,13 @@ export function buscarPorRut(rut,include=undefined){
  * @returns 
  */
 export async function crear(data){
-    const {clave, ...encargado} = await prisma.encargadoOficina.create({
+    const encargado = await prisma.encargadoOficina.create({
         data: {
             ...data,
             clave: "000000" //clave por defecto, no se puede iniciar sesión por estado "Pendiente"
+        },
+        omit: {
+            clave: true
         }
     });
     const token = crearTokenCreacionClaveEncargado(encargado.rut);
