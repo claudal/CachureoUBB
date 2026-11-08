@@ -1,12 +1,69 @@
-import { PlusIcon } from 'lucide-react';
+import { BuildingIcon, GhostIcon, IdCardIcon, MailIcon, PenIcon, PlusIcon, RotateCwClockIcon, SendIcon, SmileIcon, TrashIcon, UserMinus, UserPlus } from 'lucide-react';
 import { Button } from '../components/ui/button.js'
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import Selector from '../components/Selector.jsx';
 import { listar } from '../services/campusService.js';
+import * as encargadoOficinaService from '../services/encargadoOficinaService.js';
+import { useFetch } from '../hooks/useFetch.js';
+import { useState } from 'react';
+import { ItemCargando } from '../components/ui/item-cargando.jsx';
+import { ItemSinDatos } from '../components/ui/item-sin-datos.jsx';
+
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../components/ui/card.js';
+import { Badge } from '../components/ui/badge.js'
+import {} from 'lucide-react';
+import { useNotify } from '../hooks/useNotify.js';
+import { Paginacion } from '../components/ui/paginacion.jsx';
+
+const filtroDefecto = {
+  cantidad: 15,
+  salto: 0
+}
 
 export default function AdministrarEncargadosPage() { //TODO: listado encargado, buscar encargado, mostrar encargado, editar encargado, eliminar encargado
   const {campusSeleccionado, setCampusSeleccionado} = useOutletContext();
   const navigate = useNavigate();
+  const [filtros, setFiltros] = useState(filtroDefecto);
+  const encargados = useFetch(()=>encargadoOficinaService.listar(filtros),[filtros],[]);
+  const [enviandoCorreo,setEnviandoCorreo] = useState(false);
+  const notificacion = useNotify();
+
+  async function onReenviarCorreo(encargado){
+    setEnviandoCorreo(true);
+      try {
+        await encargadoOficinaService.reenviarCorreoCreacion(encargado.rut);
+        notificacion.exito("Se reenvió el correo de creación exitosamente");
+      }catch(err){
+        notificacion.error("Hubo un error al reenviar el correo de creación. Inténtelo más tarde.");
+      }
+    setEnviandoCorreo(false);
+  };
+
+  async function onEliminar(encargado) { //TODO
+    
+  }
+
+  async function onCambiarEstado(encargado) { //TODO
+    
+  }
+
+  function onEditar(encargado) { //TODO
+
+  }
+
+
+  function onSaltoAvanzar(){
+    setFiltros({
+      ...filtros,
+      salto: filtros.salto+filtros.cantidad
+    })
+  }
+  function onSaltoRetroceder(){
+    setFiltros({
+      ...filtros,
+      salto: filtros.salto-filtros.cantidad
+    })
+  }
 
   return (
     <div>
@@ -31,6 +88,131 @@ export default function AdministrarEncargadosPage() { //TODO: listado encargado,
             <PlusIcon /> Crear encargado de oficina
           </Button>
         </header>
+        { encargados.cargando ? (
+            <div className='align-middle justify-items-center'>
+              <ItemCargando className="max-w-100" texto='Cargando encargados de oficina...' />
+            </div>
+          ) : (
+            encargados.datos.length > 0 ? ( 
+              <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
+                {encargados.datos.map((encargado)=>{
+                  return (
+                    <Card key={encargado.rut} size="default" className="hover:shadow-md transition-shadow flex flex-col justify-between">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <CardTitle className="text-lg font-semibold leading-tight">
+                                {encargado.nombre}
+                              </CardTitle>
+                              {
+                                encargado.idEstado === 1 && (
+                                  <Badge variant="outline" className="flex items-center gap-1 shrink-0">
+                                    <SmileIcon className="h-3.5 w-3.5" />
+                                    <span>{encargado.estado.nombre}</span>
+                                  </Badge>
+                                )
+                              }
+                              {
+                                encargado.idEstado === 2 && (
+                                  <Badge variant="outline" className="flex items-center gap-1 shrink-0">
+                                    <RotateCwClockIcon className="h-3.5 w-3.5" />
+                                    <span>{encargado.estado.nombre}</span>
+                                  </Badge>
+                                )
+                              }
+                              {
+                                encargado.idEstado === 3 && (
+                                  <Badge variant="destructive" className="flex items-center gap-1 shrink-0">
+                                    <GhostIcon className="h-3.5 w-3.5" />
+                                    <span>{encargado.estado.nombre}</span>
+                                  </Badge>
+                                )
+                              }
+                            </div>
+                          </CardHeader>
+
+                          <CardContent className="space-y-2 text-sm text-muted-foreground flex-1">
+                            <div className="flex items-center gap-2">
+                              <IdCardIcon className="h-4 w-4 shrink-0" />
+                              <span>{encargado.rut}</span>
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                              <MailIcon className="h-4 w-4 shrink-0" />
+                              <span className="truncate">{encargado.correoContacto || 'Sin correo registrado'}</span>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <BuildingIcon className="h-4 w-4 shrink-0" />
+                              <span>{encargado.oficina?.nombre}</span>
+                            </div>
+                          </CardContent>
+
+                          <CardFooter className="flex-col gap-2">
+                            <Button 
+                              variant="outline" 
+                              className="w-full"
+                              onClick={() => onEditar(encargado)}
+                            >
+                              <PenIcon />Editar
+                            </Button>
+                            {encargado.idEstado === 2 && (
+                              <Button 
+                                variant="destructive" 
+                                className="w-full"
+                                onClick={() => onEliminar(encargado)}
+                              >
+                                <TrashIcon />Eliminar
+                              </Button>
+                            )}
+                            {encargado.idEstado === 1 && (
+                              <Button 
+                                variant="destructive" 
+                                className="w-full"
+                                onClick={() => onCambiarEstado(encargado, 3)}
+                              >
+                                <UserMinus />Deshabilitar
+                              </Button>
+                            )}
+                            {encargado.idEstado === 3 && (
+                              <Button 
+                                variant="default" 
+                                className="w-full"
+                                onClick={() => onCambiarEstado(encargado, 1)}
+                              >
+                                <UserPlus />Habilitar
+                              </Button>
+                            )}
+
+                            {encargado.idEstado === 2 && !encargado.correoReenviado && (
+                              <Button 
+                                variant="secondary" 
+                                className="w-full"
+                                onClick={() => onReenviarCorreo(encargado)}
+                                disabled={enviandoCorreo}
+                              >
+                                <SendIcon />Reenviar correo de creación
+                              </Button>
+                            )}
+                          </CardFooter>
+                        </Card>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className='align-middle justify-items-center'>
+                <ItemSinDatos className="max-w-100"/>
+              </div>
+            )
+          )
+        }
+        <div className='align-middle justify-items-center py-6 pb-24'>
+          <Paginacion 
+            disabledBack={encargados.cargando || filtros.salto === 0}
+            onBack={onSaltoRetroceder}
+            disabledFoward={encargados.cargando || encargados.datos.length === 0}
+            onFoward={onSaltoAvanzar}
+          />
+        </div>
       </div>
     </div>
   )
@@ -218,53 +400,7 @@ export default function AdministrarEncargadosPage() { //TODO: listado encargado,
             </Button>
           </div>
         </header>
-        { alertas.cargando ? (
-            <div className='align-middle justify-items-center'>
-              <ItemCargando className="max-w-100" texto='Cargando alertas...' />
-            </div>
-          ) : (
-            alertas.datos.length > 0 ? ( 
-              <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
-                {alertas.datos.map((alerta)=>{
-                  return (
-                      <Card key={alerta.id} size="default" className='cursor-pointer hover:shadow-md transition-shadow' onClick={()=>abrirAlerta(alerta)}>
-                        <CardHeader>
-                          <CardTitle>
-                            {alerta.nombre}
-                            <div className='p-1'>
-                              {alerta.leida ? 
-                                (<Badge variant="secondary" className='p-1'><EyeIcon/>Leída</Badge>) : 
-                                (alerta.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
-                              }
-                              {alerta.marcada ? 
-                                (<Badge variant="secondary"className='p-1'><BookmarkIcon/>Marcada</Badge>) : 
-                                (alerta.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
-                              }
-                            </div>
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <CardDescription>{alerta.descripcion.length > LARGO_MAXIMO_DESCRIPCION_ALERTA ? 
-                            `${alerta.descripcion.substring(0,LARGO_MAXIMO_DESCRIPCION_ALERTA)}...` : 
-                            alerta.descripcion
-                          }</CardDescription>
-                        </CardContent>
-                        <CardFooter className="flex flex-wrap gap-1">
-                          {alerta.etiquetas?.map((etiqueta)=>(
-                            <Badge variant={'default'}  key={`${alerta.id}-${etiqueta.id}`}>{etiqueta.nombre}</Badge>
-                          ))}
-                        </CardFooter>
-                      </Card>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className='align-middle justify-items-center'>
-                <ItemSinDatos className="max-w-100"/>
-              </div>
-            )
-          )
-        }
+        
       </div>
     </div>
   )
