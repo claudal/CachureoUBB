@@ -97,18 +97,22 @@ export function EnviarCorreoRestablecimiento() {
               </DialogTitle>
               <DialogDescription className="pt-2 text-left space-y-2">
                 <span>
-                  Si ya no tiene acceso a su correo registrado, comuníquese directamente con el administrador del sistema al correo:
+                  Si ya no tiene acceso a su correo de contacto, comuníquese directamente con el administrador del sistema al correo:
                 </span>
                 <strong className="block text-foreground font-medium text-base bg-muted p-2 rounded-md break-all">
                   {contacto.correo}
                 </strong>
                 <span>
-                  Solicite la actualización de su dirección de correo. Una vez actualizada, podrá volver a solicitar el restablecimiento de su contraseña.
+                  Solicite la actualización de su correo de contacto. Una vez actualizado, podrá volver a solicitar el restablecimiento de su contraseña.
                 </span>
               </DialogDescription>
             </DialogHeader>
 
             <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2 pt-4 border-t">
+              <DialogClose render={
+                <Button variant="outline">Cerrar</Button>
+              }>
+              </DialogClose>
               <Button 
                 variant="ghost" 
                 size="sm"
@@ -118,10 +122,6 @@ export function EnviarCorreoRestablecimiento() {
                 <ArrowLeftIcon className="h-4 w-4" />
                 Volver
               </Button>
-              <DialogClose render={
-                <Button variant="outline">Cerrar</Button>
-              }>
-              </DialogClose>
             </DialogFooter>
           </>
         ) : (
@@ -130,7 +130,7 @@ export function EnviarCorreoRestablecimiento() {
             <DialogHeader>
               <DialogTitle>Restablecer contraseña</DialogTitle>
               <DialogDescription>
-                Ingrese el RUT de su usuario. Si está registrado, le enviaremos un enlace a su correo de contacto para crear una nueva clave.
+                Ingrese el rut de su usuario. Si está registrado, le enviaremos un enlace a su correo de contacto para crear una nueva contraseña.
               </DialogDescription>
             </DialogHeader>
 
@@ -157,7 +157,7 @@ export function EnviarCorreoRestablecimiento() {
                 <div className="min-w-0 flex-1">
                   <AlertTitle className="font-semibold text-green-800 dark:text-green-200">¡Petición enviada!</AlertTitle>
                   <AlertDescription className="break-words text-sm">
-                    Si el RUT ingresado corresponde a un usuario registrado, se ha enviado un correo con las instrucciones necesarias.
+                    Si el rut ingresado corresponde a un usuario registrado, entonces se ha enviado un correo con las instrucciones necesarias.
                   </AlertDescription>
                 </div>
               </Alert>
@@ -171,7 +171,7 @@ export function EnviarCorreoRestablecimiento() {
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor="form-restablecimiento-rut">
-                          RUT del Encargado
+                          Rut
                         </FieldLabel>
                         <Input
                           {...field}
