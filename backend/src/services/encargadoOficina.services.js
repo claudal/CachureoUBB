@@ -1,4 +1,7 @@
 import { prisma } from "../config/prisma.js";
+import { encriptarClave } from "../utils/autenticacion.utils.js";
+import { crearTokenCreacionClaveEncargado } from "./autenticacion.services.js";
+import { enviarCorreoCreacionEncargado } from "./email.services.js";
 
 /**
  * 
@@ -16,13 +19,22 @@ export function buscarPorRut(rut,include=undefined){
  * @returns 
  */
 export async function crear(data){
-    const {clave, ...encargado} = prisma.encargadoOficina.create({
+    const {clave, ...encargado} = await prisma.encargadoOficina.create({
         data: {
             ...data,
-            clave: generarClaveDefecto(data.rut)
+            clave: "000000" //clave por defecto, no se puede iniciar sesión por estado "Pendiente"
         }
     });
-    return encargado;
+    const token = crearTokenCreacionClaveEncargado(encargado.rut);
+    let correoEnviado;
+    try {
+        await enviarCorreoCreacionEncargado(encargado.correoContacto,encargado.nombre,token);
+        correoEnviado = true;
+    } catch(e) {
+        correoEnviado = false;
+        console.error(e);
+    }
+    return {encargado,correoEnviado};
 }
 
 function generarClaveDefecto(rut){
