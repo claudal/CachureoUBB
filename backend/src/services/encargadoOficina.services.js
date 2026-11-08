@@ -53,6 +53,17 @@ export async function crear(data){
     return {encargado,correoEnviado};
 }
 
-function generarClaveDefecto(rut){
-    return rut.substring(2,8);
+export async function cambiarClave(rut, claveNueva){
+    await prisma.encargadoOficina.update({
+        where:{
+            rut
+        },
+        data: {
+            idEstado: 1,
+            fechaCambioClave: new Date(),
+            clave: {
+                set: encriptarClave(claveNueva)
+            }
+        }
+    });
 }

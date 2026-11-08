@@ -11,3 +11,7 @@ export function loginAdministrador(credenciales){
 export function getPerfil(){
     return api.get('/autenticacion/perfil/');
 }
+
+export function restablecerClave(data){
+    return api.post('/autenticacion/restablecerClave/',data);
+}

@@ -102,3 +102,30 @@ function generarTokenEncargado(rut, tipo, expiresIn) {
 export function crearTokenCreacionClaveEncargado(rut) {
   return generarTokenEncargado(rut, 'creacion', PASSWORD_SET_TIME);
 }
+
+export function crearTokenRestablecimientoClaveEncargado(rut) {
+  return generarTokenEncargado(rut, 'restablecimiento', PASSWORD_RESET_TIME);
+}
+
+export async function verificarTokenCambioClaveEncargado(token){
+    let data;
+    try {
+        data = jwt.verify(token, process.env.JWT_SECRET);
+    } catch(e) {
+        return false;
+    }
+    if(!data.rut)
+        return false;
+    const encargado = await buscarPorRut(data.rut);
+    if(!encargado)
+        return false;
+    const fechaEmision = data.iat*1000;
+    if(
+        encargado.fechaCambioClave.getTime() >= fechaEmision ||
+        (encargado.idEstado === 2 && data.tipo !== "creacion") ||
+        (encargado.idEstado === 1 && data.tipo !== "restablecimiento") ||
+        encargado.idEstado === 3
+    )
+        return false;
+    return encargado;
+}
