@@ -64,7 +64,7 @@ function MiniaturaFoto({ archivo, onQuitar, onClick }) {
   );
 }
 
-export default function CargaImagenes({field, fieldState, max}){
+export default function CargaImagenes({field, fieldState, max, id = "objeto-fotos", etiqueta = "Fotos", descripcion}){
   const inputFotos = useRef(null);
 
   function agregarFotos(evento) {

@@ -48,7 +48,7 @@ const defaultValues = {
  *   onEntregado?: (entrega: object) => void
  * }} props
  */
-export default function ModalRegistrarEntrega({ objeto, open, onOpenChange, onEntregado }) {
+export default function RegistrarEntrega({ objeto, open, onOpenChange, onEntregado }) {
   const notification = useNotify();
   const [apiError, setApiError] = useState(null);
   // datos ya validados que esperan la confirmacion del encargado
