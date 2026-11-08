@@ -23,126 +23,213 @@ import {
 } from "../components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert"
-import { AlertCircleIcon, CheckCircle2Icon, CheckIcon, Loader2Icon, ShieldIcon } from 'lucide-react';
+import { AlertCircleIcon, ArrowLeftIcon, CheckCircle2Icon, MailWarningIcon, ShieldIcon } from 'lucide-react';
 import { enviarCorreoRestablecimientoClave } from '../services/encargadoOficinaService.js';
+import { buscarContacto } from '../services/administradorService.js';
 
-function EnviarCorreoReestablecimiento(){
+export function EnviarCorreoRestablecimiento() {
+  const [open, setOpen] = useState(false);
+  const [exito, setExito] = useState(false);
+  const [apiError, setApiError] = useState(null);
+  const [contacto, setContacto] = useState(null);
+  const [cargandoContacto, setCargandoContacto] = useState(false);
 
-    const formulario = useForm({
-        resolver: zodResolver(RutRestablecimientoSchema),
-        defaultValues: {
-            rut: ""
-        }
-    });
+  const formulario = useForm({
+    resolver: zodResolver(RutRestablecimientoSchema),
+    defaultValues: { rut: '' }
+  });
 
-    const [exito,setExito] = useState(false);
-    const [cargando,setCargando] = useState(false);
-    const [apiError,setApiError] = useState(false);
-
-    async function onSubmit(data){
-        setExito(false);
-        setApiError(false);
-        try {
-            await enviarCorreoRestablecimientoClave(data.rut);
-            setExito(true);
-        } catch(err) {
-            setApiError(err.message);
-        }
+  // Limpia el estado completo cuando el diálogo se abre o cierra
+  const handleOpenChange = (nuevoEstado) => {
+    setOpen(nuevoEstado);
+    if (!nuevoEstado) {
+      formulario.reset();
+      setExito(false);
+      setApiError(null);
+      setContacto(null);
+      setCargandoContacto(false);
     }
+  };
 
-    return (
-        <Dialog>
-        <DialogTrigger render={
-            <Button variant="link" className="p-0 h-auto font-normal text-muted-foreground hover:text-primary">
-            ¿Se le olvidó su contraseña?
-            </Button>} />
+  async function onClickContacto() {
+    setApiError(null);
+    setExito(false);
+    setCargandoContacto(true);
+    try {
+      const data = await buscarContacto();
+      setContacto(data);
+    } catch (err) {
+      setApiError(err.message || 'No se pudo obtener la información de contacto');
+    } finally {
+      setCargandoContacto(false);
+    }
+  }
 
-        <DialogContent className="sm:max-w-md">
+  async function onSubmit(data) {
+    setExito(false);
+    setApiError(null);
+    try {
+      await enviarCorreoRestablecimientoClave(data.rut);
+      setExito(true);
+    } catch (err) {
+      setApiError(err.message || 'Ocurrió un error al procesar la solicitud');
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger render={
+        <Button variant="link" className="p-0 h-auto font-normal text-muted-foreground hover:text-primary">
+          ¿Se le olvidó su contraseña?
+        </Button>
+      }>
+        
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-md w-[90vw] max-w-md overflow-hidden">
+        {contacto ? (
+          /* VISTA: INFORMACIÓN DE CONTACTO */
+          <>
             <DialogHeader>
-            <DialogTitle>Restablecer contraseña</DialogTitle>
-            <DialogDescription>
-                Ingrese el RUT de su usuario. Si está registrado, le enviaremos un enlace a su correo de contacto para crear una nueva clave.
-            </DialogDescription>
+              <DialogTitle className="flex items-center gap-2">
+                <MailWarningIcon className="h-5 w-5 text-amber-500 shrink-0" />
+                Contacto con el administrador
+              </DialogTitle>
+              <DialogDescription className="pt-2 text-left space-y-2">
+                <span>
+                  Si ya no tiene acceso a su correo registrado, comuníquese directamente con el administrador del sistema al correo:
+                </span>
+                <strong className="block text-foreground font-medium text-base bg-muted p-2 rounded-md break-all">
+                  {contacto.correo}
+                </strong>
+                <span>
+                  Solicite la actualización de su dirección de correo. Una vez actualizada, podrá volver a solicitar el restablecimiento de su contraseña.
+                </span>
+              </DialogDescription>
             </DialogHeader>
 
-            {/* Mensaje de Error Global de la API */}
+            <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between gap-2 pt-4 border-t">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setContacto(null)}
+                className="gap-1"
+              >
+                <ArrowLeftIcon className="h-4 w-4" />
+                Volver
+              </Button>
+              <DialogClose render={
+                <Button variant="outline">Cerrar</Button>
+              }>
+              </DialogClose>
+            </DialogFooter>
+          </>
+        ) : (
+          /* VISTA: FORMULARIO PRINCIPAL DE RESTABLECIMIENTO */
+          <>
+            <DialogHeader>
+              <DialogTitle>Restablecer contraseña</DialogTitle>
+              <DialogDescription>
+                Ingrese el RUT de su usuario. Si está registrado, le enviaremos un enlace a su correo de contacto para crear una nueva clave.
+              </DialogDescription>
+            </DialogHeader>
+
+            {/* Alerta de Error API */}
             {apiError && (
-                <Alert variant="destructive" className="my-2 w-full max-w-full overflow-hidden wrap-break-word">
-                    <AlertCircleIcon className="h-4 w-4 shrink-0" />
-                    <div className="min-w-0 flex-1">
-                        <AlertTitle>Error al solicitar el reestablecimiento</AlertTitle>
-                        <AlertDescription className="wrap-break-word text-sm">
-                            {apiError}
-                        </AlertDescription>
-                    </div>
-                </Alert>
+              <Alert variant="destructive" className="my-2 w-full max-w-full overflow-hidden break-words">
+                <AlertCircleIcon className="h-4 w-4 shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <AlertTitle>Error al solicitar el restablecimiento</AlertTitle>
+                  <AlertDescription className="break-words text-sm">
+                    {apiError}
+                  </AlertDescription>
+                </div>
+              </Alert>
             )}
 
-            {/* Estado de Éxito */}
+            {/* Mensaje de Éxito */}
             {exito ? (
-            <Alert variant="default" className="border-green-500/50 bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-300 my-2">
-                <CheckCircle2Icon className="h-4 w-4 text-green-600 dark:text-green-400" />
-                <AlertTitle className="font-semibold text-green-800 dark:text-green-200">¡Petición enviada!</AlertTitle>
-                <AlertDescription>
-                Si el RUT ingresado corresponde a un usuario registrado, se ha enviado un correo con las instrucciones necesarias.
-                </AlertDescription>
-            </Alert>
+              <Alert 
+                variant="default" 
+                className="my-2 w-full max-w-full overflow-hidden break-words border-green-500/50 bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-300"
+              >
+                <CheckCircle2Icon className="h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
+                <div className="min-w-0 flex-1">
+                  <AlertTitle className="font-semibold text-green-800 dark:text-green-200">¡Petición enviada!</AlertTitle>
+                  <AlertDescription className="break-words text-sm">
+                    Si el RUT ingresado corresponde a un usuario registrado, se ha enviado un correo con las instrucciones necesarias.
+                  </AlertDescription>
+                </div>
+              </Alert>
             ) : (
-            /* Formulario estándar */
-            <form id="form-restablecimiento" onSubmit={formulario.handleSubmit(onSubmit)} className="space-y-4 py-2">
+              /* Formulario */
+              <form id="form-restablecimiento" onSubmit={formulario.handleSubmit(onSubmit)} className="space-y-4 py-2">
                 <FieldGroup>
-                <Controller
+                  <Controller
                     name="rut"
                     control={formulario.control}
                     render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
+                      <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor="form-restablecimiento-rut">
-                        RUT del Encargado
+                          RUT del Encargado
                         </FieldLabel>
                         <Input
-                        {...field}
-                        id="form-restablecimiento-rut"
-                        aria-invalid={fieldState.invalid}
-                        placeholder="11.111.111-1"
-                        autoComplete="username"
-                        disabled={formulario.formState.isSubmitting}
+                          {...field}
+                          id="form-restablecimiento-rut"
+                          aria-invalid={fieldState.invalid}
+                          placeholder="11.111.111-1"
+                          autoComplete="username"
+                          disabled={formulario.formState.isSubmitting}
                         />
                         {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
+                          <FieldError errors={[fieldState.error]} />
                         )}
-                    </Field>
+                      </Field>
                     )}
-                />
+                  />
                 </FieldGroup>
-            </form>
+
+                {/* Enlace alternativo para contacto con administrador (menos invasivo) */}
+                <div className="text-xs text-right">
+                  <button
+                    type="button"
+                    onClick={onClickContacto}
+                    disabled={formulario.formState.isSubmitting || cargandoContacto}
+                    className="text-muted-foreground underline hover:text-foreground transition-colors inline-flex items-center gap-1"
+                  >
+                    ¿No tiene acceso a su correo?
+                  </button>
+                </div>
+              </form>
             )}
 
             <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
-            <DialogClose render={
+              <DialogClose render={
                 <Button variant="outline" type="button">
-                    {exito ? 'Cerrar' : 'Cancelar'}
+                  {exito ? 'Cerrar' : 'Cancelar'}
                 </Button>
-            }>
-                
-            </DialogClose>
+              }>
+              </DialogClose>
 
-            {!exito && (
+              {!exito && (
                 <Button
-                type="submit"
-                form="form-restablecimiento"
-                disabled={formulario.formState.isSubmitting}
+                  type="submit"
+                  form="form-restablecimiento"
+                  disabled={formulario.formState.isSubmitting}
                 >
-                {formulario.formState.isSubmitting ? (
+                  {formulario.formState.isSubmitting ? (
                     'Enviando...'
-                ) : (
+                  ) : (
                     'Enviar solicitud'
-                )}
+                  )}
                 </Button>
-            )}
+              )}
             </DialogFooter>
-        </DialogContent>
-        </Dialog>
-    )
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 export default function LoginEncargadoPage() {
@@ -239,7 +326,7 @@ export default function LoginEncargadoPage() {
                     >
                     {formulario.formState.isSubmitting ? "Ingresando..." : "Ingresar"}
                     </Button>
-                    <EnviarCorreoReestablecimiento />
+                    <EnviarCorreoRestablecimiento />
                     {/* Divisor con texto */}
                     <div className="relative w-full my-1">
                         <div className="absolute inset-0 flex items-center">
