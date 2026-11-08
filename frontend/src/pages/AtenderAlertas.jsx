@@ -81,7 +81,7 @@ function FormularioSolicitud({alerta,onSend}){
             className="w-full sm:w-auto"
             disabled={formulario.formState.isSubmitting}
           >
-            {formulario.formState.isSubmitting ? 'Enviando reunión...' : 'Enviar reunion'}<SendHorizontalIcon />
+            {formulario.formState.isSubmitting ? 'Enviando solicitud...' : 'Enviar solicitud'}<SendHorizontalIcon />
           </Button>}
       closeButton={<Button variant="outline">Cerrar<ArrowRightCircleIcon/></Button>}
     >
