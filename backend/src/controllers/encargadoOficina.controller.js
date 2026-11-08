@@ -4,7 +4,6 @@ import { buscarPorRut, crear, listar } from '../services/encargadoOficina.servic
 
 export const getEncargados = async (req, res, next) => {
   try {
-    console.log(req.vQuery)
     res.json(await listar(req.vQuery));
   } catch (error) {
     next(error);

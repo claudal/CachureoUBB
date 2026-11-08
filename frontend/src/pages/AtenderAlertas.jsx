@@ -235,8 +235,6 @@ export default function AtenderAlertasPage() {
   const [filtros, setFiltros] = useState(filtroAlerta);
   const alertas = useFetch(()=>alertaBusquedaService.listar(filtros),[filtros],[]);
 
-  console.log(alertas)
-
   const onSubmitFiltros = (data) => {
     data.marcado = filtros.marcado;
     data.idEstado = 1;
