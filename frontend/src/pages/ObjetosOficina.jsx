@@ -3,7 +3,7 @@ import { useFetch } from '../hooks/useFetch.js';
 import { useState } from 'react';
 import { Controller } from 'react-hook-form';
 
-import { ArrowRightCircleIcon, CircleCheckIcon, GemIcon, GhostIcon, PackageSearchIcon, PenIcon, PlusIcon, SearchIcon } from 'lucide-react';
+import { ArrowRightCircleIcon, CircleCheckIcon, GemIcon, GhostIcon, PackageCheckIcon, PackageSearchIcon, PenIcon, PlusIcon, SearchIcon } from 'lucide-react';
 
 import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
@@ -24,6 +24,8 @@ import { DatePicker } from '../components/ui/date-picker.jsx';
 import { useNavigate } from 'react-router-dom';
 import { BotonEliminar } from '../components/ui/dialogo-eliminar.jsx';
 import { useNotify } from '../hooks/useNotify.js';
+import RegistrarEntrega from '../components/RegistrarEntrega.jsx';
+import DetalleEntrega from '../components/DetalleEntrega.jsx';
 
 const filtroEtiqueta = {}
 const filtroBase = {
@@ -59,6 +61,8 @@ export default function ObjetosOficinaPage() {
   
   const [objetoAbierto, setObjetoAbierto] = useState(null);
   const [eliminando, setEliminando] = useState(false);
+  // el formulario de entrega se abre sobre el detalle del objeto
+  const [entregando, setEntregando] = useState(false);
 
   async function abrirObjeto(objeto){
     setObjetoAbierto(objeto);
@@ -80,6 +84,12 @@ export default function ObjetosOficinaPage() {
 
   async function cerrarObjeto(){
     setObjetoAbierto(null);
+  }
+
+  // tras entregar se cierra el detalle y se recarga la lista, el objeto ya no esta "Sin entrega"
+  function objetoEntregado(){
+    setObjetoAbierto(null);
+    objetos.recargar();
   }
 
   return (
@@ -215,14 +225,20 @@ export default function ObjetosOficinaPage() {
                 ))}
               </div>
             </DrawerHeader>
-            <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2">
+            {/* con datos de entrega el contenido puede no caber, por eso hace scroll */}
+            <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2 overflow-y-auto">
               
               <span className="font-semibold text-sm text-foreground">
                 Fotos <span className='font-light text-muted-foreground'>(presione en una para expandirlo)</span>
               </span>
               <CarruselImagenes fotos={objetoAbierto?.fotos} swipeDirection={'left'} />
 
-              <div className="flex-1 min-h-0 flex flex-col gap-1.5">
+              {/* solo los objetos entregados traen entrega */}
+              <div className="shrink-0">
+                <DetalleEntrega entrega={objetoAbierto?.entrega} />
+              </div>
+
+              <div className="flex-1 min-h-32 flex flex-col gap-1.5">
                 <span className="font-semibold text-sm text-foreground">
                   Descripción:
                 </span>
@@ -237,6 +253,9 @@ export default function ObjetosOficinaPage() {
             </div>
             {objetoAbierto?.idEstado === 1 ? (
               <DrawerFooter>
+                <Button onClick={()=>setEntregando(true)} disabled={eliminando}>
+                  Entregar<PackageCheckIcon/>
+                </Button>
                 <Button variant="outline" onClick={()=>navigate(`editarObjeto/${objetoAbierto.id}`)} disabled={eliminando}>
                   Editar<PenIcon/>
                 </Button>
@@ -254,6 +273,12 @@ export default function ObjetosOficinaPage() {
               )}
         </DrawerContent>
       </Drawer>
+      <RegistrarEntrega
+        objeto={objetoAbierto}
+        open={entregando}
+        onOpenChange={setEntregando}
+        onEntregado={objetoEntregado}
+      />
       <div>
         <header className="flex flex-col gap-4 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -299,6 +324,11 @@ export default function ObjetosOficinaPage() {
                         </CardTitle>
                         <CardDescription>
                           Registrado el {new Date(objeto.fechaIngreso).toLocaleString(undefined,{dateStyle: "medium", timeStyle: 'short'})}
+                          {objeto.entrega && (
+                            <span className="block">
+                              Entregado el {new Date(objeto.entrega.fechaEntrega).toLocaleString(undefined,{dateStyle: "medium", timeStyle: 'short'})}
+                            </span>
+                          )}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="flex flex-col gap-2">
