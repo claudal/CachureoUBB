@@ -88,10 +88,29 @@ export async function postAlertaBusqueda(req, res, next) {
 }
 
 /**
- * 
- * @param {import("express").Request} req 
- * @param {import("express").Response} res 
- * @param {import("express").NextFunction} next 
+ * Edita una alerta abierta (solo descripcion y fotos nuevas).
+ * Espera multipart/form-data con descripcion y fotos[].
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+export async function putAlertaBusqueda(req, res, next) {
+  try {
+    return res.json(await services.actualizar(req.params.id, {
+      descripcion: req.body.descripcion,
+      urlsFotosNuevas: req.files?.map((archivo) => archivo.filename) || []
+    }));
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
  */
 export async function getAlertaBusqueda(req, res, next) {
     try {
