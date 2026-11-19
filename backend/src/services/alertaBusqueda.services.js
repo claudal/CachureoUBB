@@ -70,6 +70,9 @@ export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
             ...restoAlerta,
             leida: alertasLeidas.length > 0,
             marcada: marcadores.length > 0,
+            // el encargado solo puede marcar una alerta tras abrirla (queda leida), y el unico
+            // evento que borra esa lectura es la edicion del buscador (ver actualizar)
+            modificada: marcadores.length > 0 && alertasLeidas.length === 0,
             etiquetas: etiquetas.map((e)=> e.etiqueta),
             fotos: fotos.map((e)=> e.foto)
         }
