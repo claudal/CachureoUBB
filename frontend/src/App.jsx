@@ -40,7 +40,9 @@ function App() {
               <Route
               path="crear"
               element={<CrearAlertaPage />} />
-               {/* TODO: crear redirección a editar alerta, se reutiliza la página de CrearAlerta con otra ruta y la ID de la alerta */}
+              <Route
+              path="editar/:id"
+              element={<CrearAlertaPage />} />
             </Route>
           </Route>
           <Route path='/menuOficina' element={
