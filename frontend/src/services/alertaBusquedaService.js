@@ -45,6 +45,22 @@ export function crear({ nombre, descripcion, etiquetas, fotos, idCampus }){
 }
 
 /**
+ * Edita una alerta abierta: solo cambia la descripción y agrega fotos nuevas.
+ * De `fotos` solo se envían los archivos nuevos (File); las fotos que ya tiene la alerta se ignoran.
+ * @param {string} idAlerta
+ * @param {{descripcion: string, fotos?: Array<File|{id: number, url: string}>}} datos
+ */
+export function actualizar(idAlerta, { descripcion, fotos = [] }){
+    const formData = new FormData();
+    formData.append('descripcion', descripcion);
+    fotos.forEach((foto) => {
+        if(foto instanceof File)
+            formData.append('fotos', conTipoHeic(foto));
+    });
+    return api.putForm(`/alertasBusqueda/${idAlerta}`, formData);
+}
+
+/**
  * Crea una alerta de búsqueda
  * @param {{nombre: string, descripcion: string, etiquetas: number[], fotos: File[]}} datos
  */

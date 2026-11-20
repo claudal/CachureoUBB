@@ -1,4 +1,6 @@
 import { prisma } from "../config/prisma.js";
+import { ESTADO_ALERTA } from "../config/estados.js";
+import { MAXIMO_FOTOS } from "../config/upload.js";
 
 export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
     // sin sede, Prisma ignoraría el filtro y devolvería alertas de todas las sedes
@@ -68,6 +70,9 @@ export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
             ...restoAlerta,
             leida: alertasLeidas.length > 0,
             marcada: marcadores.length > 0,
+            // el encargado solo puede marcar una alerta tras abrirla (queda leida), y el unico
+            // evento que borra esa lectura es la edicion del buscador (ver actualizar)
+            modificada: marcadores.length > 0 && alertasLeidas.length === 0,
             etiquetas: etiquetas.map((e)=> e.etiqueta),
             fotos: fotos.map((e)=> e.foto)
         }
@@ -106,9 +111,64 @@ export async function crear({ nombre, descripcion, idsEtiquetas, urlsFotos, idCa
 }
 
 /**
- * 
+ * Edita una alerta abierta: solo cambia la descripcion y agrega fotos nuevas.
+ * Actualiza la fecha de edicion y la deja como no leida para todos los encargados.
+ *
+ * @param {string} idAlerta
+ * @param {{descripcion: string, urlsFotosNuevas?: string[]}} datos
+ */
+export async function actualizar(idAlerta, { descripcion, urlsFotosNuevas = [] }) {
+    return prisma.$transaction(async (tx) => {
+        const alerta = await tx.alertaBusqueda.findUniqueOrThrow({
+            where: { id: idAlerta },
+            include: { _count: { select: { fotos: true } } }
+        });
+
+        if (alerta.idEstado !== ESTADO_ALERTA.ABIERTO) {
+            const err = new Error("Solo se pueden editar alertas en estado Abierta");
+            err.statusCode = 409;
+            throw err;
+        }
+
+        if (alerta._count.fotos + urlsFotosNuevas.length > MAXIMO_FOTOS) {
+            const err = new Error("Error en las fotos enviadas");
+            err.statusCode = 400;
+            err.detalles = [{
+                campo: "fotos",
+                mensaje: `La alerta puede tener como máximo ${MAXIMO_FOTOS} fotos (tiene ${alerta._count.fotos})`
+            }];
+            throw err;
+        }
+
+        if (descripcion === alerta.descripcion && urlsFotosNuevas.length === 0) {
+            const err = new Error("No se detectaron cambios en la alerta");
+            err.statusCode = 400;
+            throw err;
+        }
+
+        // se fija la fecha a mano: Prisma no siempre actualiza @updatedAt si solo cambian relaciones
+        const actualizada = await tx.alertaBusqueda.update({
+            where: { id: idAlerta },
+            data: {
+                descripcion,
+                fechaEdicion: new Date(),
+                fotos: {
+                    create: urlsFotosNuevas.map((url) => ({ foto: { create: { url } } }))
+                }
+            }
+        });
+
+        // vuelve a aparecer como no leida para los encargados de oficina
+        await tx.alertaLeida.deleteMany({ where: { idAlerta } });
+
+        return { idAlerta: actualizada.id, fechaEdicion: actualizada.fechaEdicion };
+    });
+}
+
+/**
+ *
  * @param {import("@prisma/client").AlertaBusqueda.idAlerta} idAlerta
- * @returns 
+ * @returns
  */
 export async function buscarPorIdEncargado(id_alerta,rut_encargado){
     const alerta = await prisma.alertaBusqueda.findUnique({

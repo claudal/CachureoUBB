@@ -14,6 +14,7 @@ import { CalendarIcon, MapPinIcon, PencilIcon, Trash2Icon } from "lucide-react"
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../components/ui/drawer.js';
 import { Separator } from '../components/ui/separator.js';
 import { useEffect } from 'react';
+import { ID_ESTADO_ALERTA_ABIERTA } from '../schemas/alertaBusqueda.schema.js';
 
 export default function AlertaBusquedaPage() {
   const alertaLocal = useAlertaLocal();
@@ -176,14 +177,16 @@ export default function AlertaBusquedaPage() {
             </CardContent>
 
             <CardFooter className="flex justify-end gap-2 border-t pt-4 bg-muted/10">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate(`editar/${alerta.id}`)}
-              >
-                <PencilIcon className="h-4 w-4 mr-2" />
-                Editar
-              </Button>
+              {alerta.idEstado === ID_ESTADO_ALERTA_ABIERTA && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate(`editar/${alerta.id}`)}
+                >
+                  <PencilIcon className="h-4 w-4 mr-2" />
+                  Editar alerta
+                </Button>
+              )}
               <Button
                 variant="destructive"
                 size="sm"

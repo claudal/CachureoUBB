@@ -9,7 +9,7 @@ import { useState } from "react";
 import VisorImagen from "./ui/visor-imagen";
 import { urlFoto } from "../utils/foto.utils.js";
 
-function MiniaturaFoto({ archivo, onQuitar, onClick }) {
+function MiniaturaFoto({ archivo, onQuitar, onClick, puedeQuitar = true }) {
   const [sinVistaPrevia, setSinVistaPrevia] = useState(false);
   const [srcPreview, setSrcPreview] = useState('');
 
@@ -51,20 +51,26 @@ function MiniaturaFoto({ archivo, onQuitar, onClick }) {
           </span>
         )}
       </AttachmentMedia>
-      <AttachmentActions>
-        <AttachmentAction
-          onClick={onQuitar}
-          aria-label={`Eliminar ${nombreFoto}`}
-          className="rounded-full bg-muted p-1 text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
-        >
-          <XIcon />
-        </AttachmentAction>
-      </AttachmentActions>
+      {puedeQuitar && (
+        <AttachmentActions>
+          <AttachmentAction
+            onClick={onQuitar}
+            aria-label={`Eliminar ${nombreFoto}`}
+            className="rounded-full bg-muted p-1 text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
+          >
+            <XIcon />
+          </AttachmentAction>
+        </AttachmentActions>
+      )}
     </Attachment>
   );
 }
 
-export default function CargaImagenes({field, fieldState, max, id = "objeto-fotos", etiqueta = "Fotos", descripcion}){
+/**
+ * @param {boolean} [bloquearExistentes=false] si es true, las fotos que ya estan guardadas (no son File)
+ * se muestran sin boton para quitarlas, solo se pueden quitar las recien agregadas.
+ */
+export default function CargaImagenes({field, fieldState, max, id = "objeto-fotos", etiqueta = "Fotos", descripcion, bloquearExistentes = false}){
   const inputFotos = useRef(null);
 
   function agregarFotos(evento) {
@@ -103,6 +109,7 @@ export default function CargaImagenes({field, fieldState, max, id = "objeto-foto
               onClick={setFotoAbierta}
               key={foto.id ? `api-${foto.id}` : `${foto.name}-${foto.lastModified}-${indice}`}
               archivo={foto}
+              puedeQuitar={foto instanceof File || !bloquearExistentes}
               onQuitar={() => quitarFoto(indice)}
             />
           ))}

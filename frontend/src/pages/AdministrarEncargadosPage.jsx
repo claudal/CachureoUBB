@@ -133,7 +133,7 @@ export default function AdministrarEncargadosPage() { //TODO: listado encargado,
                           <CardContent className="space-y-2 text-sm text-muted-foreground flex-1">
                             <div className="flex items-center gap-2">
                               <IdCardIcon className="h-4 w-4 shrink-0" />
-                              <span>{encargado.rut}</span>
+                              <span>{encargado.rut}</span> {/** TODO: formatear rut */}
                             </div>
                             
                             <div className="flex items-center gap-2">

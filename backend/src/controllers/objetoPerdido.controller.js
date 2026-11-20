@@ -78,7 +78,7 @@ export const getObjetosOficina = async (req, res) => {
  */
 export const getObjetoPerdido = async (req, res) => {
   try {
-    const objeto = await services.buscarPorId(req.params.id);
+    const objeto = await services.buscarPorId(req.params.id); //TODO 403
     return res.json(objeto);
   } catch (error) {
     console.error('Error fetching object:', error);

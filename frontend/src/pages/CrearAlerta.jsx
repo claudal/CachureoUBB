@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeftIcon, MapPinIcon } from 'lucide-react';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
@@ -14,7 +15,7 @@ import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import CargaImagenes from '../components/CargaImagenes.jsx';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { useNotify } from '../hooks/useNotify.js';
-import { CrearAlertaBusquedaSchema, MAXIMO_FOTOS_OBJETO } from '../schemas/alertaBusqueda.schema.js';
+import { ActualizarAlertaBusquedaSchema, CrearAlertaBusquedaSchema, ID_ESTADO_ALERTA_ABIERTA, MAXIMO_FOTOS_OBJETO } from '../schemas/alertaBusqueda.schema.js';
 
 import * as alertaBusquedaService from '../services/alertaBusquedaService.js';
 import { useAlertaLocal } from '../hooks/useAlertaLocal.js';
@@ -36,16 +37,20 @@ const defaultValues = {
 
 export default function CrearAlertaPage() {
   const alerta = useAlertaLocal();
+  // la ruta "editar/:id" trae el id de la alerta, la ruta "crear" no
+  const { id } = useParams();
   const notification = useNotify();
-  const esEdicion = Boolean(alerta.id);
+  const esEdicion = Boolean(id);
   const [apiError, setApiError] = useState(null);
   const [cargando, setCargando] = useState(esEdicion);
+  // datos que no se pueden editar: se muestran solo de lectura
+  const [datosFijos, setDatosFijos] = useState(null);
 
   const navigate = useNavigate();
-  
+
 
   const formulario = useForm({
-    resolver: zodResolver(CrearAlertaBusquedaSchema),
+    resolver: zodResolver(esEdicion ? ActualizarAlertaBusquedaSchema : CrearAlertaBusquedaSchema),
     defaultValues
   });
 
@@ -57,12 +62,16 @@ export default function CrearAlertaPage() {
       setApiError(null);
       try {
         const datosAlerta = await alertaBusquedaService.buscarPorId(id);
-        const etiquetas = datosAlerta.etiquetas?.map((e) => e.id) ?? [];
+        if (datosAlerta.idEstado !== ID_ESTADO_ALERTA_ABIERTA)
+          throw new Error('solo se pueden editar alertas en estado Abierta');
+        setDatosFijos({
+          nombre: datosAlerta.nombre,
+          campus: datosAlerta.campus,
+          etiquetas: datosAlerta.etiquetas ?? []
+        });
         // Mapear datos a la estructura del formulario
         formulario.reset({
-          nombre: datosAlerta.nombre ?? '',
           descripcion: datosAlerta.descripcion ?? '',
-          etiquetas: etiquetas,
           fotos: datosAlerta.fotos ?? []
         });
       } catch (err) {
@@ -73,7 +82,7 @@ export default function CrearAlertaPage() {
     }
 
     cargarAlerta();
-  }, [esEdicion]);
+  }, [esEdicion, id]);
 
   async function onSubmit(datos) {
     setApiError(null);
@@ -81,7 +90,6 @@ export default function CrearAlertaPage() {
       if(esEdicion) {
         await alertaBusquedaService.actualizar(id,datos)
         notification.exito(`Alerta editada correctamente`);
-        
       } else {
         alerta.setIdAlerta((await alertaBusquedaService.crear(datos)).idAlerta);
         notification.exito(`Alerta creada correctamente`);
@@ -108,11 +116,11 @@ export default function CrearAlertaPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">{esEdicion ? 'Editar' : 'Crear'} alerta de búsqueda</CardTitle>
-            {!esEdicion && (
-              <CardDescription>
-                Ingrese los datos del objeto de valor que se le perdió. Se requiere, al menos, un nombre fácil de identificar y una descripción del objeto.
-              </CardDescription>
-            )}
+            <CardDescription>
+              {esEdicion
+                ? 'Solo puede modificar la descripción y agregar fotos de evidencia.'
+                : 'Ingrese los datos del objeto de valor que se le perdió. Se requiere, al menos, un nombre fácil de identificar y una descripción del objeto.'}
+            </CardDescription>
             
             {apiError && (
               <Alert variant="destructive">
@@ -125,6 +133,25 @@ export default function CrearAlertaPage() {
           <CardContent>
             <form id={ID_FORMULARIO} onSubmit={formulario.handleSubmit(onSubmit)} noValidate>
               <FieldGroup>
+                {esEdicion && datosFijos && (
+                  <div className="space-y-2 rounded-lg bg-muted/40 p-3 text-sm">
+                    <p className="font-semibold">{datosFijos.nombre}</p>
+                    <p className="flex items-center gap-1.5 text-muted-foreground">
+                      <MapPinIcon className="h-4 w-4 shrink-0" />
+                      Buscando en campus: {datosFijos.campus?.nombre}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {datosFijos.etiquetas.map((etiqueta) => (
+                        <Badge key={etiqueta.id} variant="secondary">{etiqueta.nombre}</Badge>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      El nombre, el campus y las etiquetas no se pueden modificar.
+                    </p>
+                  </div>
+                )}
+
+                {!esEdicion && (
                 <Controller
                   name="nombre"
                   control={formulario.control}
@@ -143,6 +170,7 @@ export default function CrearAlertaPage() {
                     </Field>
                   )}
                 />
+                )}
 
                 <Controller
                   name="descripcion"
@@ -162,6 +190,7 @@ export default function CrearAlertaPage() {
                   )}
                 />
 
+                {!esEdicion && (
                 <Controller
                   name="idCampus"
                   control={formulario.control}
@@ -184,7 +213,9 @@ export default function CrearAlertaPage() {
                     </Field>
                   )}
                 />
+                )}
 
+                {!esEdicion && (
                 <Controller
                   name="etiquetas"
                   control={formulario.control}
@@ -202,12 +233,21 @@ export default function CrearAlertaPage() {
                     </Field>
                   )}
                 />
+                )}
 
                 <Controller
                   name="fotos"
                   control={formulario.control}
                   render={({ field, fieldState }) => (
-                    <CargaImagenes field={field} fieldState={fieldState} max={MAXIMO_FOTOS_OBJETO} />
+                    <CargaImagenes
+                      field={field}
+                      fieldState={fieldState}
+                      max={MAXIMO_FOTOS_OBJETO}
+                      bloquearExistentes={esEdicion}
+                      descripcion={esEdicion
+                        ? `Puede agregar fotos de evidencia nuevas hasta completar ${MAXIMO_FOTOS_OBJETO}. Las fotos ya subidas no se pueden quitar.`
+                        : undefined}
+                    />
                   )}
                 />
               </FieldGroup>
@@ -231,7 +271,7 @@ export default function CrearAlertaPage() {
               className="w-full sm:w-auto"
               disabled={formulario.formState.isSubmitting}
             >
-              {formulario.formState.isSubmitting ? 'Registrando...' : (esEdicion ? 'Editar alerta' : 'Crear alerta')}
+              {formulario.formState.isSubmitting ? (esEdicion ? 'Guardando...' : 'Registrando...') : (esEdicion ? 'Guardar cambios' : 'Crear alerta')}
             </Button>
           </CardFooter>
         </Card>

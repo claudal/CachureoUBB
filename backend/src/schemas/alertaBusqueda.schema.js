@@ -25,6 +25,10 @@ export const crearAlertaBusquedaSchema = z.object({
   idCampus: z.string().regex(/^\d+$/).transform(Number),
 });
 
+// Solo se puede modificar la descripcion y agregar fotos (las fotos llegan por multer, no en el body).
+// Nombre, campus y etiquetas no se pueden editar: si llegan en el body, zod los descarta.
+export const actualizarAlertaBusquedaSchema = crearAlertaBusquedaSchema.pick({ descripcion: true });
+
 export const filtroAlertaBusquedaSchema = z.object({
   idEstado: z.string().regex(/^\d+$/).transform(Number).optional(),
   etiquetaObjeto: z.preprocess((val) => { 

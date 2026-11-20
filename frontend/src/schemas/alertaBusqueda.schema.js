@@ -3,6 +3,8 @@ import { z } from 'zod';
 // mismas reglas que backend/src/schemas/objetoPerdido.schema.js y backend/src/config/upload.js
 export const MAXIMO_FOTOS_OBJETO = 5;
 export const TAMANO_MAXIMO_FOTO_MB = 5;
+// mismo id que ESTADO_ALERTA.ABIERTO del backend: solo las alertas abiertas se pueden editar
+export const ID_ESTADO_ALERTA_ABIERTA = 1;
 export const TIPOS_IMAGEN_PERMITIDOS = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
 
 // algunos navegadores (Windows/Android) no reconocen HEIC y dejan el tipo vacío
@@ -43,6 +45,12 @@ export const CrearAlertaBusquedaSchema = z.object({
 });
 
 
+
+// al editar solo se puede cambiar la descripcion y agregar fotos (mismo criterio que el backend)
+export const ActualizarAlertaBusquedaSchema = CrearAlertaBusquedaSchema.pick({
+  descripcion: true,
+  fotos: true
+});
 
 export const CrearSolicitudDetallesSchema = z.object({
   indicaciones: z

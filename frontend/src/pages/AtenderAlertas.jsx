@@ -427,14 +427,9 @@ export default function AtenderAlertasPage() {
                           <CardTitle>
                             {alerta.nombre}
                             <div className='p-1'>
-                              {alerta.leida ? 
-                                (<Badge variant="secondary" className='p-1'><EyeIcon/>Leída</Badge>) : 
-                                (alerta.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
-                              }
-                              {alerta.marcada ? 
-                                (<Badge variant="secondary"className='p-1'><BookmarkIcon/>Marcada</Badge>) : 
-                                (alerta.marcada && (<Badge variant="default"><AlertCircle />Actualizada</Badge>))
-                              }
+                              {alerta.leida && (<Badge variant="secondary" className='p-1'><EyeIcon/>Leída</Badge>)}
+                              {alerta.modificada && (<Badge variant="default"><AlertCircle />Modificada</Badge>)}
+                              {alerta.marcada && (<Badge variant="secondary"className='p-1'><BookmarkIcon/>Marcada</Badge>)}
                             </div>
                           </CardTitle>
                         </CardHeader>
