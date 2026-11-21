@@ -29,6 +29,20 @@ export const crearAlertaBusquedaSchema = z.object({
 // Nombre, campus y etiquetas no se pueden editar: si llegan en el body, zod los descarta.
 export const actualizarAlertaBusquedaSchema = crearAlertaBusquedaSchema.pick({ descripcion: true });
 
+// El motivo es opcional. req.body undefined si la peticion no trae cuerpo,
+// por eso se parte de un objeto vacio. Un motivo vacio se trata como no ingresado.
+export const cerrarAlertaBusquedaSchema = z.preprocess(
+  (val) => val ?? {},
+  z.object({
+    motivo: z
+      .string({ error: "El motivo debe ser texto" })
+      .trim()
+      .max(500, { error: "El motivo debe tener a lo más 500 carácteres" })
+      .transform((motivo) => motivo || undefined)
+      .optional()
+  })
+);
+
 export const filtroAlertaBusquedaSchema = z.object({
   idEstado: z.string().regex(/^\d+$/).transform(Number).optional(),
   etiquetaObjeto: z.preprocess((val) => { 

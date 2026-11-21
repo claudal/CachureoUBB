@@ -106,6 +106,24 @@ export async function putAlertaBusqueda(req, res, next) {
   }
 }
 
+// Elimina (cierra) una alerta abierta. Acepta un motivo opcional en el cuerpo: { motivo }.
+export async function deleteAlertaBusqueda(req, res, next) {
+  try {
+    return res.json(await services.cerrar(req.params.id, req.body.motivo));
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Lista las alertas cerradas para auditoria (solo administrador).
+export async function getAlertasCerradas(req, res, next) {
+  try {
+    return res.json(await services.listarCerradas());
+  } catch (err) {
+    next(err);
+  }
+}
+
 /**
  *
  * @param {import("express").Request} req

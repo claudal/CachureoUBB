@@ -8,7 +8,10 @@ export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
         throw new Error("Se requiere la sede para listar alertas");
     /**@type {import("@prisma/client").Prisma.AlertaBusquedaWhereInput}*/
     const where = {
-        idCampus
+        idCampus,
+        // las alertas cerradas dejan de mostrarse a los encargados (solo las ve el administrador).
+        // Va en AND para que el filtro opcional por idEstado no lo pise
+        AND: { idEstado: { not: ESTADO_ALERTA.CERRADO } }
     };
     /**@type {import("@prisma/client").Prisma.AlertaBusquedaInclude}*/
     const include = {
@@ -163,6 +166,63 @@ export async function actualizar(idAlerta, { descripcion, urlsFotosNuevas = [] }
 
         return { idAlerta: actualizada.id, fechaEdicion: actualizada.fechaEdicion };
     });
+}
+
+/**
+ * Cierra (elimina) una alerta abierta. Pasa a "Cerrada" y guarda el motivo y la fecha para auditoria.
+ * Los datos se conservan, solo deja de mostrarse a los encargados (visible para administrador).
+ * @param {string} idAlerta
+ * @param {string} [motivo]
+ */
+export async function cerrar(idAlerta, motivo) {
+    const fechaCierre = new Date();
+    // el cambio solo se aplica si sigue "Abierta", asi dos cierres o un cierre y una edicion simultaneos no se pisan
+    const { count } = await prisma.alertaBusqueda.updateMany({
+        where: { id: idAlerta, idEstado: ESTADO_ALERTA.ABIERTO },
+        data: {
+            idEstado: ESTADO_ALERTA.CERRADO,
+            motivoCierre: motivo ?? null,
+            fechaCierre,
+            fechaEdicion: fechaCierre
+        }
+    });
+    if (count === 0) {
+        // lanza P2025 (404) si la alerta no existe, si existe es porque ya no esta abierta
+        await prisma.alertaBusqueda.findUniqueOrThrow({ where: { id: idAlerta }, select: { id: true } });
+        const err = new Error("Solo se pueden eliminar alertas en estado Abierta");
+        err.statusCode = 409;
+        throw err;
+    }
+    return { idAlerta, fechaCierre };
+}
+
+/**
+ * @param {string} idAlerta
+ * @returns {Promise<number|null>} id del estado de la alerta, o null si no existe
+ */
+export async function buscarIdEstado(idAlerta) {
+    const alerta = await prisma.alertaBusqueda.findUnique({ where: { id: idAlerta }, select: { idEstado: true } });
+    return alerta?.idEstado ?? null;
+}
+
+/**
+ * Lista las alertas cerradas con su motivo, para auditoria del administrador.
+ */
+export async function listarCerradas() {
+    const alertas = await prisma.alertaBusqueda.findMany({
+        where: { idEstado: ESTADO_ALERTA.CERRADO },
+        include: {
+            campus: true,
+            etiquetas: { select: { etiqueta: true } },
+            fotos: { select: { foto: true } }
+        },
+        orderBy: { fechaCierre: { sort: "desc", nulls: "last" } }
+    });
+    return alertas.map(({ etiquetas, fotos, ...alerta }) => ({
+        ...alerta,
+        etiquetas: etiquetas.map((e) => e.etiqueta),
+        fotos: fotos.map((f) => f.foto)
+    }));
 }
 
 /**

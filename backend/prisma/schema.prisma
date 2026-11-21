@@ -160,6 +160,9 @@ model AlertaBusqueda {
   descripcion   String   @db.Text
   idCampus        Int      @map("id_campus")
   idEstado      Int      @map("id_estado")
+  // datos de auditoria al cerrar la alerta: el motivo es opcional
+  motivoCierre  String?  @map("motivo_cierre") @db.VarChar(500)
+  fechaCierre   DateTime? @map("fecha_cierre")
 
   // Relaciones con @relation explícito
   campus   Campus         @relation(fields: [idCampus], references: [id], onDelete: Restrict)
