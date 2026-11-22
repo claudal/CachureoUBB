@@ -56,11 +56,11 @@ export async function registrar({
 
         // el cambio de estado solo se aplica si sigue "Sin entrega",
         // así dos entregas simultáneas del mismo objeto no pasan ambas
-        const { count } = await tx.objetoPerdido.updateMany({
+        const objetoEntregado = await tx.objetoPerdido.update({
             where: { id: idObjeto, idEstado: ESTADO_OBJETO.SIN_ENTREGA },
             data: { idEstado: ESTADO_OBJETO.ENTREGADO }
         });
-        if (count === 0)
+        if (!objetoEntregado)
             throw errorConEstado("El objeto ya no está disponible para entrega", 409);
 
         // si el reclamante ya retiró otro objeto se reutiliza su registro sin cambiar el nombre guardado
