@@ -72,7 +72,7 @@ export async function runDevSeed(prisma,{ estadosAlerta, etiquetasValiosas, etiq
         objetos.push(await prisma.objetoPerdido.create({
             data: {
             idOficina: oficina.id,
-            idEstado: estadosOjeto.sinEntrega.id,
+            idEstado: 1,
             nombre: faker.lorem.sentence({min:1,max:4}),
             descripcion: faker.lorem.words({min:5,max:55}),
             valioso: valioso,
