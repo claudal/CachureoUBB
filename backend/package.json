@@ -14,7 +14,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "db:seed:prod": "npx prisma db seed",
+    "db:seed:dev": "npx prisma db seed -- --dev",
+    "db:seed:clean": "npx prisma db seed -- --clean",
+    "db:seed:refresh": "npm run db:seed:clean && npm run db:seed:dev"
   },
   "keywords": [],
   "author": "",
