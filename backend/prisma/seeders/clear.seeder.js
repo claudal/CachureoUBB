@@ -9,6 +9,7 @@ export async function runClearSeed(prisma) {
 
     console.log('Limpiando datos de desarrollo...');
     try {
+        await prisma.entrega.deleteMany();
         await prisma.objetoPerdido.deleteMany();
         await prisma.foto.deleteMany();
         await prisma.alertaBusqueda.deleteMany();
