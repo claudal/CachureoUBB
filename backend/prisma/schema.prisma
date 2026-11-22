@@ -281,6 +281,8 @@ model AlertaTieneEtiqueta {
 model MarcadorEncargado {
   idAlerta     String    @map("id_alerta")
   rutEncargado String @map("rut_encargado") @db.VarChar(12)
+  // true desde que el buscador cierra la alerta hasta que el encargado descarta el aviso
+  avisoCierrePendiente Boolean @default(false) @map("aviso_cierre_pendiente")
 
   // Relaciones con @relation explícito
   alerta    AlertaBusqueda   @relation(fields: [idAlerta], references: [id], onDelete: Cascade)

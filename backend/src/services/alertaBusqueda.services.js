@@ -171,29 +171,38 @@ export async function actualizar(idAlerta, { descripcion, urlsFotosNuevas = [] }
 /**
  * Cierra (elimina) una alerta abierta. Pasa a "Cerrada" y guarda el motivo y la fecha para auditoria.
  * Los datos se conservan, solo deja de mostrarse a los encargados (visible para administrador).
+ * Los encargados que la habian marcado quedan con un aviso de cierre pendiente.
  * @param {string} idAlerta
  * @param {string} [motivo]
  */
 export async function cerrar(idAlerta, motivo) {
     const fechaCierre = new Date();
-    // el cambio solo se aplica si sigue "Abierta", asi dos cierres o un cierre y una edicion simultaneos no se pisan
-    const { count } = await prisma.alertaBusqueda.updateMany({
-        where: { id: idAlerta, idEstado: ESTADO_ALERTA.ABIERTO },
-        data: {
-            idEstado: ESTADO_ALERTA.CERRADO,
-            motivoCierre: motivo ?? null,
-            fechaCierre,
-            fechaEdicion: fechaCierre
+    return prisma.$transaction(async (tx) => {
+        // el cambio solo se aplica si sigue "Abierta", asi dos cierres o un cierre y una edicion simultaneos no se pisan
+        const { count } = await tx.alertaBusqueda.updateMany({
+            where: { id: idAlerta, idEstado: ESTADO_ALERTA.ABIERTO },
+            data: {
+                idEstado: ESTADO_ALERTA.CERRADO,
+                motivoCierre: motivo ?? null,
+                fechaCierre,
+                fechaEdicion: fechaCierre
+            }
+        });
+        if (count === 0) {
+            // lanza P2025 (404) si la alerta no existe, si existe es porque ya no esta abierta
+            await tx.alertaBusqueda.findUniqueOrThrow({ where: { id: idAlerta }, select: { id: true } });
+            const err = new Error("Solo se pueden eliminar alertas en estado Abierta");
+            err.statusCode = 409;
+            throw err;
         }
+        // la alerta desaparece de la lista de los encargados, asi que el aviso queda guardado en su marcador.
+        // Va en la misma transaccion para que no haya cierre sin aviso (ni aviso sin cierre)
+        await tx.marcadorEncargado.updateMany({
+            where: { idAlerta },
+            data: { avisoCierrePendiente: true }
+        });
+        return { idAlerta, fechaCierre };
     });
-    if (count === 0) {
-        // lanza P2025 (404) si la alerta no existe, si existe es porque ya no esta abierta
-        await prisma.alertaBusqueda.findUniqueOrThrow({ where: { id: idAlerta }, select: { id: true } });
-        const err = new Error("Solo se pueden eliminar alertas en estado Abierta");
-        err.statusCode = 409;
-        throw err;
-    }
-    return { idAlerta, fechaCierre };
 }
 
 /**

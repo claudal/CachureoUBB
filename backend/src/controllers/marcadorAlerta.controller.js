@@ -1,5 +1,5 @@
 import { buscarPorId } from "../services/alertaBusqueda.services.js";
-import { buscar, crear, eliminar } from "../services/marcadorAlerta.services.js";
+import { buscar, crear, descartarAvisoCierre, eliminar, listarAvisosCierre } from "../services/marcadorAlerta.services.js";
 
 
 /**
@@ -34,6 +34,26 @@ export async function deleteMarcadorAlerta(req, res, next) {
             return res.status(404).json({"error":"La alerta no se encuentra en los marcadores."});
         await eliminar(req.params.id,req.user.rut);
         res.status(200).json({"mensaje": "Marcador eliminado con éxito."});
+    } catch (err) {
+        next(err);
+    }
+}
+
+// Alertas marcadas por el encargado que su buscador cerro y cuyo aviso sigue pendiente.
+export async function getAvisosCierre(req, res, next) {
+    try {
+        res.json(await listarAvisosCierre(req.user.rut));
+    } catch (err) {
+        next(err);
+    }
+}
+
+// El encargado descarta el aviso de cierre de una alerta.
+export async function deleteAvisoCierre(req, res, next) {
+    try {
+        if(await descartarAvisoCierre(req.params.id,req.user.rut) === 0)
+            return res.status(404).json({"error":"La alerta no tiene un aviso de cierre pendiente."});
+        res.status(200).json({"mensaje": "Aviso descartado con éxito."});
     } catch (err) {
         next(err);
     }
