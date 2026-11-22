@@ -22,6 +22,18 @@ export function quitarMarcador(id_alerta){
     return api.delete(`/alertasBusqueda/${id_alerta}/marcadores`);
 }
 
+/**
+ * Alertas marcadas por el encargado que su buscador eliminó y cuyo aviso aún no descarta.
+ * @returns {Promise<{id: string, nombre: string, fechaCierre: string|null}[]>}
+ */
+export function listarAvisosCierre(){
+    return api.get('/alertasBusqueda/avisosCierre');
+}
+
+export function descartarAvisoCierre(idAlerta){
+    return api.delete(`/alertasBusqueda/${idAlerta}/avisoCierre`);
+}
+
 export function agregarMarcador(idAlerta){
     return api.post(`/alertasBusqueda/${idAlerta}/marcadores`);
 }
