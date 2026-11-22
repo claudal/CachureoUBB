@@ -61,6 +61,16 @@ export function actualizar(idAlerta, { descripcion, fotos = [] }){
 }
 
 /**
+ * Elimina (cierra) una alerta abierta. El motivo es opcional.
+ * @param {string} idAlerta
+ * @param {string} [motivo]
+ */
+export function eliminar(idAlerta, motivo){
+    const motivoLimpio = motivo?.trim();
+    return api.delete(`/alertasBusqueda/${idAlerta}`, motivoLimpio ? { motivo: motivoLimpio } : undefined);
+}
+
+/**
  * Crea una alerta de búsqueda
  * @param {{nombre: string, descripcion: string, etiquetas: number[], fotos: File[]}} datos
  */

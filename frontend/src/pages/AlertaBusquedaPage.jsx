@@ -2,7 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../components/ui/empty';
 import { useFetch } from '../hooks/useFetch.js';
-import { buscarPorId } from '../services/alertaBusquedaService.js';
+import { buscarPorId, eliminar } from '../services/alertaBusquedaService.js';
+import { useNotify } from '../hooks/useNotify.js';
+import DialogoEliminarAlerta from '../components/DialogoEliminarAlerta.jsx';
 import { ArrowRightCircleIcon, BellOffIcon, BellPlusIcon, InfoIcon, UserSearchIcon } from 'lucide-react';
 import { Button } from '../components/ui/button.js';
 import { useAlertaLocal } from '../hooks/useAlertaLocal.js';
@@ -10,7 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion.js';
 import { Badge } from '../components/ui/badge.js';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
-import { CalendarIcon, MapPinIcon, PencilIcon, Trash2Icon } from "lucide-react"
+import { CalendarIcon, MapPinIcon, PencilIcon } from "lucide-react"
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../components/ui/drawer.js';
 import { Separator } from '../components/ui/separator.js';
 import { useEffect } from 'react';
@@ -27,6 +29,14 @@ export default function AlertaBusquedaPage() {
   },[error]);
 
   const navigate = useNavigate();
+  const notificacion = useNotify();
+
+  // si falla lanza el error para que el dialogo lo muestre, si sale bien la alerta deja de existir para el buscador
+  async function eliminarAlerta(motivo) {
+    await eliminar(alertaLocal.id, motivo);
+    notificacion.exito("Alerta eliminada correctamente");
+    alertaLocal.clearIdAlerta();
+  }
 
   return (
     <div>
@@ -187,14 +197,9 @@ export default function AlertaBusquedaPage() {
                   Editar alerta
                 </Button>
               )}
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => {alertaLocal.clearIdAlerta(); alerta}}
-              >
-                <Trash2Icon className="h-4 w-4 mr-2" />
-                Eliminar
-              </Button>
+              {alerta.idEstado === ID_ESTADO_ALERTA_ABIERTA && (
+                <DialogoEliminarAlerta onConfirmar={eliminarAlerta} />
+              )}
             </CardFooter>
           </Card>
         ) : (
