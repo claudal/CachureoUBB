@@ -56,17 +56,6 @@ export async function runDevSeed(prisma,{ estadosAlerta, etiquetasValiosas, etiq
         }
     }
 
-    await prisma.estadoObjeto.deleteMany();
-    
-    const estadosOjeto = {
-        sinEntrega: await prisma.estadoObjeto.create({
-            data: {
-            id: 1,
-            nombre: "Sin entrega"
-            },
-        })
-    }
-
     console.log('\t- Creando objetos perdidos');
     const objetos = []
     for(let oficina of oficinas){
