@@ -14,6 +14,7 @@ import LoginAdministradorPage from './pages/LoginAdministradorPage';
 import LoginEncargadoPage from './pages/LoginEncargadoPage';
 import AdministrarEncargadosPage from './pages/AdministrarEncargadosPage';
 import CrearEncargadoPage from './pages/CrearEncargadoPage';
+import AdministrarCampusPage from './pages/AdministrarCampusPage';
 import RestablecerClavePage from './pages/ReestablecerClavePage';
 
 function App() {
@@ -98,7 +99,7 @@ function App() {
             />
             <Route
               path="campus"
-              element={<AtenderAlertasPage />}
+              element={<AdministrarCampusPage />}
             />
             <Route
               path="perfil"

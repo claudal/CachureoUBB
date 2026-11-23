@@ -29,15 +29,17 @@ export async function runDevSeed(prisma,{ estadosAlerta, etiquetasValiosas, etiq
     );
 
     console.log('\t- Creando campus');
-    const nombreCampus = ['Concepción', 'La Castilla', 'Fernando May'];
+    const datosCampus = [
+        { nombre: 'Concepción', direccion: 'Avda. Collao 1202, Concepción' },
+        { nombre: 'La Castilla', direccion: 'Avenida Brasil 1180, Chillán' },
+        { nombre: 'Fernando May', direccion: 'Av. Andrés Bello 720, Chillán' }
+    ];
+
     const campus = await Promise.all(
-        nombreCampus.map((nombre) =>
-        prisma.campus.create({
-            data: {
-            nombre,
-            direccion: faker.location.direction()
-            },
-        })
+        datosCampus.map((campus) =>
+            prisma.campus.create({
+                data: campus
+            })
         )
     );
 
