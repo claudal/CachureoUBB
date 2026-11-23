@@ -98,8 +98,8 @@ export function crearReunion(idAlerta,data){
     return api.post(`/alertasBusqueda/${idAlerta}/reuniones`, data);
 }
 
-export async function buscarNovedad(idAlerta){
+export async function buscarNovedades(idAlerta){
     if(!idAlerta)
         return;
-    return api.get(`/alertasBusqueda/${idAlerta}/solicitudesDetalles/novedad`);
+    return api.get(`/alertasBusqueda/${idAlerta}/novedades/`);
 }

@@ -323,15 +323,24 @@ export function crearReunion(idAlerta,rutEncargado,idOficina,datos){
     })
 }
 
-export async function buscarNovedad(idAlerta){
+export async function buscarNovedades(idAlerta){
+    const alerta = await prisma.alertaBusqueda.findUnique({
+        where:{
+            id: idAlerta
+        },
+        select: {fechaEdicion:true}
+    });
+    console.log(idAlerta)
+    if(!alerta)
+        return false;
     const solicitudes = await prisma.solicitudDetalles.count(
         {
-            where: {idAlerta}
+            where: {idAlerta,fechaCreacion: {gt: alerta.fechaEdicion}}
         }
     )
     const reuniones = await prisma.reunion.count(
         {
-            where: {idAlerta}
+            where: {idAlerta,fechaCreacion: {gt: alerta.fechaEdicion}}
         }
     )
     return solicitudes > 0 || reuniones > 0;
