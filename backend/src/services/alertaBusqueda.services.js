@@ -48,6 +48,11 @@ export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
             rutEncargado
         }
     }
+    include.solicitudesDetalles = {
+        where: {
+            rutEncargado
+        }
+    }
     if(filtros.etiquetaObjeto) where.etiquetas = {
         some: {
             idEtiqueta: {
@@ -70,7 +75,7 @@ export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
     }
     const alertas = await prisma.alertaBusqueda.findMany({where,include,orderBy:{fechaEdicion:'desc'}});
     return alertas.map((alerta)=>{
-        const { alertasLeidas,marcadores, etiquetas, fotos, ...restoAlerta} = alerta;
+        const { alertasLeidas,marcadores, etiquetas, fotos, solicitudesDetalles, reuniones, ...restoAlerta} = alerta;
         return {
             ...restoAlerta,
             leida: alertasLeidas.length > 0,
@@ -79,6 +84,8 @@ export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
             // evento que borra esa lectura es la edicion del buscador (ver actualizar)
             modificada: marcadores.length > 0 && alertasLeidas.length === 0,
             etiquetas: etiquetas.map((e)=> e.etiqueta),
+            solicitudDetalleActiva: solicitudesDetalles.filter((sd)=> sd.fechaCreacion > alerta.fechaEdicion).length > 0,
+            reunionActiva: reuniones.length > 0,
             fotos: fotos.map((e)=> e.foto)
         }
     });
@@ -312,7 +319,7 @@ export async function buscarPorIdEncargado(id_alerta,rut_encargado){
  * @returns 
  */
 export async function buscarPorId(id_alerta){
-    const {fotos,etiquetas,reuniones,...alerta} = await prisma.alertaBusqueda.findUniqueOrThrow({
+    const {fotos,etiquetas,reuniones,solicitudesDetalles,...alerta} = await prisma.alertaBusqueda.findUniqueOrThrow({
         where:{id: id_alerta},
         include: {
             solicitudesDetalles: {
@@ -337,6 +344,7 @@ export async function buscarPorId(id_alerta){
         porVencer,
         fotos: fotos.map((f)=>f.foto),
         etiquetas: etiquetas.map((e)=>e.etiqueta),
+        solicitudesDetalles: solicitudesDetalles.filter((sd)=> sd.fechaCreacion > alerta.fechaEdicion),
         reuniones: reuniones.map(({oficina,...r})=>{
             const {fotos,...o} = oficina;
             return {
