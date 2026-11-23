@@ -262,7 +262,7 @@ export async function buscarPorIdEncargado(id_alerta,rut_encargado){
  * @returns 
  */
 export async function buscarPorId(id_alerta){
-    const {fotos,etiquetas,reuniones,...alerta} = await prisma.alertaBusqueda.findUniqueOrThrow({
+    const {fotos,etiquetas,reuniones,solicitudesDetalles,...alerta} = await prisma.alertaBusqueda.findUniqueOrThrow({
         where:{id: id_alerta},
         include: {
             solicitudesDetalles: {
@@ -281,6 +281,7 @@ export async function buscarPorId(id_alerta){
         ...alerta,
         fotos: fotos.map((f)=>f.foto),
         etiquetas: etiquetas.map((e)=>e.etiqueta),
+        solicitudesDetalles: solicitudesDetalles.filter((sd)=> sd.fechaCreacion > alerta.fechaEdicion),
         reuniones: reuniones.map(({oficina,...r})=>{
             const {fotos,...o} = oficina;
             return {
