@@ -20,23 +20,116 @@ const ESTADOS_ENCARGADO = [
 ];
 
 const NOMBRE_ETIQUETAS_NORMALES = [
-  "Mochila vacía",
+  // Bolsos y contenedores vacíos
+  "Mochila",
+  "Bolso o cartera",
+  "Bananos o riñonera",
+  "Estuche o cartuchera",
+  "Bolsa reutilizable o de compras",
+
+  // Vestimenta y accesorios personales
   "Ropa",
-  "Estuche",
+  "Polerón o chaqueta",
+  "Calzado o zapatillas",
+  "Gorro, jockey o sombrero",
+  "Bufanda, cuello o guantes",
+  "Cinturón",
+  "Lentes de sol",
+  "Accesorios para el cabello", // pinches, cintillos, colets
+
+  // Vida universitaria y estudio
   "Útiles de estudio",
+  "Libros o apuntes",
+  "Carpeta o archivador",
+  "Calculadora científica",
+  "Materiales de arte o arquitectura", // reglas, tubos portaplanos, pinceles
+  "Delantal o bata de laboratorio",
+  "Gafas de seguridad o EPP",
+
+  // Tecnología básica / accesorios
   "Tecnología",
-  "Calculadora",
-  "Audífonos"
+  "Cargador o cable",
+  "Adaptador o pendrive",
+  "Audífonos (básicos o con cable)",
+  "Funda o carcasa",
+  "Mouse o teclado",
+
+  // Alimentación e hidratación
+  "Botella o termo",
+  "Tupper o lonchera",
+  "Taza o vaso térmico",
+  "Cubiertos reutilizables",
+
+  // Llaves y varios cotidianos
+  "Llaves",
+  "Llavero o lanyard",
+  "Candado",
+  "Paraguas",
+  "Cosméticos o artículos de higiene", // bloqueador, bálsamo, alcohol gel
+  "Libro recreativo o revista",
+
+  // Deporte y recreación
+  "Artículos deportivos",
+  "Balón o pelota",
+  "Mat de yoga o colchoneta",
+  "Toalla deportiva",
+
+  // Visitantes, familias y mascotas
+  "Accesorios de mascota", // correas, arneses, bozales, juguetes de perro
+  "Plato o botella para mascota",
+  "Juguetes o artículos escolares", // peluches, láminas, materiales de excursión
+  "Artículos de bebé", // mamaderas, chupetes, mantas, pañalera
+  "Coche o silla de paseo",
+  "Silla plegable o manta de picnic",
+
+  // Comodín
+  "Otros objetos",
 ];
 
 const NOMBRE_ETIQUETAS_VALIOSAS = [
-  "Tecnología (de valor)",
-  "Joya",
-  "Credenciales",
+  // Tecnología de alto valor
+  "Tecnología (de valor)", // notebooks, tablets, consolas portátiles
+  "Teléfono celular",
+  "Smartwatch o pulsera inteligente",
+  "Audífonos (inalámbricos o de gama alta)",
+  "Cámara fotográfica o lentes",
+  "Disco duro externo",
+  "E-reader (Kindle o similar)",
+
+  // Joyería y relojería
+  "Joya", // anillos, cadenas, pulseras, aros
+  "Reloj",
+
+  // Documentación e identidad
+  "Credenciales", // TNE, pase escolar, credencial universitaria/funcionario
+  "Documentos o identificación", // cédula de identidad, pasaporte, licencia
+  "Tarjetas bancarias o de transporte", // débito, crédito, Bip!/tarjeta local
+  "Certificados o documentos legales", // carpetas con trámites, recetas médicas
+
+  // Bolsos con contenido crítico y dinero
   "Mochila (con cosas)",
-  "Teléfono",
-  "Tablet",
-  "Laptop"
+  "Bolso o cartera (con cosas)",
+  "Billetera o monedero",
+  "Dinero en efectivo",
+  "Chequera o vales",
+
+  // Movilidad y transporte
+  "Llaves de vehículo", // auto o moto (con chip/control)
+  "Bicicleta",
+  "Scooter eléctrico o monopatín",
+  "Skate o longboard",
+  "Casco o protecciones",
+
+  // Salud y accesibilidad
+  "Lentes ópticos",
+  "Medicamentos o inhaladores",
+  "Audífonos medicados o prótesis",
+  "Bastón o artículo ortopédico",
+
+  // Equipamiento especializado de alto costo
+  "Instrumento musical",
+  "Herramientas especializadas o testers",
+  "Equipo de laboratorio o medición",
 ];
 
 /**
