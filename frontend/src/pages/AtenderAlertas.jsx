@@ -67,7 +67,10 @@ function FormularioSolicitud({alerta,onSend}){
   return (
     <ResponsiveModal
       drawerProps={{swipeDirection: 'left'}}
-      trigger={<Button variant="outline">Solicitar más información</Button>}
+      trigger={!(alerta.solicitudDetalleActiva || alerta.reunionActiva) ?
+        <Button variant="outline">Solicitar más detalles</Button> :
+        <Button disabled={true} variant="outline">Solicitud enviada</Button>
+      }
       title="Solicitar más información"
       description={
         <span>
@@ -161,7 +164,7 @@ function FormularioReunion({alerta,onSend}){
   return (
     <ResponsiveModal
       drawerProps={{swipeDirection: 'left'}}
-      trigger={alerta.reuniones.length === 0 ?
+      trigger={!alerta.reunionActiva ?
         <Button variant="default">Revelar oficina</Button> :
         <Button disabled={true} variant="default">Oficina relevada</Button>
       }
