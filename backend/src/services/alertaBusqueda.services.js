@@ -1,6 +1,7 @@
 import { prisma } from "../config/prisma.js";
 import { ESTADO_ALERTA } from "../config/estados.js";
 import { MAXIMO_FOTOS } from "../config/upload.js";
+import { DIAS_AVISO_VENCIMIENTO, DIAS_VENCIMIENTO, MS_POR_DIA } from "../config/caducidad.js";
 
 export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
     // sin sede, Prisma ignoraría el filtro y devolvería alertas de todas las sedes
@@ -10,8 +11,9 @@ export async function listarEncargado(rutEncargado,idCampus,filtros = {},){
     const where = {
         idCampus,
         // las alertas cerradas dejan de mostrarse a los encargados (solo las ve el administrador).
+        // Las vencidas tampoco: quedan a la espera de que su creador las reabra o elimine.
         // Va en AND para que el filtro opcional por idEstado no lo pise
-        AND: { idEstado: { not: ESTADO_ALERTA.CERRADO } }
+        AND: { idEstado: { notIn: [ESTADO_ALERTA.CERRADO, ESTADO_ALERTA.VENCIDO] } }
     };
     /**@type {import("@prisma/client").Prisma.AlertaBusquedaInclude}*/
     const include = {
@@ -176,7 +178,7 @@ export async function actualizar(idAlerta, { descripcion, urlsFotosNuevas = [] }
 }
 
 /**
- * Cierra (elimina) una alerta abierta. Pasa a "Cerrada" y guarda el motivo y la fecha para auditoria.
+ * Cierra (elimina) una alerta abierta o vencida. Pasa a "Cerrada" y guarda el motivo y la fecha para auditoria.
  * Los datos se conservan, solo deja de mostrarse a los encargados (visible para administrador).
  * Los encargados que la habian marcado quedan con un aviso de cierre pendiente.
  * @param {string} idAlerta
@@ -185,9 +187,9 @@ export async function actualizar(idAlerta, { descripcion, urlsFotosNuevas = [] }
 export async function cerrar(idAlerta, motivo) {
     const fechaCierre = new Date();
     return prisma.$transaction(async (tx) => {
-        // el cambio solo se aplica si sigue "Abierta", asi dos cierres o un cierre y una edicion simultaneos no se pisan
+        // el cambio solo se aplica si sigue "Abierta" o "Vencida", asi dos cierres o un cierre y una edicion simultaneos no se pisan
         const { count } = await tx.alertaBusqueda.updateMany({
-            where: { id: idAlerta, idEstado: ESTADO_ALERTA.ABIERTO },
+            where: { id: idAlerta, idEstado: { in: [ESTADO_ALERTA.ABIERTO, ESTADO_ALERTA.VENCIDO] } },
             data: {
                 idEstado: ESTADO_ALERTA.CERRADO,
                 motivoCierre: motivo ?? null,
@@ -198,7 +200,7 @@ export async function cerrar(idAlerta, motivo) {
         if (count === 0) {
             // lanza P2025 (404) si la alerta no existe, si existe es porque ya no esta abierta
             await tx.alertaBusqueda.findUniqueOrThrow({ where: { id: idAlerta }, select: { id: true } });
-            const err = new Error("Solo se pueden eliminar alertas en estado Abierta");
+            const err = new Error("Solo se pueden eliminar alertas en estado Abierta o Vencida");
             err.statusCode = 409;
             throw err;
         }
@@ -210,6 +212,54 @@ export async function cerrar(idAlerta, motivo) {
         });
         return { idAlerta, fechaCierre };
     });
+}
+
+/**
+ * Reabre una alerta vencida: vuelve a "Abierta" y su fecha de modificacion pasa a ser la actual,
+ * con lo que vuelven a contar los plazos de caducidad.
+ * @param {string} idAlerta
+ */
+export async function reabrir(idAlerta) {
+    const fechaEdicion = new Date();
+    // solo se aplica si sigue "Vencida", asi una reapertura y una eliminacion simultaneas no se pisan
+    const { count } = await prisma.alertaBusqueda.updateMany({
+        where: { id: idAlerta, idEstado: ESTADO_ALERTA.VENCIDO },
+        data: { idEstado: ESTADO_ALERTA.ABIERTO, fechaEdicion }
+    });
+    if (count === 0) {
+        // lanza P2025 (404) si la alerta no existe, si existe es porque no esta vencida
+        await prisma.alertaBusqueda.findUniqueOrThrow({ where: { id: idAlerta }, select: { id: true } });
+        const err = new Error("Solo se pueden reabrir alertas en estado Vencida");
+        err.statusCode = 409;
+        throw err;
+    }
+    return { idAlerta, fechaEdicion };
+}
+
+/**
+ * Pasa a "Vencida" las alertas abiertas que no se modifican hace DIAS_VENCIMIENTO dias.
+ * Se conserva la fecha de modificacion original (no cuenta como una edicion).
+ * @returns {Promise<number>} cantidad de alertas vencidas
+ */
+export async function vencerAlertas() {
+    const limite = new Date(Date.now() - DIAS_VENCIMIENTO * MS_POR_DIA);
+    const candidatas = await prisma.alertaBusqueda.findMany({
+        where: { idEstado: ESTADO_ALERTA.ABIERTO, fechaEdicion: { lt: limite } },
+        select: { id: true, fechaEdicion: true }
+    });
+    if (candidatas.length === 0)
+        return 0;
+
+    // una actualizacion por alerta porque @updatedAt pisaria la fecha de edicion; al volver a pasarla explicita se conserva.
+    // La condicion por fechaEdicion evita vencer una alerta que el buscador edito justo despues de la consulta
+    const resultados = await prisma.$transaction(
+        candidatas.map(({ id, fechaEdicion }) => prisma.alertaBusqueda.updateMany({
+            where: { id, idEstado: ESTADO_ALERTA.ABIERTO, fechaEdicion },
+            data: { idEstado: ESTADO_ALERTA.VENCIDO, fechaEdicion }
+        }))
+    );
+    // devuelve la cantidad de alertas vencidas, que puede ser menor a candidatas si alguna se edito mientras se ejecutaba la transaccion
+    return resultados.reduce((total, { count }) => total + count, 0);
 }
 
 /**
@@ -284,8 +334,14 @@ export async function buscarPorId(id_alerta){
             fotos:{select: {foto:true}}
         }
     });
+    // aviso de caducidad: la alerta vence DIAS_VENCIMIENTO dias despues de su ultima modificacion
+    const fechaVencimiento = new Date(alerta.fechaEdicion.getTime() + DIAS_VENCIMIENTO * MS_POR_DIA);
+    const porVencer = alerta.idEstado === ESTADO_ALERTA.ABIERTO
+        && Date.now() >= alerta.fechaEdicion.getTime() + DIAS_AVISO_VENCIMIENTO * MS_POR_DIA;
     return {
         ...alerta,
+        fechaVencimiento,
+        porVencer,
         fotos: fotos.map((f)=>f.foto),
         etiquetas: etiquetas.map((e)=>e.etiqueta),
         solicitudesDetalles: solicitudesDetalles.filter((sd)=> sd.fechaCreacion > alerta.fechaEdicion),
@@ -343,5 +399,16 @@ export async function buscarNovedades(idAlerta){
             where: {idAlerta,fechaCreacion: {gt: alerta.fechaEdicion}}
         }
     )
-    return solicitudes > 0 || reuniones > 0;
+    if (solicitudes > 0 || reuniones > 0)
+        return true;
+    // tambien es novedad que la alerta este por vencer o ya vencida (requiere una accion del buscador)
+    const alerta = await prisma.alertaBusqueda.findUnique({
+        where: { id: idAlerta },
+        select: { idEstado: true, fechaEdicion: true }
+    });
+    if (!alerta)
+        return false;
+    return alerta.idEstado === ESTADO_ALERTA.VENCIDO
+        || (alerta.idEstado === ESTADO_ALERTA.ABIERTO
+            && Date.now() >= alerta.fechaEdicion.getTime() + DIAS_AVISO_VENCIMIENTO * MS_POR_DIA);
 }

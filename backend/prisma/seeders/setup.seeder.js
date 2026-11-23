@@ -9,7 +9,8 @@ const ESTADOS_OBJETO = [
 const ESTADOS_ALERTA = [
   { id: 1, nombre: "Abierto" },
   { id: 2, nombre: "Cerrado" },
-  { id: 3, nombre: "Rectificado" }
+  { id: 3, nombre: "Rectificado" },
+  { id: 4, nombre: "Vencido" }
 ];
 
 const ESTADOS_ENCARGADO = [
