@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { ItemCargando } from '../components/ui/item-cargando.jsx';
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '../components/ui/empty';
 import { useFetch } from '../hooks/useFetch.js';
-import { buscarPorId, eliminar } from '../services/alertaBusquedaService.js';
+import { buscarPorId, eliminar, reabrir } from '../services/alertaBusquedaService.js';
+import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert.js';
 import { useNotify } from '../hooks/useNotify.js';
 import DialogoEliminarAlerta from '../components/DialogoEliminarAlerta.jsx';
 import { ArrowRightCircleIcon, BellOffIcon, BellPlusIcon, InfoIcon, UserSearchIcon } from 'lucide-react';
@@ -12,15 +13,16 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion.js';
 import { Badge } from '../components/ui/badge.js';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
-import { CalendarIcon, MapPinIcon, PencilIcon } from "lucide-react"
+import { CalendarIcon, HourglassIcon, MapPinIcon, PencilIcon, RotateCcwIcon, TriangleAlertIcon } from "lucide-react"
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '../components/ui/drawer.js';
 import { Separator } from '../components/ui/separator.js';
-import { useEffect } from 'react';
-import { ID_ESTADO_ALERTA_ABIERTA } from '../schemas/alertaBusqueda.schema.js';
+import { useEffect, useState } from 'react';
+import { ID_ESTADO_ALERTA_ABIERTA, ID_ESTADO_ALERTA_VENCIDA } from '../schemas/alertaBusqueda.schema.js';
 
 export default function AlertaBusquedaPage() {
   const alertaLocal = useAlertaLocal();
-  const { datos: alerta, cargando, error } = useFetch(()=>buscarPorId(alertaLocal.id),[alertaLocal.id]);
+  const { datos: alerta, cargando, error, recargar } = useFetch(()=>buscarPorId(alertaLocal.id),[alertaLocal.id]);
+  const [reabriendo, setReabriendo] = useState(false);
   
   useEffect(()=>{
     if(!error) return;
@@ -37,6 +39,22 @@ export default function AlertaBusquedaPage() {
     notificacion.exito("Alerta eliminada correctamente");
     alertaLocal.clearIdAlerta();
   }
+
+  // una alerta vencida vuelve a quedar abierta y sus plazos de caducidad comienzan de nuevo
+  async function reabrirAlerta() {
+    setReabriendo(true);
+    try {
+      await reabrir(alertaLocal.id);
+      notificacion.exito("Alerta reabierta correctamente");
+      recargar();
+    } catch (err) {
+      notificacion.error(err.message || "No se pudo reabrir la alerta");
+    } finally {
+      setReabriendo(false);
+    }
+  }
+
+  const vencida = alerta?.idEstado === ID_ESTADO_ALERTA_VENCIDA;
 
   return (
     <div>
@@ -88,6 +106,27 @@ export default function AlertaBusquedaPage() {
             </CardHeader>
               
             <CardContent className="space-y-4">
+
+              {/* Aviso de caducidad: la alerta vence si no se modifica durante el plazo indicado por el servidor */}
+              {alerta.porVencer && (
+                <Alert>
+                  <HourglassIcon />
+                  <AlertTitle>Tu alerta está por vencer</AlertTitle>
+                  <AlertDescription>
+                    Vencerá el {new Date(alerta.fechaVencimiento).toLocaleDateString()} si no la modificas.
+                    Edita tu alerta para mantenerla abierta.
+                  </AlertDescription>
+                </Alert>
+              )}
+              {vencida && (
+                <Alert variant="destructive">
+                  <TriangleAlertIcon />
+                  <AlertTitle>Tu alerta venció</AlertTitle>
+                  <AlertDescription>
+                    Los encargados de oficina ya no la ven. Puedes reabrirla para que vuelva a estar activa o eliminarla.
+                  </AlertDescription>
+                </Alert>
+              )}
 
               {/* Desplegable de mensajes (solicitudes de detalle y reuniones) */}
               {(alerta.solicitudesDetalles.length > 0 || alerta.reuniones.length > 0) && (
@@ -197,7 +236,18 @@ export default function AlertaBusquedaPage() {
                   Editar alerta
                 </Button>
               )}
-              {alerta.idEstado === ID_ESTADO_ALERTA_ABIERTA && (
+              {vencida && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={reabrirAlerta}
+                  disabled={reabriendo}
+                >
+                  <RotateCcwIcon className="h-4 w-4 mr-2" />
+                  {reabriendo ? "Reabriendo..." : "Reabrir alerta"}
+                </Button>
+              )}
+              {(alerta.idEstado === ID_ESTADO_ALERTA_ABIERTA || vencida) && (
                 <DialogoEliminarAlerta onConfirmar={eliminarAlerta} />
               )}
             </CardFooter>

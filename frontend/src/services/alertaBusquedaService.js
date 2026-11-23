@@ -83,6 +83,14 @@ export function eliminar(idAlerta, motivo){
 }
 
 /**
+ * Reabre una alerta vencida: vuelve a estar abierta y se renuevan sus plazos de caducidad.
+ * @param {string} idAlerta
+ */
+export function reabrir(idAlerta){
+    return api.post(`/alertasBusqueda/${idAlerta}/reapertura`);
+}
+
+/**
  * Crea una alerta de búsqueda
  * @param {{nombre: string, descripcion: string, etiquetas: number[], fotos: File[]}} datos
  */

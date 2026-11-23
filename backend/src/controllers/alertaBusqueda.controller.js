@@ -106,7 +106,16 @@ export async function putAlertaBusqueda(req, res, next) {
   }
 }
 
-// Elimina (cierra) una alerta abierta. Acepta un motivo opcional en el cuerpo: { motivo }.
+// Reabre una alerta vencida: vuelve a "Abierta" con la fecha de modificacion actualizada.
+export async function postReaperturaAlertaBusqueda(req, res, next) {
+  try {
+    return res.json(await services.reabrir(req.params.id));
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Elimina (cierra) una alerta abierta o vencida. Acepta un motivo opcional en el cuerpo: { motivo }.
 export async function deleteAlertaBusqueda(req, res, next) {
   try {
     return res.json(await services.cerrar(req.params.id, req.body.motivo));

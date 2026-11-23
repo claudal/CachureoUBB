@@ -9,5 +9,6 @@ export const ESTADO_OBJETO = Object.freeze({
 export const ESTADO_ALERTA = Object.freeze({
     ABIERTO: 1,
     CERRADO: 2,
-    RECTIFICADO: 3
+    RECTIFICADO: 3,
+    VENCIDO: 4
 });
