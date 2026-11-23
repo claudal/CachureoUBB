@@ -70,3 +70,32 @@ export async function cambiarClave(rut, claveNueva){
         }
     });
 }
+
+export async function buscarNovedades(rutEncargado){
+    const cierreAlerta = await prisma.alertaBusqueda.count({
+        where: {
+            idEstado: 2,
+            marcadores: { some: { rutEncargado, avisoCierrePendiente: true } }
+        }
+    });
+    const modificacionAlerta = await prisma.alertaBusqueda.count(
+        {
+            where: {
+                idEstado: 1,
+                marcadores: {
+                    some: {
+                        rutEncargado
+                    }
+                },
+                alertasLeidas: {
+                    none: {
+                        rutEncargado
+                    }
+                }
+            }
+        }
+    );
+    return {
+        modificacionAlerta: modificacionAlerta+cierreAlerta > 0
+    };
+}

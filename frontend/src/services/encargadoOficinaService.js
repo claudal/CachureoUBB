@@ -20,3 +20,7 @@ export function reenviarCorreoCreacion(rut){
 export function enviarCorreoRestablecimientoClave(rut){
     return api.post(`/encargadoOficina/${rut}/enviarCorreoRestablecimientoClave`);
 }
+
+export function buscarNovedades(){
+    return api.get(`/encargadoOficina/novedades`);
+}

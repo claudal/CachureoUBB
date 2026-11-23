@@ -1,6 +1,6 @@
 import { crearTokenCreacionClaveEncargado, crearTokenRestablecimientoClaveEncargado } from '../services/autenticacion.services.js';
 import { enviarCorreoCreacionEncargado, enviarCorreoRestablecimientoEncargado } from '../services/email.services.js';
-import { buscarPorRut, crear, listar } from '../services/encargadoOficina.services.js';
+import { buscarNovedades, buscarPorRut, crear, listar } from '../services/encargadoOficina.services.js';
 
 export const getEncargados = async (req, res, next) => {
   try {
@@ -45,6 +45,14 @@ export const postEnviarCorreoReestablecimientoEncargado = async (req, res, next)
       )
     }
     return res.status(200).json({"mensaje": "Solicitud de reestablecimiento de clave enviada con éxito"});
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getNovedades = async (req, res, next) => {
+  try {
+    return res.status(200).json(await buscarNovedades(req.user.rut));
   } catch (error) {
     next(error);
   }
