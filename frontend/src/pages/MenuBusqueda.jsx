@@ -4,11 +4,11 @@ import { BellIcon, PillBottleIcon } from "lucide-react";
 import { useFetch } from "../hooks/useFetch";
 import { useAlertaLocal } from "../hooks/useAlertaLocal";
 import { useEffect } from "react";
-import { buscarNovedad } from "../services/alertaBusquedaService";
+import { buscarNovedades } from "../services/alertaBusquedaService";
 
 export default function MenuBusquedaPage(){
     const alerta = useAlertaLocal();
-    const novedades = useFetch(()=>buscarNovedad(alerta.id),[alerta.id]);
+    const novedades = useFetch(()=>buscarNovedades(alerta.id),[alerta.id]);
     const [secciones, setSecciones] = useState([
         {
             texto: "Buscar objetos",

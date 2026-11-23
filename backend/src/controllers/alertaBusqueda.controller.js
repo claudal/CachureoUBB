@@ -153,9 +153,9 @@ export async function getAlertaBusqueda(req, res, next) {
  * @param {import("express").Response} res 
  * @param {import("express").NextFunction} next 
  */
-export async function getAlertaBusquedaNovedad(req, res, next) {
+export async function getNovedades(req, res, next) {
     try {
-        return res.status(200).json({novedad: await services.buscarNovedad(req.params.id)});
+        return res.status(200).json({novedad: await services.buscarNovedades(req.params.id)});
     } catch (err) {
         next(err);
     }

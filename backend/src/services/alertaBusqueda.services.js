@@ -379,27 +379,29 @@ export function crearReunion(idAlerta,rutEncargado,idOficina,datos){
     })
 }
 
-export async function buscarNovedad(idAlerta){
+export async function buscarNovedades(idAlerta){
+    const alerta = await prisma.alertaBusqueda.findUnique({
+        where:{
+            id: idAlerta
+        },
+        select: {idEstado:true, fechaEdicion:true}
+    });
+    if(!alerta)
+        return false;
+    const vencimiento = alerta.idEstado === ESTADO_ALERTA.VENCIDO
+        || (alerta.idEstado === ESTADO_ALERTA.ABIERTO
+            && Date.now() >= alerta.fechaEdicion.getTime() + DIAS_AVISO_VENCIMIENTO * MS_POR_DIA);
+    if(vencimiento)
+        return true;
     const solicitudes = await prisma.solicitudDetalles.count(
         {
-            where: {idAlerta}
+            where: {idAlerta,fechaCreacion: {gt: alerta.fechaEdicion}}
         }
     )
     const reuniones = await prisma.reunion.count(
         {
-            where: {idAlerta}
+            where: {idAlerta,fechaCreacion: {gt: alerta.fechaEdicion}}
         }
     )
-    if (solicitudes > 0 || reuniones > 0)
-        return true;
-    // tambien es novedad que la alerta este por vencer o ya vencida (requiere una accion del buscador)
-    const alerta = await prisma.alertaBusqueda.findUnique({
-        where: { id: idAlerta },
-        select: { idEstado: true, fechaEdicion: true }
-    });
-    if (!alerta)
-        return false;
-    return alerta.idEstado === ESTADO_ALERTA.VENCIDO
-        || (alerta.idEstado === ESTADO_ALERTA.ABIERTO
-            && Date.now() >= alerta.fechaEdicion.getTime() + DIAS_AVISO_VENCIMIENTO * MS_POR_DIA);
+    return (solicitudes > 0 || reuniones > 0);
 }

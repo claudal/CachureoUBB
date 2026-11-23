@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteAlertaBusqueda, getAlertaBusqueda, getAlertaBusquedaNovedad, getAlertasBusqueda, postAlertaBusqueda, postReaperturaAlertaBusqueda, postReunion, putAlertaBusqueda, postSolicitudDetalles } from "../controllers/alertaBusqueda.controller.js";
+import { deleteAlertaBusqueda, getAlertaBusqueda, getAlertasBusqueda, postAlertaBusqueda, postReaperturaAlertaBusqueda, postReunion, putAlertaBusqueda, postSolicitudDetalles, getNovedades } from "../controllers/alertaBusqueda.controller.js";
 import { validate } from "../middlewares/validate.middleware.js";
 import { filtroAlertaBusquedaSchema, parametroAlertaBusquedaSchema, crearAlertaBusquedaSchema, actualizarAlertaBusquedaSchema, cerrarAlertaBusquedaSchema, crearSolicitudDetallesSchema, crearReunionSchema } from "../schemas/alertaBusqueda.schema.js";
 import { autenticacion } from "../middlewares/auth.middleware.js";
@@ -40,6 +40,6 @@ router.post('/:id/reuniones/',
     ocultarAlertaInactiva,
     validate(crearReunionSchema),
     postReunion);
-router.get('/:id/solicitudesDetalles/novedad',validate(parametroAlertaBusquedaSchema, 'params'), getAlertaBusquedaNovedad);
+router.get('/:id/novedades/',validate(parametroAlertaBusquedaSchema, 'params'), getNovedades);
 
 export default router;
