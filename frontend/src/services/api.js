@@ -32,5 +32,6 @@ export const api = {
   postForm: (ruta, formData) => pedir(ruta, { method: 'POST', body: formData }),
   put: (ruta, cuerpo) => pedir(ruta, { method: 'PUT', body: JSON.stringify(cuerpo) }),
   putForm: (ruta, formData) => pedir(ruta, { method: 'PUT', body: formData }),
-  delete: (ruta) => pedir(ruta, { method: 'DELETE' })
+  // el cuerpo es opcional (p. ej. el motivo al eliminar una alerta)
+  delete: (ruta, cuerpo) => pedir(ruta, { method: 'DELETE', body: cuerpo && JSON.stringify(cuerpo) })
 }

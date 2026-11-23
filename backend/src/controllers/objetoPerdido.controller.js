@@ -78,7 +78,11 @@ export const getObjetosOficina = async (req, res) => {
  */
 export const getObjetoPerdido = async (req, res) => {
   try {
-    const objeto = await services.buscarPorId(req.params.id); //TODO 403
+    const encargado = await buscarEncargadoSesion(req, res);
+    if(!encargado) return;
+    const objeto = await services.buscarPorId(req.params.id);
+    if(encargado.idOficina !== objeto.idOficina)
+      return res.status(403).json({ error: 'No tiene permisos para ver este objeto' });
     return res.json(objeto);
   } catch (error) {
     console.error('Error fetching object:', error);

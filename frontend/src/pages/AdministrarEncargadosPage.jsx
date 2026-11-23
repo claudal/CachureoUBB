@@ -14,6 +14,7 @@ import { Badge } from '../components/ui/badge.js'
 import {} from 'lucide-react';
 import { useNotify } from '../hooks/useNotify.js';
 import { Paginacion } from '../components/ui/paginacion.jsx';
+import { formatear } from '../utils/rut.utils.js';
 
 const filtroDefecto = {
   cantidad: 15,
@@ -133,7 +134,7 @@ export default function AdministrarEncargadosPage() { //TODO: listado encargado,
                           <CardContent className="space-y-2 text-sm text-muted-foreground flex-1">
                             <div className="flex items-center gap-2">
                               <IdCardIcon className="h-4 w-4 shrink-0" />
-                              <span>{encargado.rut}</span> {/** TODO: formatear rut */}
+                              <span>{formatear(encargado.rut)}</span>
                             </div>
                             
                             <div className="flex items-center gap-2">

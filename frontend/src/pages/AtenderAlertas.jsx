@@ -3,7 +3,7 @@ import { useFetch } from '../hooks/useFetch.js';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { AlertCircle, AlertCircleIcon, ArrowRightCircleIcon, BookmarkIcon, EyeIcon, SearchIcon, SendHorizontalIcon } from 'lucide-react';
+import { AlertCircle, AlertCircleIcon, ArrowRightCircleIcon, BellOffIcon, BookmarkIcon, EyeIcon, SearchIcon, SendHorizontalIcon } from 'lucide-react';
 
 import SelectorEtiquetasObjeto from '../components/SelectorEtiquetasObjeto.jsx';
 import CarruselImagenes from '../components/CarruselImagenes.jsx';
@@ -67,7 +67,10 @@ function FormularioSolicitud({alerta,onSend}){
   return (
     <ResponsiveModal
       drawerProps={{swipeDirection: 'left'}}
-      trigger={<Button variant="outline">Solicitar más información</Button>}
+      trigger={!(alerta.solicitudDetalleActiva || alerta.reunionActiva) ?
+        <Button variant="outline">Solicitar más detalles</Button> :
+        <Button disabled={true} variant="outline">Solicitud enviada</Button>
+      }
       title="Solicitar más información"
       description={
         <span>
@@ -161,7 +164,7 @@ function FormularioReunion({alerta,onSend}){
   return (
     <ResponsiveModal
       drawerProps={{swipeDirection: 'left'}}
-      trigger={alerta.reuniones.length === 0 ?
+      trigger={!alerta.reunionActiva ?
         <Button variant="default">Revelar oficina</Button> :
         <Button disabled={true} variant="default">Oficina relevada</Button>
       }
@@ -234,6 +237,18 @@ function FormularioReunion({alerta,onSend}){
 export default function AtenderAlertasPage() {
   const [filtros, setFiltros] = useState(filtroAlerta);
   const alertas = useFetch(()=>alertaBusquedaService.listar(filtros),[filtros],[]);
+  // alertas marcadas que su buscador eliminó: ya no están en la lista, solo queda el aviso
+  const avisosCierre = useFetch(()=>alertaBusquedaService.listarAvisosCierre(),[],[]);
+  const notificacion = useNotify();
+
+  async function descartarAviso(idAlerta){
+    try {
+      await alertaBusquedaService.descartarAvisoCierre(idAlerta);
+      avisosCierre.setDatos((avisos)=>avisos.filter((aviso)=>aviso.id !== idAlerta));
+    } catch (err) {
+      notificacion.error(err.message);
+    }
+  }
 
   const onSubmitFiltros = (data) => {
     data.marcado = filtros.marcado;
@@ -399,6 +414,25 @@ export default function AtenderAlertasPage() {
         </DrawerContent>
       </Drawer>
       <div>
+        {avisosCierre.datos.length > 0 && (
+          <div className="flex flex-col gap-2 p-4 border-b">
+            {avisosCierre.datos.map((aviso)=>(
+              <Alert key={aviso.id}>
+                <BellOffIcon className="h-4 w-4" />
+                <AlertTitle>Alerta eliminada: {aviso.nombre}</AlertTitle>
+                <AlertDescription>
+                  <p>
+                    {aviso.fechaCierre && `El ${new Date(aviso.fechaCierre).toLocaleDateString()} `}
+                    su buscador eliminó esta alerta que usted tenía marcada, por lo que ya no aparece en la lista.
+                  </p>
+                  <Button className="mt-2" variant="outline" size="sm" onClick={()=>descartarAviso(aviso.id)}>
+                    Entendido
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            ))}
+          </div>
+        )}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b mb-6">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold tracking-tight">Alertas de Búsqueda</h1>

@@ -106,6 +106,33 @@ export async function putAlertaBusqueda(req, res, next) {
   }
 }
 
+// Reabre una alerta vencida: vuelve a "Abierta" con la fecha de modificacion actualizada.
+export async function postReaperturaAlertaBusqueda(req, res, next) {
+  try {
+    return res.json(await services.reabrir(req.params.id));
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Elimina (cierra) una alerta abierta o vencida. Acepta un motivo opcional en el cuerpo: { motivo }.
+export async function deleteAlertaBusqueda(req, res, next) {
+  try {
+    return res.json(await services.cerrar(req.params.id, req.body.motivo));
+  } catch (err) {
+    next(err);
+  }
+}
+
+// Lista las alertas cerradas para auditoria (solo administrador).
+export async function getAlertasCerradas(req, res, next) {
+  try {
+    return res.json(await services.listarCerradas());
+  } catch (err) {
+    next(err);
+  }
+}
+
 /**
  *
  * @param {import("express").Request} req
@@ -126,9 +153,9 @@ export async function getAlertaBusqueda(req, res, next) {
  * @param {import("express").Response} res 
  * @param {import("express").NextFunction} next 
  */
-export async function getAlertaBusquedaNovedad(req, res, next) {
+export async function getNovedades(req, res, next) {
     try {
-        return res.status(200).json({novedad: await services.buscarNovedad(req.params.id)});
+        return res.status(200).json({novedad: await services.buscarNovedades(req.params.id)});
     } catch (err) {
         next(err);
     }

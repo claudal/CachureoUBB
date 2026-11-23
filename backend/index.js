@@ -3,6 +3,7 @@ import express from 'express';
 import { router } from './src/routes/index.routes.js';
 import { prisma } from './src/config/prisma.js';
 import { errorHandler, notFoundHandler } from './src/middlewares/error.middleware.js';
+import { iniciarCaducidadAlertas } from './src/jobs/caducidadAlertas.job.js';
 
 import cors from 'cors';
 
@@ -27,6 +28,7 @@ async function bootstrap() {
     app.listen(PORT, () => {
       console.log(`Servidor corriendo en puerto ${PORT}`);
     });
+    iniciarCaducidadAlertas();
   } catch (error) {
     console.error('=> Error al iniciar el servidor o conectar a PostgreSQL:', error);
     process.exit(1);
