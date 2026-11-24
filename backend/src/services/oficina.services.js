@@ -18,6 +18,31 @@ function pluralizar(cantidad, singular, plural) {
     return `${cantidad} ${cantidad === 1 ? singular : plural}`;
 }
 
+/**
+ * Borra de la BD las fotos que quedaron sin ningun uso (ni oficinas, ni objetos, ni alertas,
+ * ni entregas) y devuelve las borradas para que el llamador elimine sus archivos.
+ * Una foto que otro registro sigue usando se deja intacta, asi no se rompe ese registro
+ * (pasa con los datos de prueba, donde varias oficinas comparten la misma foto).
+ *
+ * @param {import("@prisma/client").Prisma.TransactionClient} tx
+ * @param {{id: number, url: string}[]} fotos
+ */
+async function borrarFotosHuerfanas(tx, fotos) {
+    if (fotos.length === 0) return [];
+    const huerfanas = await tx.foto.findMany({
+        where: {
+            id: { in: fotos.map((f) => f.id) },
+            oficinas: { none: {} },
+            objetos: { none: {} },
+            alertas: { none: {} },
+            entrega: null
+        }
+    });
+    if (huerfanas.length > 0)
+        await tx.foto.deleteMany({ where: { id: { in: huerfanas.map((f) => f.id) } } });
+    return huerfanas;
+}
+
 async function validarCampus(idCampus) {
     const campus = await prisma.campus.findUnique({ where: { id: idCampus } });
     if (!campus) {
@@ -73,7 +98,7 @@ export async function crear({ nombre, descripcion, idCampus, urlFoto }) {
 
 /**
  * Edita la oficina. Si llega una foto nueva, reemplaza a la anterior
- * (se borra de la BD y del disco), si no, se conserva la actual.
+ * (se borra de la BD y del disco si nadie mas la usa), si no, se conserva la actual.
  * Si la oficina no existe, prisma lanza P2025 (404).
  *
  * @param {number} id
@@ -84,11 +109,14 @@ export async function editar(id, { nombre, descripcion, idCampus, urlFotoNueva }
     await validarCampus(idCampus);
 
     const fotosAnteriores = urlFotoNueva ? actual.fotos.map((f) => f.foto) : [];
+    let fotosABorrar = [];
 
     const oficina = await prisma.$transaction(async (tx) => {
-        // borrar la foto borra tambien su relacion con la oficina (cascade)
-        if (fotosAnteriores.length > 0)
-            await tx.foto.deleteMany({ where: { id: { in: fotosAnteriores.map((f) => f.id) } } });
+        // primero se suelta la relacion de la oficina con sus fotos anteriores
+        if (fotosAnteriores.length > 0) {
+            await tx.fotoOficina.deleteMany({ where: { idOficina: id } });
+            fotosABorrar = await borrarFotosHuerfanas(tx, fotosAnteriores);
+        }
 
         return tx.oficina.update({
             where: { id },
@@ -103,7 +131,7 @@ export async function editar(id, { nombre, descripcion, idCampus, urlFotoNueva }
     });
 
     // el archivo se borra recien cuando la BD ya quedo actualizada
-    for (const foto of fotosAnteriores)
+    for (const foto of fotosABorrar)
         await eliminarArchivoFisico(foto.url);
 
     return formatear(oficina);
@@ -112,7 +140,7 @@ export async function editar(id, { nombre, descripcion, idCampus, urlFotoNueva }
 /**
  * Elimina la oficina solo si no tiene encargados ni objetos perdidos asociados.
  * Si los tiene, lanza un 409 informando el motivo del rechazo.
- * Tambien elimina su foto de la BD y del disco.
+ * Tambien elimina su foto de la BD y del disco si nadie mas la usa.
  *
  * @param {number} id
  */
@@ -138,13 +166,13 @@ export async function eliminar(id) {
         throw err;
     }
 
-    const fotos = oficina.fotos.map((f) => f.foto);
+    let fotosABorrar = [];
     try {
-        await prisma.$transaction([
-            prisma.oficina.delete({ where: { id } }),
-            // la oficina solo borra su relacion con la foto (cascade), la foto hay que borrarla aparte
-            prisma.foto.deleteMany({ where: { id: { in: fotos.map((f) => f.id) } } })
-        ]);
+        await prisma.$transaction(async (tx) => {
+            // borrar la oficina borra su relacion con las fotos (cascade), pero no las fotos
+            await tx.oficina.delete({ where: { id } });
+            fotosABorrar = await borrarFotosHuerfanas(tx, oficina.fotos.map((f) => f.foto));
+        });
     } catch (error) {
         // P2003: alguien asigno un encargado u objeto a la oficina despues de contarlos
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2003") {
@@ -155,7 +183,7 @@ export async function eliminar(id) {
         throw error;
     }
 
-    for (const foto of fotos)
+    for (const foto of fotosABorrar)
         await eliminarArchivoFisico(foto.url);
 
     return formatear(oficina);
