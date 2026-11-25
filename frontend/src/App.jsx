@@ -15,6 +15,7 @@ import LoginEncargadoPage from './pages/LoginEncargadoPage';
 import AdministrarEncargadosPage from './pages/AdministrarEncargadosPage';
 import CrearEncargadoPage from './pages/CrearEncargadoPage';
 import AdministrarCampusPage from './pages/AdministrarCampusPage';
+import AdministrarOficinasPage from './pages/AdministrarOficinasPage';
 import RestablecerClavePage from './pages/ReestablecerClavePage';
 
 function App() {
@@ -91,7 +92,7 @@ function App() {
             />
             <Route
               path="oficinas"
-              element={<RegistrarObjetoPage />}
+              element={<AdministrarOficinasPage />}
             />
             <Route
               path="editarObjeto/:id"
