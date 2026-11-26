@@ -63,7 +63,7 @@ export async function loginAdministrador(correo,clave){
 }
 
 export async function getPerfilEncargadoOficina(rut) {
-    const encargado = await buscarPorRut(rut,{oficina: true});
+    const encargado = await buscarPorRut(rut,{oficina: {include: {campus: true}}});
     if(!encargado) {
         const err = new Error('El usuario de la sesión ya no existe');
         err.statusCode = 404;
@@ -74,17 +74,20 @@ export async function getPerfilEncargadoOficina(rut) {
         nombre: encargado.nombre,
         correoContacto: encargado.correoContacto,
         idOficina: encargado.idOficina,
-        idCampus: encargado.oficina.idCampus
+        idCampus: encargado.oficina.idCampus,
+        nombreOficina: encargado.oficina.nombre,
+        nombreCampus: encargado.oficina.campus.nombre
     }
 }
 
 export async function getPerfilAdministrador(email) {
-    const {clave, ...administrador} = await buscarPorCorreo(email);
-    if(!administrador) {
+    const usuario = await buscarPorCorreo(email);
+    if(!usuario) {
         const err = new Error('El usuario de la sesión ya no existe');
         err.statusCode = 404;
         throw err;
     }
+    const {clave, ...administrador} = usuario;
     return administrador;
 }
 

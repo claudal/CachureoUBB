@@ -17,6 +17,7 @@ import CrearEncargadoPage from './pages/CrearEncargadoPage';
 import AdministrarCampusPage from './pages/AdministrarCampusPage';
 import AdministrarOficinasPage from './pages/AdministrarOficinasPage';
 import RestablecerClavePage from './pages/ReestablecerClavePage';
+import PerfilPage from './pages/PerfilPage';
 
 function App() {
 
@@ -70,7 +71,7 @@ function App() {
             />
             <Route
               path="perfil"
-              element={<ObjetosOficinaPage />}
+              element={<PerfilPage />}
             />
             <Route
               path="entregas"
@@ -104,7 +105,7 @@ function App() {
             />
             <Route
               path="perfil"
-              element={<ObjetosOficinaPage />}
+              element={<PerfilPage />}
             />
           </Route>
           <Route path="*" element={<Navigate to="/menuBusqueda" replace />} />
