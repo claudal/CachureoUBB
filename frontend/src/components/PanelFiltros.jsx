@@ -34,9 +34,11 @@ export function PanelFiltro({controlador,children}){
     )
 }
 
-export function usePanelFiltro(defaultValues,onSubmit){
+// opciones: configuracion extra para useForm (por ejemplo un resolver de validacion)
+export function usePanelFiltro(defaultValues,onSubmit,opciones={}){
     const [abierto, setAbierto] = useState(false);
     const formulario = useForm({
+        ...opciones,
         defaultValues
     });
 
