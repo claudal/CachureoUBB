@@ -110,7 +110,7 @@ model Oficina {
 model EncargadoOficina {
   rut                 String   @id @db.VarChar(9)
   nombre              String   @db.VarChar(150)
-  correoContacto      String   @map("correo_contacto") @db.VarChar(255)
+  correoContacto      String   @unique @map("correo_contacto") @db.VarChar(255)
   fechaCambioClave    DateTime @default(now()) @map("fecha_cambio_clave")
   clave               String   @db.VarChar(255)
   idOficina           Int      @map("id_oficina")

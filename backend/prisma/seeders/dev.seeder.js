@@ -94,7 +94,7 @@ export async function runDevSeed(prisma,{ estadosAlerta, etiquetasValiosas, etiq
         prisma.encargadoOficina.create({
             data: {
             rut: rut.concat(rutjs.getCheckDigit(rut)),
-            correoContacto: faker.internet.email(),
+            correoContacto: faker.internet.email().toLowerCase(),
             nombre: faker.person.fullName(),
             clave: hashSync(clave,BCRYPT_SALT_ROUNDS),
             idOficina: faker.helpers.arrayElement(oficinas).id,

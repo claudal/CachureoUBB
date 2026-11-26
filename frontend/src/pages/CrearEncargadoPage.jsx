@@ -15,7 +15,6 @@ import { useNotify } from '../hooks/useNotify.js';
 import Selector from '../components/Selector.jsx';
 import { listar, listarOficinas } from '../services/campusService.js';
 import { CrearEncargadoOficinaSchema } from '../schemas/encargadoOficina.schema.js';
-import { formatear } from '../utils/rut.utils.js';
 
 const ID_FORMULARIO = 'form-crear-encargado';
 
@@ -88,10 +87,8 @@ export default function CrearEncargadoPage() {
         if (campo in formulario.getValues())
           formulario.setError(campo, { message: mensaje });
       });
-      if(err.status === 409){
-        setApiError(`Ya existe un encargado con el rut ${formatear(datos.rut)}`);
-      } else
-        setApiError(err.message);
+      // en un 409 el servidor indica si lo repetido es el rut o el correo
+      setApiError(err.message);
     }
   }
 

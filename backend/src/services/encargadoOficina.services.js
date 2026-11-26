@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../config/prisma.js";
 import { encriptarClave } from "../utils/autenticacion.utils.js";
+import { formatear } from "../utils/rut.utils.js";
 import { crearTokenCreacionClaveEncargado } from "./autenticacion.services.js";
 import { enviarCorreoCreacionEncargado } from "./email.services.js";
 
@@ -43,12 +44,43 @@ export function buscarPorRut(rut,include=undefined){
     return prisma.encargadoOficina.findUnique({where:{rut: rut},include});
 }
 
+function errorHttp(mensaje, statusCode, detalles){
+    const err = new Error(mensaje);
+    err.statusCode = statusCode;
+    if(detalles) err.detalles = detalles;
+    return err;
+}
+
 /**
- * 
+ * Lanza un 409 si otro encargado ya usa el correo. Cada correo pertenece a un solo
+ * encargado porque ahi llegan los enlaces para definir y restablecer la clave.
+ *
+ * @param {string} correoContacto
+ * @param {string} [rutExcluido] encargado que se esta editando, puede conservar su correo
+ */
+async function verificarCorreoDisponible(correoContacto, rutExcluido){
+    const otro = await prisma.encargadoOficina.findFirst({
+        where: { correoContacto, rut: { not: rutExcluido } },
+        select: { rut: true }
+    });
+    if(otro){
+        const mensaje = `El correo ${correoContacto} ya está en uso por otro encargado`;
+        throw errorHttp(mensaje, 409, [{ campo: "correoContacto", mensaje }]);
+    }
+}
+
+/**
+ *
  * @param {import(import("@prisma/client").Prisma.EncargadoOficinaCreateInput)} data
- * @returns 
+ * @returns
  */
 export async function crear(data){
+    // el rut se revisa primero: si el encargado ya existe, ese es el motivo del rechazo
+    if(await buscarPorRut(data.rut)){
+        const mensaje = `Ya existe un encargado con el rut ${formatear(data.rut)}`;
+        throw errorHttp(mensaje, 409, [{ campo: "rut", mensaje }]);
+    }
+    await verificarCorreoDisponible(data.correoContacto);
     const encargado = await prisma.encargadoOficina.create({
         data: {
             ...data,
@@ -70,20 +102,15 @@ export async function crear(data){
     return {encargado,correoEnviado};
 }
 
-function errorHttp(mensaje, statusCode){
-    const err = new Error(mensaje);
-    err.statusCode = statusCode;
-    return err;
-}
-
 /**
- * Edita el correo de contacto y la oficina del encargado.
+ * Edita el correo de contacto y la oficina del encargado. El correo no puede ser el de otro encargado (409).
  * Si el encargado no existe prisma lanza P2025 (404) y si la oficina no existe P2003 (400).
  *
  * @param {string} rut
  * @param {{correoContacto: string, idOficina: number}} datos
  */
-export function editar(rut, {correoContacto, idOficina}){
+export async function editar(rut, {correoContacto, idOficina}){
+    await verificarCorreoDisponible(correoContacto, rut);
     return prisma.encargadoOficina.update({
         where: { rut },
         data: { correoContacto, idOficina },
