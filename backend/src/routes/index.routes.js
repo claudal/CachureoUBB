@@ -7,6 +7,7 @@ import etiquetaObjetoRoutes from "./etiquetaObjeto.routes.js";
 import campusRoutes from "./campus.routes.js";
 import administradorRoutes from "./administrador.routes.js";
 import oficinaRoutes from "./oficina.routes.js";
+import entregaRoutes from "./entrega.routes.js";
 
 export const router = Router();
 
@@ -15,6 +16,7 @@ router.use("/alertasBusqueda", alertaBusquedaRoutes);
 router.use("/autenticacion", autenticacionRoutes);
 router.use("/objetoPerdido", objetoPerdidoRoutes);
 router.use("/encargadoOficina", encargadoOficinaRoutes);
+router.use("/entrega", entregaRoutes);
 router.use("/etiquetaObjeto", etiquetaObjetoRoutes);
 router.use("/campus", campusRoutes);
 router.use("/oficina", oficinaRoutes);

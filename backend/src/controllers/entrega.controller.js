@@ -2,6 +2,27 @@ import * as services from '../services/entrega.services.js';
 import { buscarPorRut } from '../services/encargadoOficina.services.js';
 
 /**
+ * Lista las entregas de los objetos de la oficina del encargado autenticado.
+ * Acepta en la query los filtros nombreObjeto, nombreReclamante, rutReclamante,
+ * fechaEntrega, salto y cantidad.
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ */
+export async function getEntregasOficina(req, res, next) {
+  try {
+    const encargado = await buscarPorRut(req.user.rut);
+    if (!encargado)
+      return res.status(401).json({ error: 'El usuario de la sesión ya no existe' });
+
+    res.json(await services.listar({ ...req.vQuery, idOficina: encargado.idOficina }));
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
  * Registra la entrega de un objeto de la oficina del encargado autenticado.
  * Espera multipart/form-data con rutReclamante, nombreReclamante,
  * caracteristicaVerificacion (opcional), comentarios (opcional) y foto (opcional, máximo 1).

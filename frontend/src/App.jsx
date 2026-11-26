@@ -18,6 +18,7 @@ import AdministrarCampusPage from './pages/AdministrarCampusPage';
 import AdministrarOficinasPage from './pages/AdministrarOficinasPage';
 import RestablecerClavePage from './pages/ReestablecerClavePage';
 import PerfilPage from './pages/PerfilPage';
+import EntregasOficinaPage from './pages/EntregasOficina';
 
 function App() {
 
@@ -75,7 +76,7 @@ function App() {
             />
             <Route
               path="entregas"
-              element={<ObjetosOficinaPage />}
+              element={<EntregasOficinaPage />}
             />
           </Route>
           <Route path='/menuAdministrador' element={

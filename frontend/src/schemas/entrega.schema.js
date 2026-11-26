@@ -13,6 +13,18 @@ const textoOpcional = (maximo, campo) => z
   .optional()
   .transform((valor) => valor || undefined);
 
+export const FiltroEntregaSchema = z.object({
+  nombreObjeto: z.string().trim(),
+  nombreReclamante: z.string().trim(),
+  // el rut es opcional, pero si se ingresa debe ser valido
+  rutReclamante: z
+    .string()
+    .trim()
+    .refine((rut) => rut === "" || validar(rut), { error: "El RUT del reclamante debe ser válido" })
+    .transform((rut) => rut && limpiar(rut)),
+  fechaEntrega: z.date().optional()
+});
+
 /**
  * Schema del formulario de entrega. Depende del objeto: si es valioso exige
  * una caracteristica que solo el dueño conoceria o una foto de verificacion.

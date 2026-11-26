@@ -27,3 +27,17 @@ export const registrarEntregaSchema = z.object({
   caracteristicaVerificacion: textoOpcional(1000, "La característica de verificación"),
   comentarios: textoOpcional(1000, "Los comentarios")
 });
+
+export const filtroEntregaOficinaSchema = z.object({
+  nombreObjeto: z.string().trim().optional(),
+  nombreReclamante: z.string().trim().optional(),
+  rutReclamante: z
+    .string()
+    .trim()
+    .refine((rut) => rutjs.validate(rut), { error: "El RUT del reclamante debe ser válido" })
+    .transform((rut) => rutjs.clean(rut))
+    .optional(),
+  fechaEntrega: z.iso.datetime({ error: "La fecha de entrega debe ser válida" }).optional(),
+  salto: z.string().regex(/^\d+$/).transform(Number).optional().default(0),
+  cantidad: z.string().regex(/^\d+$/).transform(Number).optional().default(15)
+});
