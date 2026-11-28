@@ -124,9 +124,6 @@ export default function ObjetosOficinaPage() {
                       <ToggleGroupItem value="2" aria-label="Entregados">
                         <CircleCheckIcon /> Entregados
                       </ToggleGroupItem>
-                      <ToggleGroupItem value="3" aria-label="Vencidos">
-                        <GhostIcon /> Abandonados
-                      </ToggleGroupItem>
                     </ToggleGroup>
                   </div>
                 </Field>
