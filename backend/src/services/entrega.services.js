@@ -1,5 +1,6 @@
 import { prisma } from "../config/prisma.js";
 import { ESTADO_OBJETO } from "../config/estados.js";
+import { calcularRangoDia } from "../utils/fecha.utils.js";
 
 /**
  * Datos de la entrega que se muestran junto al objeto (trazabilidad).
@@ -17,6 +18,63 @@ function errorConEstado(mensaje, statusCode, detalles) {
     err.statusCode = statusCode;
     if (detalles) err.detalles = detalles;
     return err;
+}
+
+/**
+ * Historial de entregas de los objetos de una oficina, de la mas reciente a la mas antigua.
+ * Cada entrega incluye su objeto con las etiquetas y fotos como listas simples.
+ *
+ * @param {{
+ *   idOficina: number,
+ *   nombreObjeto?: string,
+ *   nombreReclamante?: string,
+ *   rutReclamante?: string,
+ *   fechaEntrega?: string,
+ *   salto?: number,
+ *   cantidad?: number
+ * }} filtros
+ */
+export async function listar({ idOficina, nombreObjeto, nombreReclamante, rutReclamante, fechaEntrega, salto, cantidad }) {
+    // la oficina de una entrega es la del objeto entregado
+    /**@type {import("@prisma/client").Prisma.EntregaWhereInput} */
+    const where = { objeto: { idOficina } };
+
+    if (nombreObjeto)
+        where.objeto.nombre = { contains: nombreObjeto, mode: "insensitive" };
+    if (nombreReclamante)
+        where.reclamante = { nombreReclamante: { contains: nombreReclamante, mode: "insensitive" } };
+    if (rutReclamante)
+        where.rutReclamante = rutReclamante;
+    if (fechaEntrega) {
+        const fechas = calcularRangoDia(fechaEntrega);
+        where.fechaEntrega = { gte: fechas.inicioFecha, lte: fechas.finFecha };
+    }
+
+    const entregas = await prisma.entrega.findMany({
+        where,
+        include: {
+            ...INCLUDE_ENTREGA,
+            objeto: {
+                include: {
+                    etiquetas: { include: { etiqueta: true } },
+                    fotos: { include: { foto: true }, orderBy: { foto: { id: 'asc' } } }
+                }
+            }
+        },
+        skip: salto,
+        take: cantidad,
+        // el id desempata para que la paginacion sea estable
+        orderBy: [{ fechaEntrega: 'desc' }, { id: 'desc' }]
+    });
+
+    return entregas.map(({ objeto, ...entrega }) => ({
+        ...entrega,
+        objeto: {
+            ...objeto,
+            etiquetas: objeto.etiquetas.map((e) => e.etiqueta),
+            fotos: objeto.fotos.map((e) => e.foto)
+        }
+    }));
 }
 
 /**

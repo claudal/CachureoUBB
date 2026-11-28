@@ -178,6 +178,7 @@ CachureoUBB/
 │   │   │   ├── autenticacion.routes.js      # Endpoint de autenticación y manejo de sesión (/autenticacion)
 │   │   │   ├── campus.routes.js             # Endpoint de los campus de la universidad (/campus)
 │   │   │   ├── encargadoOficina.routes.js   # Endpoint de los encargados de oficinas de objetos perdidos (/encargadoOficina)
+│   │   │   ├── entrega.routes.js            # Endpoint del historial de entregas (/entrega)
 │   │   │   ├── etiquetaObjeto.routes.js     # Endpoint de etiquetas de objetos (/etiquetaObjeto)
 │   │   │   ├── index.routes.js              # Enrutador principal (/api)
 │   │   │   └── objetoPerdido.routes.js      # Endpoint de objetos perdidos (/objetoPerdido)
@@ -331,6 +332,7 @@ CachureoUBB/
 | Método | Endpoint | Acceso | Descripción |
 |----------|----------|----------|----------|
 | `POST` | `/api/objetoPerdido/:id/entrega` | Encargado | Registrar la entrega de un objeto perdido a su propietario, incluyendo evidencia fotográfica de la entrega. |
+| `GET` | `/api/entrega/oficina` | Encargado | Listar el historial de entregas de la oficina del usuario autenticado, con filtros por objeto, reclamante (nombre o RUT) y fecha de entrega. |
 
 ---
 

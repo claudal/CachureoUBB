@@ -60,15 +60,6 @@ model EtiquetaObjeto {
   @@map("etiqueta_objeto")
 }
 
-model DestinoCaducidad {
-  id     Int    @id @default(autoincrement())
-  nombre String @db.VarChar(100)
-
-  tratamientosCaducidad TratamientoCaducidad[]
-
-  @@map("destino_caducidad")
-}
-
 // ======================================================
 // ENTIDADES PRINCIPALES Y SUS RELACIONES
 // ======================================================
@@ -110,7 +101,7 @@ model Oficina {
 model EncargadoOficina {
   rut                 String   @id @db.VarChar(9)
   nombre              String   @db.VarChar(150)
-  correoContacto      String   @map("correo_contacto") @db.VarChar(255)
+  correoContacto      String   @unique @map("correo_contacto") @db.VarChar(255)
   fechaCambioClave    DateTime @default(now()) @map("fecha_cambio_clave")
   clave               String   @db.VarChar(255)
   idOficina           Int      @map("id_oficina")
@@ -125,7 +116,6 @@ model EncargadoOficina {
   solicitudesDetalles   SolicitudDetalles[]
   reuniones             Reunion[]
   entregas              Entrega[]
-  tratamientosCaducidad TratamientoCaducidad[]
 
   @@map("encargado_oficina")
 }
@@ -147,7 +137,6 @@ model ObjetoPerdido {
   fotos                 FotoObjeto[]
   etiquetas             ObjetoTieneEtiqueta[]
   entregas              Entrega[]
-  tratamientosCaducidad TratamientoCaducidad[]
 
   @@map("objeto_perdido")
 }
@@ -344,20 +333,4 @@ model Reunion {
 
   @@id([idAlerta, rutEncargado])
   @@map("reunion")
-}
-
-model TratamientoCaducidad {
-  idObjeto      Int      @map("id_objeto")
-  rutEncargado  String   @map("rut_encargado") @db.VarChar(12)
-  fechaCreacion DateTime @default(now()) @map("fecha_creacion")
-  razon         String   @db.Text
-  idDestino     Int      @map("id_destino")
-
-  // Relaciones con @relation explícito
-  objeto    ObjetoPerdido    @relation(fields: [idObjeto], references: [id], onDelete: Restrict)
-  encargado EncargadoOficina @relation(fields: [rutEncargado], references: [rut], onDelete: Restrict)
-  destino   DestinoCaducidad @relation(fields: [idDestino], references: [id], onDelete: Restrict)
-
-  @@id([idObjeto, rutEncargado])
-  @@map("tratamiento_caducidad")
 }

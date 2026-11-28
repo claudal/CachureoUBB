@@ -1,6 +1,6 @@
 import { crearTokenCreacionClaveEncargado, crearTokenRestablecimientoClaveEncargado } from '../services/autenticacion.services.js';
 import { enviarCorreoCreacionEncargado, enviarCorreoRestablecimientoEncargado } from '../services/email.services.js';
-import { buscarNovedades, buscarPorRut, crear, listar } from '../services/encargadoOficina.services.js';
+import { buscarNovedades, buscarPorRut, cambiarEstado, crear, editar, eliminar, listar } from '../services/encargadoOficina.services.js';
 
 export const getEncargados = async (req, res, next) => {
   try {
@@ -13,6 +13,30 @@ export const getEncargados = async (req, res, next) => {
 export const postEncargado = async (req, res, next) => {
   try {
     res.status(201).json(await crear(req.body));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const putEncargado = async (req, res, next) => {
+  try {
+    res.json(await editar(req.params.rut, req.body));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const patchEstadoEncargado = async (req, res, next) => {
+  try {
+    res.json(await cambiarEstado(req.params.rut, req.body.idEstado));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteEncargado = async (req, res, next) => {
+  try {
+    res.json(await eliminar(req.params.rut));
   } catch (error) {
     next(error);
   }

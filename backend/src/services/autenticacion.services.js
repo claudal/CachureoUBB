@@ -13,14 +13,14 @@ export async function loginEncargadoOficina(rut,clave){
         err.statusCode = 401;
         throw err;
     }
-    if(usuario.idEstado !== 1) { //estado habilitado
-        const err = new Error('Usuario no habilitado para inicio de sesión');
-        err.statusCode = 403;
-        throw err;
-    }
     if(!(await bcrypt.compare(clave,usuario.clave))) {
         const err = new Error('RUT o contraseña incorrectos');
         err.statusCode = 401;
+        throw err;
+    }
+    if(usuario.idEstado !== 1) { //estado habilitado
+        const err = new Error('Usuario no habilitado para inicio de sesión');
+        err.statusCode = 403;
         throw err;
     }
     const payload = {
@@ -63,7 +63,7 @@ export async function loginAdministrador(correo,clave){
 }
 
 export async function getPerfilEncargadoOficina(rut) {
-    const encargado = await buscarPorRut(rut,{oficina: true});
+    const encargado = await buscarPorRut(rut,{oficina: {include: {campus: true}}});
     if(!encargado) {
         const err = new Error('El usuario de la sesión ya no existe');
         err.statusCode = 404;
@@ -74,17 +74,20 @@ export async function getPerfilEncargadoOficina(rut) {
         nombre: encargado.nombre,
         correoContacto: encargado.correoContacto,
         idOficina: encargado.idOficina,
-        idCampus: encargado.oficina.idCampus
+        idCampus: encargado.oficina.idCampus,
+        nombreOficina: encargado.oficina.nombre,
+        nombreCampus: encargado.oficina.campus.nombre
     }
 }
 
 export async function getPerfilAdministrador(email) {
-    const {clave, ...administrador} = await buscarPorCorreo(email);
-    if(!administrador) {
+    const usuario = await buscarPorCorreo(email);
+    if(!usuario) {
         const err = new Error('El usuario de la sesión ya no existe');
         err.statusCode = 404;
         throw err;
     }
+    const {clave, ...administrador} = usuario;
     return administrador;
 }
 

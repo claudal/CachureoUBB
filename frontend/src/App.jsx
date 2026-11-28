@@ -14,7 +14,11 @@ import LoginAdministradorPage from './pages/LoginAdministradorPage';
 import LoginEncargadoPage from './pages/LoginEncargadoPage';
 import AdministrarEncargadosPage from './pages/AdministrarEncargadosPage';
 import CrearEncargadoPage from './pages/CrearEncargadoPage';
+import AdministrarCampusPage from './pages/AdministrarCampusPage';
+import AdministrarOficinasPage from './pages/AdministrarOficinasPage';
 import RestablecerClavePage from './pages/ReestablecerClavePage';
+import PerfilPage from './pages/PerfilPage';
+import EntregasOficinaPage from './pages/EntregasOficina';
 
 function App() {
 
@@ -68,11 +72,11 @@ function App() {
             />
             <Route
               path="perfil"
-              element={<ObjetosOficinaPage />}
+              element={<PerfilPage />}
             />
             <Route
               path="entregas"
-              element={<ObjetosOficinaPage />}
+              element={<EntregasOficinaPage />}
             />
           </Route>
           <Route path='/menuAdministrador' element={
@@ -90,7 +94,7 @@ function App() {
             />
             <Route
               path="oficinas"
-              element={<RegistrarObjetoPage />}
+              element={<AdministrarOficinasPage />}
             />
             <Route
               path="editarObjeto/:id"
@@ -98,11 +102,11 @@ function App() {
             />
             <Route
               path="campus"
-              element={<AtenderAlertasPage />}
+              element={<AdministrarCampusPage />}
             />
             <Route
               path="perfil"
-              element={<ObjetosOficinaPage />}
+              element={<PerfilPage />}
             />
           </Route>
           <Route path="*" element={<Navigate to="/menuBusqueda" replace />} />

@@ -124,9 +124,6 @@ export default function ObjetosOficinaPage() {
                       <ToggleGroupItem value="2" aria-label="Entregados">
                         <CircleCheckIcon /> Entregados
                       </ToggleGroupItem>
-                      <ToggleGroupItem value="3" aria-label="Vencidos">
-                        <GhostIcon /> Abandonados
-                      </ToggleGroupItem>
                     </ToggleGroup>
                   </div>
                 </Field>
@@ -243,7 +240,7 @@ export default function ObjetosOficinaPage() {
                   Descripción:
                 </span>
                 
-                <div className="flex-1 overflow-y-auto p-4 border rounded-2xl">
+                <div className="flex-1 p-4 border rounded-2xl">
                   <p className="text-sm text-muted-foreground whitespace-pre-line">
                     {objetoAbierto?.descripcion}
                   </p>

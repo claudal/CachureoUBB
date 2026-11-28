@@ -142,7 +142,7 @@ export default function BuscarObjetos() {
                 ))}
               </div>
             </DrawerHeader>
-            <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2">
+            <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2 overflow-y-auto">
               
               <span className="font-semibold text-sm text-foreground">
                 Fotos <span className='font-light text-muted-foreground'>(presione en una para expandirlo)</span>
@@ -154,7 +154,7 @@ export default function BuscarObjetos() {
                   Descripción:
                 </span>
                 
-                <div className="flex-1 overflow-y-auto p-4 border rounded-2xl">
+                <div className="flex-1 p-4 border rounded-2xl">
                   <p className="text-sm text-muted-foreground whitespace-pre-line">
                     {objetoAbierto?.descripcion}
                   </p>

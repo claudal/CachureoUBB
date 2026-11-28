@@ -94,3 +94,5 @@ export function subirImagenes(campo, maximo) {
 export const subirFotos = subirImagenes("fotos", MAXIMO_FOTOS);
 // foto de verificación opcional al registrar una entrega
 export const subirFotoEntrega = subirImagenes("foto", 1);
+// foto de la oficina: obligatoria al crear y opcional al editar (lo valida el controlador)
+export const subirFotoOficina = subirImagenes("foto", 1);

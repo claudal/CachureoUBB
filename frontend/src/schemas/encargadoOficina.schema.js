@@ -14,3 +14,19 @@ export const CrearEncargadoOficinaSchema = z.object({
   idOficina: z
     .number({ error: "Debe seleccionar una oficina"}).int()
 });
+
+// al editar solo se pueden cambiar el correo de contacto y la oficina
+export const EditarEncargadoOficinaSchema = CrearEncargadoOficinaSchema.pick({
+  correoContacto: true,
+  idOficina: true
+});
+
+export const FiltroEncargadoOficinaSchema = z.object({
+  nombre: z.string().trim(),
+  // el rut es opcional, pero si se ingresa debe ser valido
+  rut: z.string()
+      .trim()
+      .refine((rut)=>rut === "" || validar(rut),{error: "El rut debe ser válido"})
+      .transform((rut)=>rut && limpiar(rut)),
+  idOficina: z.number().int().nullable()
+});
