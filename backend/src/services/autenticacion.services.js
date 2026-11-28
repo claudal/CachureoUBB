@@ -13,14 +13,14 @@ export async function loginEncargadoOficina(rut,clave){
         err.statusCode = 401;
         throw err;
     }
-    if(usuario.idEstado !== 1) { //estado habilitado
-        const err = new Error('Usuario no habilitado para inicio de sesión');
-        err.statusCode = 403;
-        throw err;
-    }
     if(!(await bcrypt.compare(clave,usuario.clave))) {
         const err = new Error('RUT o contraseña incorrectos');
         err.statusCode = 401;
+        throw err;
+    }
+    if(usuario.idEstado !== 1) { //estado habilitado
+        const err = new Error('Usuario no habilitado para inicio de sesión');
+        err.statusCode = 403;
         throw err;
     }
     const payload = {
