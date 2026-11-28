@@ -378,7 +378,7 @@ export default function AtenderAlertasPage() {
                 <BookmarkIcon className="group-aria-pressed/toggle:fill-foreground"/>Marcar
               </Toggle>
             </DrawerHeader>
-            <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2">
+            <div className="flex-1 min-h-0 flex flex-col gap-4 px-4 py-2 overflow-y-auto">
               
               {alertaAbierta?.fotos.length > 0 && (
                 <div>
@@ -394,7 +394,7 @@ export default function AtenderAlertasPage() {
                   Descripción:
                 </span>
                 
-                <div className="flex-1 overflow-y-auto p-4 border rounded-2xl">
+                <div className="flex-1 p-4 border rounded-2xl">
                   <p className="text-sm text-muted-foreground whitespace-pre-line">
                     {alertaAbierta?.descripcion}
                   </p>
